@@ -9,7 +9,7 @@ import {
   Keyboard,
   Dimensions,
 } from 'react-native';
-import { Modal } from 'react-native-paper';
+import Modal from 'react-native-modal'; // Import Modal from react-native-modal
 import Avatar from './Avatar';
 import { Icon } from 'react-native-elements';
 import { useMutation, useQuery } from '@apollo/client';
@@ -95,7 +95,11 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     <Modal
       visible={visible}
       onDismiss={onDismiss}
-      contentContainerStyle={styles.modalContainer}
+      isVisible={visible}
+      onBackdropPress={onDismiss}
+      onSwipeComplete={onDismiss}
+      swipeDirection="down"
+      style={styles.modal} // Add style for modal
     >
       <View style={styles.container}>
         <View style={styles.header}>
@@ -142,12 +146,9 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
 };
 
 const styles = StyleSheet.create({
-  modalContainer: {
+  modal: {
     justifyContent: 'flex-end',
     margin: 0,
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
   },
   container: {
     backgroundColor: 'white',
