@@ -95,7 +95,7 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     <Modal
       visible={visible}
       onDismiss={onDismiss}
-      contentContainerStyle={styles.modal}
+      contentContainerStyle={styles.modalContainer}
     >
       <View style={styles.container}>
         <View style={styles.header}>
@@ -142,9 +142,12 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
 };
 
 const styles = StyleSheet.create({
-  modal: {
+  modalContainer: {
     justifyContent: 'flex-end',
     margin: 0,
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
   },
   container: {
     backgroundColor: 'white',
