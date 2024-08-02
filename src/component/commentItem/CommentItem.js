@@ -10,7 +10,8 @@ import {
   TouchableOpacity
 } from "react-native";
 import { useMutation } from "@apollo/client";
-import {Icon, Avatar} from 'react-native-elements';
+import {Icon} from 'react-native-elements';
+import Avatar from '../FeedCard/Avatar';
 import moment from 'moment';
 import 'moment/locale/th';
 import { iOSColors } from "react-native-typography";
@@ -45,11 +46,8 @@ function CommentItem(props) {
     <View>
       <View style={styles.topContainer}>
         <Avatar 
-          rounded 
-          source={props.commentInfo.author.avatar? 
-            {uri: props.commentInfo.author.avatar} 
-            : 
-            require('../../assets/pic/profile.jpg')} />
+          source={props.commentInfo.author.avatar}
+          style={styles.avatar} />
         <View style={styles.commentBox} >
           <View style={styles.commentBoxMeta}>
             <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{props.commentInfo.author.username}</Text>
