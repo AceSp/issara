@@ -113,10 +113,7 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
           ref={flatlistRef}
         />
         <View style={styles.footer}>
-          <Avatar
-            source={me.avatar}
-            style={styles.avatar}
-          />
+          <Avatar source={me.avatar} />
           <View style={styles.commentBox}>
             <TextInput
               style={styles.inputBox}
