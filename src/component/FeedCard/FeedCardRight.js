@@ -107,12 +107,29 @@ function FeedCardRight({
             __typename: 'Mutation',
             likePost: {
                 __typename: 'Post',
-                id: postInfo.id,
-                likeCount: liked ? postInfo.likeCount - 1 : postInfo.likeCount + 1,
-                isLiked: !liked,
+                postInfo: {
+                    __typename: 'PostInfo',
+                    id: postInfo.id,
+                    text: postInfo.text,
+                    video: postInfo.video,
+                    likeCount: liked ? postInfo.likeCount - 1 : postInfo.likeCount + 1,
+                    commentCount: postInfo.commentCount,
+                    createdAt: postInfo.createdAt,
+                    pinLocation: postInfo.pinLocation,
+                    author: {
+                        __typename: 'Author',
+                        itemName: postInfo.author.itemName,
+                        avatar: postInfo.author.avatar,
+                        id: postInfo.author.id,
+                        meFollowed: postInfo.author.meFollowed,
+                    },
+                },
                 relation: {
                     __typename: 'Relation',
+                    id: relation.id,
                     isLiked: !liked,
+                    isViewed: relation.isViewed,
+                    isSaved: relation.isSaved,
                 },
             },
         };
