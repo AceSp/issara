@@ -140,36 +140,6 @@ function BottomTab(props) {
         }}
       />
       <BTab.Screen
-        name="Market"
-        component={ShopFeedScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: 'สินค้า',
-          tabBarIcon: ({ color: tintColor }) => (
-            <Icon 
-              type="font-awesome"
-              name="shopping-basket"
-              color={tintColor}
-            />
-          )
-        }}
-      />
-      <BTab.Screen
-        name="Menu"
-        component={MenuScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: 'ตัวเลือก',
-          tabBarIcon: ({ color: tintColor }) => (
-            <Icon name="menu"
-              color={tintColor}
-              size={35}
-              iconStyle={{ marginBottom: 20 }}
-            />
-          )
-        }}
-        changeLogin={props.changeLogin} />
-      <BTab.Screen
         name="PostVideo"
         component={PostVideoScreen}
         options={{
@@ -203,6 +173,36 @@ function BottomTab(props) {
           ),
         }}
       />
+      <BTab.Screen
+        name="Market"
+        component={ShopFeedScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: 'สินค้า',
+          tabBarIcon: ({ color: tintColor }) => (
+            <Icon 
+              type="font-awesome"
+              name="shopping-basket"
+              color={tintColor}
+            />
+          )
+        }}
+      />
+      <BTab.Screen
+        name="Menu"
+        component={MenuScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: 'ตัวเลือก',
+          tabBarIcon: ({ color: tintColor }) => (
+            <Icon name="menu"
+              color={tintColor}
+              size={35}
+              iconStyle={{ marginBottom: 20 }}
+            />
+          )
+        }}
+        changeLogin={props.changeLogin} />
     </BTab.Navigator>
   )
 }
