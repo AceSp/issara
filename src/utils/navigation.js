@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {
@@ -16,6 +16,7 @@ import {
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import SearchScreen from '../screen/SearchScreen/SearchScreen';
+import PostVideoScreen from '../screen/PostVideoScreen';
 import MenuScreen from '../screen/MenuScreen/MenuScreen';
 import NotificationScreen from '../screen/Notification/NotificationScreen';
 import PostScreen from '../screen/PostScreen/PostScreen';
@@ -168,6 +169,40 @@ function BottomTab(props) {
           )
         }}
         changeLogin={props.changeLogin} />
+      <BTab.Screen
+        name="PostVideo"
+        component={PostVideoScreen}
+        options={{
+          tabBarLabel: '',
+          tabBarIcon: ({ color: tintColor }) => (
+            <Icon 
+              name="plus"
+              color={tintColor}
+              type="material-community"
+              size={40}
+            />
+          ),
+          tabBarButton: (props) => (
+            <TouchableOpacity
+              {...props}
+              style={{
+                top: -20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 60,
+                height: 60,
+                borderRadius: 30,
+                backgroundColor: colors.PRIMARY,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 2,
+                elevation: 5,
+              }}
+            />
+          ),
+        }}
+      />
     </BTab.Navigator>
   )
 }
