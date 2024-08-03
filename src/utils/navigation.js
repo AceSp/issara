@@ -461,6 +461,11 @@ export function MainStack(props) {
       <Stack.Screen name="MoreComment" component={MoreCommentScreen} />
       <Stack.Screen name="MoreReply" component={MoreReplyScreen} />
       <Stack.Screen name="Nomatch" component={NoMatchScreen} />
+      <Stack.Screen 
+        name="PostVideo" 
+        component={PostVideoScreen} 
+        options={{ headerShown: false }}
+       />
     </Stack.Navigator>
   );
 }
