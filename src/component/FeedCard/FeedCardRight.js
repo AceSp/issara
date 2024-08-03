@@ -103,8 +103,66 @@ function FeedCardRight({
     }, [postInfo.coinCount]);
 
     const like = () => {
+        const optimisticResponse = {
+            __typename: 'Mutation',
+            likePost: {
+                __typename: 'Post',
+                id: postInfo.id,
+                likeCount: liked ? postInfo.likeCount - 1 : postInfo.likeCount + 1,
+                isLiked: !liked,
+            },
+        };
+
         setLiked(!liked);
-        likePost({ variables: { postId: postInfo.id } });
+        likePost({
+            variables: { postId: postInfo.id },
+            optimisticResponse,
+            update: (cache, { data: { likePost } }) => {
+                const data = cache.readQuery({
+                    query: GET_POSTS_QUERY,
+                    variables: { cursor: null, limit: null, isJob: null },
+                });
+
+                if (data && data.getPosts && data.getPosts.sections) {
+                    const updatedSections = data.getPosts.sections.map(section => {
+                        if (section.data) {
+                            return {
+                                ...section,
+                                data: section.data.map(item => {
+                                    if (item.postInfo.id === postInfo.id) {
+                                        return {
+                                            ...item,
+                                            postInfo: {
+                                                ...item.postInfo,
+                                                likeCount: likePost.postInfo.likeCount,
+                                                isLiked: likePost.relation.isLiked,
+                                            },
+                                            relation: {
+                                                ...item.relation,
+                                                isLiked: likePost.relation.isLiked,
+                                            },
+                                        };
+                                    }
+                                    return item;
+                                }),
+                            };
+                        }
+                        return section;
+                    });
+
+                    cache.writeQuery({
+                        query: GET_POSTS_QUERY,
+                        variables: { cursor: null, limit: null, isJob: null },
+                        data: {
+                            getPosts: {
+                                ...data.getPosts,
+                                sections: updatedSections,
+                            },
+                        },
+                    });
+                }
+            },
+        });
     }
 
     const save = () => {
