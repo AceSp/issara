@@ -287,10 +287,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         width: width,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        paddingVertical: 10,
-        paddingBottom: 20,
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        paddingVertical: 10
     },
     shareOption: {
         marginLeft: 10,
