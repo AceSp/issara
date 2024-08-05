@@ -5,8 +5,8 @@ import { Camera, useCameraDevice } from 'react-native-vision-camera';
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
   const camera = useRef(null);
-  const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('front');
+  const { hasPermission, requestPermission } = useCameraPermission();
 
   if (!hasPermission) {
     requestPermission();
