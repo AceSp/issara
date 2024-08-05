@@ -140,6 +140,10 @@ function BottomTab(props) {
         }}
       />
       <BTab.Screen
+        name="PostVideo"
+        component={PostVideoScreen}
+      />
+      <BTab.Screen
         name="Market"
         component={ShopFeedScreen}
         options={{
@@ -169,40 +173,7 @@ function BottomTab(props) {
           )
         }}
         changeLogin={props.changeLogin} />
-      <BTab.Screen
-        name="PostVideo"
-        component={PostVideoScreen}
-        options={{
-          tabBarLabel: '',
-          tabBarIcon: ({ color: tintColor }) => (
-            <Icon 
-              name="plus"
-              color={tintColor}
-              type="material-community"
-              size={40}
-            />
-          ),
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              {...props}
-              style={{
-                top: -20,
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                backgroundColor: colors.PRIMARY,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.8,
-                shadowRadius: 2,
-                elevation: 5,
-              }}
-            />
-          ),
-        }}
-      />
+
     </BTab.Navigator>
   )
 }
