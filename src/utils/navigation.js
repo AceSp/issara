@@ -140,21 +140,6 @@ function BottomTab(props) {
         }}
       />
       <BTab.Screen
-        name="PostVideo"
-        component={PostVideoScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: 'Post Video',
-          tabBarIcon: ({ color: tintColor }) => (
-            <Icon 
-              name="video"
-              color={tintColor}
-              type="material-community"
-            />
-          )
-        }}
-      />
-      <BTab.Screen
         name="Market"
         component={ShopFeedScreen}
         options={{
