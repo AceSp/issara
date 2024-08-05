@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { Camera, useCameraDevices, getCa } from 'react-native-vision-camera';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -11,6 +11,9 @@ const PostVideoScreen = () => {
 
   useEffect(() => {
     (async () => {
+      availableDevice = await Camera.getAvailableCameraDevices()
+      console.log("---------PostVideoScreen----------")
+      console.log(availableDevice)
       const status = await Camera.requestCameraPermission();
       setHasPermission(status === 'authorized');
     })();
