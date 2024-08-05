@@ -420,6 +420,7 @@ export function MainStack(props) {
         component={SearchScreen} 
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="PostVideo" component={PostVideoScreen} />
       <Stack.Screen name="Notification" component={NotificationScreen} />
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
