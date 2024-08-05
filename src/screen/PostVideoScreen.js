@@ -6,11 +6,21 @@ const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
   const camera = useRef(null);
   const device = useCameraDevice('front');
-  const { hasPermission, requestPermission } = useCameraPermission();
+  const [hasPermission, setHasPermission] = useState(null);
 
-  if (!hasPermission) {
-    requestPermission();
+  useEffect(() => {
+    (async () => {
+      const status = await Camera.requestCameraPermission();
+      setHasPermission(status === 'authorized');
+    })();
+  }, []);
+
+  if (hasPermission === null) {
     return <Text>Requesting permission...</Text>;
+  }
+
+  if (hasPermission === false) {
+    return <Text>Camera permission denied</Text>;
   }
 
   if (device == null) return <Text>Camera not available</Text>;
