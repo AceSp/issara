@@ -1,29 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { RNCamera } from 'react-native-camera';
+import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
+  const camera = useRef(null);
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const device = useCameraDevice('front');
 
-  const startRecording = async (camera) => {
+  if (!hasPermission) {
+    requestPermission();
+    return <Text>Requesting permission...</Text>;
+  }
+
+  if (device == null) return <Text>Camera not available</Text>;
+
+  const startRecording = async () => {
     setIsRecording(true);
-    const options = { quality: RNCamera.Constants.VideoQuality['480p'] };
-    const data = await camera.recordAsync(options);
-    console.log(data);
-    setIsRecording(false);
+    const video = await camera.current.startRecording({
+      onRecordingFinished: (video) => console.log(video),
+      onRecordingError: (error) => console.error(error),
+    });
   };
 
-  const stopRecording = (camera) => {
-    camera.stopRecording();
+  const stopRecording = () => {
+    camera.current.stopRecording();
     setIsRecording(false);
   };
 
   return (
     <View style={styles.container}>
-      <RNCamera
+      <Camera
+        ref={camera}
         style={styles.preview}
-        type={RNCamera.Constants.Type.front}
-        captureAudio={true}
+        device={device}
+        isActive={true}
+        video={true}
+        audio={true}
       />
       <TouchableOpacity
         onPress={isRecording ? stopRecording : startRecording}
