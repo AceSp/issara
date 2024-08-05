@@ -4,6 +4,7 @@ import { Camera, useCameraDevices } from 'react-native-vision-camera';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const camera = useRef(null);
   const device = useCameraDevices('front');
   const [hasPermission, setHasPermission] = useState(null);
@@ -26,6 +27,10 @@ const PostVideoScreen = () => {
   if (device == null) return <Text>Camera not available</Text>;
 
   const startRecording = async () => {
+    if (!isCameraReady) {
+      console.warn('Camera is not ready yet!');
+      return;
+    }
     setIsRecording(true);
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
@@ -47,6 +52,8 @@ const PostVideoScreen = () => {
         isActive={true}
         video={true}
         audio={true}
+        onInitialized={() => setIsCameraReady(true)}
+        onError={(error) => console.error('Camera error:', error)}
       />
       <TouchableOpacity
         onPress={isRecording ? stopRecording : startRecording}
