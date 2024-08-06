@@ -91,12 +91,14 @@ const PostVideoScreen = () => {
         onInitialized={() => setIsCameraReady(true)}
         onError={(error) => console.error('Camera error:', error)}
       />
-      <TouchableOpacity
-        onPress={isRecording ? stopRecording : startRecording}
-        style={styles.capture}
-      >
-        <Text style={{ fontSize: 14 }}>{isRecording ? 'Stop' : 'Record'}</Text>
-      </TouchableOpacity>
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+        <TouchableOpacity
+          onPress={isRecording ? stopRecording : startRecording}
+          style={[styles.capture, isRecording && { backgroundColor: 'red' }]}
+        >
+          <Text style={{ fontSize: 14, color: isRecording ? 'white' : 'black' }}>{isRecording ? 'Stop' : 'Record'}</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 };
