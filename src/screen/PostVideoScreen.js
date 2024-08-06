@@ -12,8 +12,9 @@ const PostVideoScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const status = await Camera.requestCameraPermission();
-      setHasPermission(status === 'authorized');
+      const cameraStatus = await Camera.requestCameraPermission();
+      const microphoneStatus = await Camera.requestMicrophonePermission();
+      setHasPermission(cameraStatus === 'authorized' && microphoneStatus === 'authorized');
     })();
   }, []);
 
@@ -36,6 +37,7 @@ const PostVideoScreen = () => {
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
       onRecordingError: (error) => console.error(error),
+      audio: hasPermission,
     });
   };
 
