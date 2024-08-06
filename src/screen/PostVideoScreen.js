@@ -60,7 +60,7 @@ const PostVideoScreen = () => {
         onPress={isRecording ? stopRecording : startRecording}
         style={styles.capture}
       >
-        <Text style={{ fontSize: 14 }}>{isRecording ? 'Stop' : 'Record'}</Text>
+        <Text style={{ fontSize: 14, color: 'white' }}>{isRecording ? 'Stop' : 'Record'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -82,9 +82,14 @@ const styles = StyleSheet.create({
   capture: {
     position: 'absolute',
     bottom: 20,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'red',
+    borderWidth: 2,
+    borderColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
