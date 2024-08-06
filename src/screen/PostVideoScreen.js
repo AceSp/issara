@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useRef } from 'react';
+import { Animated, Easing } from 'react-native';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Camera, useCameraDevices, getCa } from 'react-native-vision-camera';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
+  const scaleValue = useRef(new Animated.Value(1)).current;
   const [isCameraReady, setIsCameraReady] = useState(false);
   const camera = useRef(null);
   const devices = useCameraDevices();
@@ -33,6 +35,22 @@ const PostVideoScreen = () => {
       return;
     }
     setIsRecording(true);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 0.8,
+          duration: 300,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
       onRecordingError: (error) => console.error(error),
@@ -42,6 +60,23 @@ const PostVideoScreen = () => {
   const stopRecording = () => {
     camera.current.stopRecording();
     setIsRecording(false);
+    scaleValue.setValue(1);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 0.8,
+          duration: 300,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).stop();
   };
 
   return (
