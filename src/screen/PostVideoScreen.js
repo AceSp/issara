@@ -59,9 +59,9 @@ const PostVideoScreen = () => {
       <TouchableOpacity
         onPress={isRecording ? stopRecording : startRecording}
         style={styles.capture}
-      >
-        <Text style={{ fontSize: 14, color: 'white' }}>{isRecording ? 'Stop' : 'Record'}</Text>
-      </TouchableOpacity>
+      />
+        {/* <Text style={{ fontSize: 14, color: 'white' }}>{isRecording ? 'Stop' : 'Record'}</Text>
+      </TouchableOpacity> */}
     </View>
   );
 };
