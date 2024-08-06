@@ -1,11 +1,9 @@
-import React, { useState, useRef, useEffect, useRef } from 'react';
-import { Animated, Easing } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Camera, useCameraDevices, getCa } from 'react-native-vision-camera';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const scaleValue = useRef(new Animated.Value(1)).current;
   const [isCameraReady, setIsCameraReady] = useState(false);
   const camera = useRef(null);
   const devices = useCameraDevices();
@@ -35,22 +33,6 @@ const PostVideoScreen = () => {
       return;
     }
     setIsRecording(true);
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 0.8,
-          duration: 300,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 300,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
       onRecordingError: (error) => console.error(error),
@@ -60,23 +42,6 @@ const PostVideoScreen = () => {
   const stopRecording = () => {
     camera.current.stopRecording();
     setIsRecording(false);
-    scaleValue.setValue(1);
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 0.8,
-          duration: 300,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 300,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).stop();
   };
 
   return (
@@ -91,14 +56,12 @@ const PostVideoScreen = () => {
         onInitialized={() => setIsCameraReady(true)}
         onError={(error) => console.error('Camera error:', error)}
       />
-      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-        <TouchableOpacity
-          onPress={isRecording ? stopRecording : startRecording}
-          style={[styles.capture, isRecording && { backgroundColor: 'red' }]}
-        >
-          <Text style={{ fontSize: 14, color: isRecording ? 'white' : 'black' }}>{isRecording ? 'Stop' : 'Record'}</Text>
-        </TouchableOpacity>
-      </Animated.View>
+      <TouchableOpacity
+        onPress={isRecording ? stopRecording : startRecording}
+        style={styles.capture}
+      >
+        <Text style={{ fontSize: 14 }}>{isRecording ? 'Stop' : 'Record'}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
