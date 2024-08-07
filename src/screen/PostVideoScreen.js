@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Camera, useCameraDevices, getCa } from 'react-native-vision-camera';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
+  const scaleValue = useRef(new Animated.Value(1)).current;
   const [isCameraReady, setIsCameraReady] = useState(false);
   const camera = useRef(null);
   const devices = useCameraDevices();
@@ -34,6 +35,20 @@ const PostVideoScreen = () => {
       return;
     }
     setIsRecording(true);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.2,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
       onRecordingError: (error) => console.error(error),
@@ -44,6 +59,8 @@ const PostVideoScreen = () => {
   const stopRecording = () => {
     camera.current.stopRecording();
     setIsRecording(false);
+    scaleValue.stopAnimation();
+    scaleValue.setValue(1);
   };
 
   return (
@@ -58,10 +75,12 @@ const PostVideoScreen = () => {
         onInitialized={() => setIsCameraReady(true)}
         onError={(error) => console.error('Camera error:', error)}
       />
-      <TouchableOpacity
-        onPress={isRecording ? stopRecording : startRecording}
-        style={styles.capture}
-      />
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+        <TouchableOpacity
+          onPress={isRecording ? stopRecording : startRecording}
+          style={styles.capture}
+        />
+      </Animated.View>
     </View>
   );
 };
