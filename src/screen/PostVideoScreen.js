@@ -53,7 +53,7 @@ const PostVideoScreen = () => {
     Animated.timing(borderRadiusValue, {
       toValue: 0,
       duration: 500,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start(() => {
       scaleValue.setValue(1);
     });
@@ -75,7 +75,7 @@ const PostVideoScreen = () => {
       Animated.timing(borderRadiusValue, {
         toValue: 40,
         duration: 500,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }).start();
     });
   };
