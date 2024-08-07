@@ -36,27 +36,25 @@ const PostVideoScreen = () => {
       return;
     }
     setIsRecording(true);
-    Animated.parallel([
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(scaleValue, {
-            toValue: 1.2,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scaleValue, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-        ])
-      ),
-      Animated.timing(borderRadiusValue, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: false,
-      }),
-    ]).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.2,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+    Animated.timing(borderRadiusValue, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
       onRecordingError: (error) => console.error(error),
@@ -67,18 +65,16 @@ const PostVideoScreen = () => {
   const stopRecording = () => {
     camera.current.stopRecording();
     setIsRecording(false);
-    Animated.parallel([
-      Animated.timing(scaleValue, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(borderRadiusValue, {
-        toValue: 40,
-        duration: 500,
-        useNativeDriver: false,
-      }),
-    ]).start();
+    Animated.timing(scaleValue, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(borderRadiusValue, {
+      toValue: 40,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
   };
 
   return (
