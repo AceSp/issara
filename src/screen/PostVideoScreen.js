@@ -54,7 +54,9 @@ const PostVideoScreen = () => {
       toValue: 0,
       duration: 500,
       useNativeDriver: false,
-    }).start();
+    }).start(() => {
+      scaleValue.setValue(1);
+    });
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
       onRecordingError: (error) => console.error(error),
@@ -69,12 +71,13 @@ const PostVideoScreen = () => {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
-    }).start();
-    Animated.timing(borderRadiusValue, {
-      toValue: 40,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
+    }).start(() => {
+      Animated.timing(borderRadiusValue, {
+        toValue: 40,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
+    });
   };
 
   return (
