@@ -92,12 +92,14 @@ const PostVideoScreen = () => {
         onInitialized={() => setIsCameraReady(true)}
         onError={(error) => console.error('Camera error:', error)}
       />
-      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-        <TouchableOpacity
-          onPress={isRecording ? stopRecording : startRecording}
-          style={[styles.capture, { borderRadius: borderRadiusValue }]}
-        />
-      </Animated.View>
+      <View style={styles.whiteCircle}>
+        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+          <TouchableOpacity
+            onPress={isRecording ? stopRecording : startRecording}
+            style={[styles.capture, { borderRadius: borderRadiusValue }]}
+          />
+        </Animated.View>
+      </View>
     </View>
   );
 };
@@ -123,8 +125,17 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     backgroundColor: 'red',
-    borderWidth: 2,
-    borderColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  whiteCircle: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
