@@ -5,6 +5,7 @@ import { Camera, useCameraDevices, getCa } from 'react-native-vision-camera';
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const borderRadiusValue = useRef(new Animated.Value(40)).current;
   const [isCameraReady, setIsCameraReady] = useState(false);
   const camera = useRef(null);
   const devices = useCameraDevices();
@@ -35,20 +36,27 @@ const PostVideoScreen = () => {
       return;
     }
     setIsRecording(true);
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 1.2,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
+    Animated.parallel([
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(scaleValue, {
+            toValue: 1.2,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleValue, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ])
+      ),
+      Animated.timing(borderRadiusValue, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: false,
+      }),
+    ]).start();
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
       onRecordingError: (error) => console.error(error),
@@ -59,8 +67,18 @@ const PostVideoScreen = () => {
   const stopRecording = () => {
     camera.current.stopRecording();
     setIsRecording(false);
-    scaleValue.stopAnimation();
-    scaleValue.setValue(1);
+    Animated.parallel([
+      Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(borderRadiusValue, {
+        toValue: 40,
+        duration: 500,
+        useNativeDriver: false,
+      }),
+    ]).start();
   };
 
   return (
@@ -78,7 +96,7 @@ const PostVideoScreen = () => {
       <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
         <TouchableOpacity
           onPress={isRecording ? stopRecording : startRecording}
-          style={styles.capture}
+          style={[styles.capture, { borderRadius: borderRadiusValue }]}
         />
       </Animated.View>
     </View>
