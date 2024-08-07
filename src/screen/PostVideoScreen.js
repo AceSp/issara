@@ -100,7 +100,10 @@ const styles = StyleSheet.create({
   },
   capture: {
     position: 'absolute',
-    bottom: 20,
+    bottom: '50%',
+    left: '50%',
+    marginLeft: -40,
+    marginBottom: -40,
     width: 80,
     height: 80,
     borderRadius: 40,
