@@ -1,101 +1,39 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
-import { Camera, useCameraDevices, getCa } from 'react-native-vision-camera';
+import { RNCamera } from 'react-native-camera';
+import Animated, { useSharedValue, withTiming, withRepeat, Easing } from 'react-native-reanimated';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const scaleValue = useRef(new Animated.Value(1)).current;
-  const borderRadiusValue = useRef(new Animated.Value(40)).current;
-  const [isCameraReady, setIsCameraReady] = useState(false);
+  const scale = useSharedValue(1);
   const camera = useRef(null);
-  const devices = useCameraDevices();
-  const device = devices.front;
-  const [hasPermission, setHasPermission] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const cameraStatus = await Camera.requestCameraPermission();
-      const microphoneStatus = await Camera.requestMicrophonePermission();
-      setHasPermission(cameraStatus === 'authorized' && microphoneStatus === 'authorized');
-    })();
-  }, []);
-
-  if (hasPermission === null) {
-    return <Text>Requesting permission...</Text>;
-  }
-
-  if (hasPermission === false) {
-    return <Text>Camera permission denied</Text>;
-  }
-
-  if (device == null) return <Text>Camera not available</Text>;
 
   const startRecording = async () => {
-    if (!isCameraReady) {
-      console.warn('Camera is not ready yet!');
-      return;
-    }
     setIsRecording(true);
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleValue, {
-          toValue: 1.2,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleValue, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-    Animated.timing(borderRadiusValue, {
-      toValue: 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start(() => {
-      scaleValue.setValue(1);
-    });
-    const video = await camera.current.startRecording({
-      onRecordingFinished: (video) => console.log(video),
-      onRecordingError: (error) => console.error(error),
-      audio: hasPermission,
-    });
+    scale.value = withRepeat(withTiming(1.2, { duration: 500, easing: Easing.linear }), -1, true);
+    const video = await camera.current.recordAsync();
+    console.log(video);
   };
 
   const stopRecording = () => {
     camera.current.stopRecording();
     setIsRecording(false);
-    Animated.timing(scaleValue, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start(() => {
-      Animated.timing(borderRadiusValue, {
-        toValue: 40,
-        duration: 500,
-        useNativeDriver: true,
-      }).start();
-    });
+    scale.value = withTiming(1, { duration: 500 });
   };
 
   return (
     <View style={styles.container}>
-      <Camera
+      <RNCamera
         ref={camera}
         style={styles.preview}
-        device={device}
-        isActive={true}
-        video={true}
-        audio={true}
-        onInitialized={() => setIsCameraReady(true)}
-        onError={(error) => console.error('Camera error:', error)}
+        type={RNCamera.Constants.Type.front}
+        flashMode={RNCamera.Constants.FlashMode.off}
+        captureAudio={true}
       />
-      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+      <Animated.View style={{ transform: [{ scale: scale }] }}>
         <TouchableOpacity
           onPress={isRecording ? stopRecording : startRecording}
-          style={[styles.capture, { borderRadius: borderRadiusValue }]}
+          style={styles.capture}
         />
       </Animated.View>
     </View>
