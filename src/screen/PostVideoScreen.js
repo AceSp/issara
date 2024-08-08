@@ -70,7 +70,7 @@ const PostVideoScreen = () => {
           onPress={isRecording ? stopRecording : startRecording}
           style={[styles.capture]}
         >
-          <Animated.View style={[isRecording ? styles.recordingSquare : styles.innerCircle, { width: 60, height: 60 }]} />
+          <Animated.View style={[isRecording ? styles.recordingSquare : styles.innerCircle, { width: 60, height: 60, borderRadius: borderRadiusValue }]} />
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -106,13 +106,11 @@ const styles = StyleSheet.create({
   innerCircle: {
     width: 60,
     height: 60,
-    borderRadius: 30,
     backgroundColor: 'red',
   },
   recordingSquare: {
     width: 60,
     height: 60,
-    borderRadius: 0,
     backgroundColor: 'red',
   },
 });
