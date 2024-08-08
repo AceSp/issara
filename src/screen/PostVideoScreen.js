@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import Animated, { useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
-import { Camera, useCameraDevices, getCa } from 'react-native-vision-camera';
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
