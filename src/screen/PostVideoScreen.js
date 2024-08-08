@@ -68,7 +68,7 @@ const PostVideoScreen = () => {
       <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
         <TouchableOpacity
           onPress={isRecording ? stopRecording : startRecording}
-          style={[styles.capture, { borderRadius: borderRadiusValue.value }]}
+          style={[styles.capture]}
         >
           <Animated.View style={[isRecording ? styles.recordingSquare : styles.innerCircle, { width: 60, height: 60 }]} />
         </TouchableOpacity>
