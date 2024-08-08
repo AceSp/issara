@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Animated, { useSharedValue, withTiming, withRepeat, Easing } from 'react-native-reanimated';
 
@@ -7,7 +7,6 @@ const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
   const scale = useSharedValue(1);
   const camera = useRef(null);
-
   const startRecording = async () => {
     setIsRecording(true);
     scale.value = withRepeat(withTiming(1.2, { duration: 500, easing: Easing.linear }), -1, true);
