@@ -65,10 +65,10 @@ const PostVideoScreen = () => {
         onInitialized={() => setIsCameraReady(true)}
         onError={(error) => console.error('Camera error:', error)}
       />
-      <Animated.View style={{ transform: [{ scale: scaleValue.value }] }}>
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
         <TouchableOpacity
           onPress={isRecording ? stopRecording : startRecording}
-          style={[styles.capture, { borderRadius: borderRadiusValue.value }]}
+          style={[styles.capture, { borderRadius: borderRadiusValue }]}
         />
       </Animated.View>
     </View>
