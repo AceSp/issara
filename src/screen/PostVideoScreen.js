@@ -5,7 +5,6 @@ import Animated, { useSharedValue, withRepeat, withTiming, Easing } from 'react-
 
 const PostVideoScreen = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const scaleValue = useSharedValue(1);
   const borderRadiusValue = useSharedValue(40);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const camera = useRef(null);
@@ -37,7 +36,6 @@ const PostVideoScreen = () => {
       return;
     }
     setIsRecording(true);
-    scaleValue.value = withRepeat(withTiming(1.2, { duration: 500, easing: Easing.linear }), -1, true);
     borderRadiusValue.value = withTiming(0, { duration: 500, easing: Easing.linear });
     const video = await camera.current.startRecording({
       onRecordingFinished: (video) => console.log(video),
@@ -49,7 +47,6 @@ const PostVideoScreen = () => {
   const stopRecording = () => {
     camera.current.stopRecording();
     setIsRecording(false);
-    scaleValue.value = withTiming(1, { duration: 500, easing: Easing.linear });
     borderRadiusValue.value = withTiming(40, { duration: 500, easing: Easing.linear });
   };
 
@@ -65,7 +62,7 @@ const PostVideoScreen = () => {
         onInitialized={() => setIsCameraReady(true)}
         onError={(error) => console.error('Camera error:', error)}
       />
-      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+      <Animated.View>
         <TouchableOpacity
           onPress={isRecording ? stopRecording : startRecording}
           style={[styles.capture]}
