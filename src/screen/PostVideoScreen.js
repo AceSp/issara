@@ -1,115 +1,319 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
-import Animated, { useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import * as React from 'react'
+import { 
+  useRef, 
+  useState, 
+  useCallback, 
+  useMemo
+} from 'react'
+import { 
+  StyleSheet, 
+  Text, 
+  View,
+  TouchableOpacity
+} from 'react-native'
+import { TapGestureHandler } from 'react-native-gesture-handler'
+import {
+  runAtTargetFps,
+  useCameraDevice,
+  useCameraFormat,
+  useFrameProcessor,
+  useLocationPermission,
+} from 'react-native-vision-camera'
+import { Camera } from 'react-native-vision-camera'
+import { 
+  CONTENT_SPACING, 
+  CONTROL_BUTTON_SIZE, 
+  MAX_ZOOM_FACTOR, 
+  SAFE_AREA_PADDING, 
+  SCREEN_HEIGHT, 
+  SCREEN_WIDTH 
+} from '../utils/constants'
+import Reanimated, { useAnimatedProps, useSharedValue } from 'react-native-reanimated'
+import { useEffect } from 'react'
+import { useIsForeground } from '../utils/hooks/useIsForeground'
+// import { StatusBarBlurBackground } from '../utils/views/StatusBarBlurBackground'
+import { CaptureButton } from '../utils/views/CaptureButton'
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons'
+import IonIcon from 'react-native-vector-icons/Ionicons'
+import { useIsFocused } from '@react-navigation/core'
+import { usePreferredCameraDevice } from '../utils/hooks/usePreferredCameraDevice'
+import { examplePlugin } from '../utils/frame-processors/ExamplePlugin'
+import { exampleKotlinSwiftPlugin } from '../utils/frame-processors/ExampleKotlinSwiftPlugin'
 
-const PostVideoScreen = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const borderRadiusValue = useSharedValue(40);
-  const [isCameraReady, setIsCameraReady] = useState(false);
-  const camera = useRef(null);
-  const devices = useCameraDevices();
-  const device = devices.front;
-  const [hasPermission, setHasPermission] = useState(null);
+const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
+Reanimated.addWhitelistedNativeProps({
+  zoom: true,
+})
+
+const SCALE_FULL_ZOOM = 3
+
+function PostVideoScreen({ navigation }) {
+  const camera = useRef<Camera>(null)
+  const [isCameraInitialized, setIsCameraInitialized] = useState(false)
+  const microphone = Camera.getMicrophonePermissionStatus()
+  const location = useLocationPermission()
+  const zoom = useSharedValue(1)
+  const isPressingButton = useSharedValue(false)
+
+  // check if camera page is active
+  const isFocussed = useIsFocused()
+  const isForeground = useIsForeground()
+  const isActive = isFocussed && isForeground
+
+  const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back')
+  const [enableHdr, setEnableHdr] = useState(false)
+  const [flash, setFlash] = useState<'off' | 'on'>('off')
+  const [enableNightMode, setEnableNightMode] = useState(false)
+
+  // camera device settings
+  const [preferredDevice] = usePreferredCameraDevice()
+  let device = useCameraDevice(cameraPosition)
+
+  if (preferredDevice != null && preferredDevice.position === cameraPosition) {
+    // override default device with the one selected by the user in settings
+    device = preferredDevice
+  }
+
+  const [targetFps, setTargetFps] = useState(60)
+
+  const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
+  const format = useCameraFormat(device, [
+    { fps: targetFps },
+    { videoAspectRatio: screenAspectRatio },
+    { videoResolution: 'max' },
+    { photoAspectRatio: screenAspectRatio },
+    { photoResolution: 'max' },
+  ])
+
+  const fps = Math.min(format?.maxFps ?? 1, targetFps)
+
+  const supportsFlash = device?.hasFlash ?? false
+  const supportsHdr = format?.supportsPhotoHdr
+  const supports60Fps = useMemo(() => device?.formats.some((f) => f.maxFps >= 60), [device?.formats])
+  const canToggleNightMode = device?.supportsLowLightBoost ?? false
+
+  //#region Animated Zoom
+  const minZoom = device?.minZoom ?? 1
+  const maxZoom = Math.min(device?.maxZoom ?? 1, MAX_ZOOM_FACTOR)
+
+  const cameraAnimatedProps = useAnimatedProps<CameraProps>(() => {
+    const z = Math.max(Math.min(zoom.value, maxZoom), minZoom)
+    return {
+      zoom: z,
+    }
+  }, [maxZoom, minZoom, zoom])
+  //#endregion
+
+  //#region Callbacks
+  const setIsPressingButton = useCallback(
+    (_isPressingButton) => {
+      isPressingButton.value = _isPressingButton
+    },
+    [isPressingButton],
+  )
+  const onError = useCallback((error) => {
+    console.error(error)
+  }, [])
+  const onInitialized = useCallback(() => {
+    console.log('Camera initialized!')
+    setIsCameraInitialized(true)
+  }, [])
+  const onMediaCaptured = useCallback(
+    (media, type) => {
+      console.log(`Media captured! ${JSON.stringify(media)}`)
+      navigation.navigate('MediaPage', {
+        path: media.path,
+        type: type,
+      })
+    },
+    [navigation],
+  )
+  const onFlipCameraPressed = useCallback(() => {
+    setCameraPosition((p) => (p === 'back' ? 'front' : 'back'))
+  }, [])
+  const onFlashPressed = useCallback(() => {
+    setFlash((f) => (f === 'off' ? 'on' : 'off'))
+  }, [])
+  //#endregion
+
+  //#region Tap Gesture
+  const onFocusTap = useCallback(
+    ({ nativeEvent: event }) => {
+      if (!device?.supportsFocus) return
+      camera.current?.focus({
+        x: event.locationX,
+        y: event.locationY,
+      })
+    },
+    [device?.supportsFocus],
+  )
+  const onDoubleTap = useCallback(() => {
+    onFlipCameraPressed()
+  }, [onFlipCameraPressed])
+  //#endregion
+
+  //#region Effects
+  useEffect(() => {
+    // Reset zoom to it's default everytime the `device` changes.
+    zoom.value = device?.neutralZoom ?? 1
+  }, [zoom, device])
+  //#endregion
+
 
   useEffect(() => {
-    (async () => {
-      const cameraStatus = await Camera.requestCameraPermission();
-      const microphoneStatus = await Camera.requestMicrophonePermission();
-      setHasPermission(cameraStatus === 'authorized' && microphoneStatus === 'authorized');
-    })();
-  }, []);
+    const f =
+      format != null
+        ? `(${format.photoWidth}x${format.photoHeight} photo / ${format.videoWidth}x${format.videoHeight}@${format.maxFps} video @ ${fps}fps)`
+        : undefined
+    console.log(`Camera: ${device?.name} | Format: ${f}`)
+  }, [device?.name, format, fps])
 
-  if (hasPermission === null) {
-    return <Text>Requesting permission...</Text>;
-  }
+  useEffect(() => {
+    location.requestPermission()
+  }, [location])
 
-  if (hasPermission === false) {
-    return <Text>Camera permission denied</Text>;
-  }
+  const frameProcessor = useFrameProcessor((frame) => {
+    'worklet'
 
-  if (device == null) return <Text>Camera not available</Text>;
+    runAtTargetFps(10, () => {
+      'worklet'
+      console.log(`${frame.timestamp}: ${frame.width}x${frame.height} ${frame.pixelFormat} Frame (${frame.orientation})`)
+      examplePlugin(frame)
+      exampleKotlinSwiftPlugin(frame)
+    })
+  }, [])
 
-  const startRecording = async () => {
-    if (!isCameraReady) {
-      console.warn('Camera is not ready yet!');
-      return;
-    }
-    setIsRecording(true);
-    borderRadiusValue.value = withTiming(0, { duration: 500, easing: Easing.linear });
-    const video = await camera.current.startRecording({
-      onRecordingFinished: (video) => console.log(video),
-      onRecordingError: (error) => console.error(error),
-      audio: hasPermission,
-    });
-  };
-
-  const stopRecording = () => {
-    camera.current.stopRecording();
-    setIsRecording(false);
-    borderRadiusValue.value = withTiming(40, { duration: 500, easing: Easing.linear });
-  };
+  const videoHdr = format?.supportsVideoHdr && enableHdr
+  const photoHdr = format?.supportsPhotoHdr && enableHdr && !videoHdr
 
   return (
     <View style={styles.container}>
-      <Camera
-        ref={camera}
-        style={styles.preview}
-        device={device}
-        isActive={true}
-        video={true}
-        audio={true}
-        onInitialized={() => setIsCameraReady(true)}
-        onError={(error) => console.error('Camera error:', error)}
+      {device != null ? (
+          <Reanimated.View onTouchEnd={onFocusTap} style={StyleSheet.absoluteFill}>
+            <TapGestureHandler onEnded={onDoubleTap} numberOfTaps={2}>
+              <ReanimatedCamera
+                style={StyleSheet.absoluteFill}
+                device={device}
+                isActive={isActive}
+                ref={camera}
+                onInitialized={onInitialized}
+                onError={onError}
+                onStarted={() => console.log('Camera started!')}
+                onStopped={() => console.log('Camera stopped!')}
+                onPreviewStarted={() => console.log('Preview started!')}
+                onPreviewStopped={() => console.log('Preview stopped!')}
+                onOutputOrientationChanged={(o) => console.log(`Output orientation changed to ${o}!`)}
+                onPreviewOrientationChanged={(o) => console.log(`Preview orientation changed to ${o}!`)}
+                onUIRotationChanged={(degrees) => console.log(`UI Rotation changed: ${degrees}°`)}
+                format={format}
+                fps={fps}
+                photoHdr={photoHdr}
+                videoHdr={videoHdr}
+                photoQualityBalance="quality"
+                lowLightBoost={device.supportsLowLightBoost && enableNightMode}
+                enableZoomGesture={false}
+                animatedProps={cameraAnimatedProps}
+                exposure={0}
+                enableFpsGraph={true}
+                outputOrientation="device"
+                photo={true}
+                video={true}
+                audio={microphone.hasPermission}
+                enableLocation={location.hasPermission}
+                frameProcessor={frameProcessor}
+              />
+            </TapGestureHandler>
+          </Reanimated.View>
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.text}>Your phone does not have a Camera.</Text>
+        </View>
+      )}
+
+      <CaptureButton
+        style={styles.captureButton}
+        camera={camera}
+        onMediaCaptured={onMediaCaptured}
+        cameraZoom={zoom}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        flash={supportsFlash ? flash : 'off'}
+        enabled={isCameraInitialized && isActive}
+        setIsPressingButton={setIsPressingButton}
       />
-      <Animated.View>
-        <TouchableOpacity
-          onPress={isRecording ? stopRecording : startRecording}
-          style={[styles.capture]}
-        >
-          <Animated.View style={[isRecording ? styles.recordingSquare : styles.innerCircle, { width: 60, height: 60, borderRadius: borderRadiusValue }]} />
-        </TouchableOpacity>
-      </Animated.View>
+
+      {/* <StatusBarBlurBackground /> */}
+
+      <View style={styles.rightButtonRow}>
+        <PressableOpacity style={styles.button} onPress={onFlipCameraPressed} disabledOpacity={0.4}>
+          <IonIcon name="camera-reverse" color="white" size={24} />
+        </PressableOpacity>
+        {supportsFlash && (
+          <PressableOpacity style={styles.button} onPress={onFlashPressed} disabledOpacity={0.4}>
+            <IonIcon name={flash === 'on' ? 'flash' : 'flash-off'} color="white" size={24} />
+          </PressableOpacity>
+        )}
+        {supports60Fps && (
+          <PressableOpacity style={styles.button} onPress={() => setTargetFps((t) => (t === 30 ? 60 : 30))}>
+            <Text style={styles.text}>{`${targetFps}\nFPS`}</Text>
+          </PressableOpacity>
+        )}
+        {supportsHdr && (
+          <PressableOpacity style={styles.button} onPress={() => setEnableHdr((h) => !h)}>
+            <MaterialIcon name={enableHdr ? 'hdr' : 'hdr-off'} color="white" size={24} />
+          </PressableOpacity>
+        )}
+        {canToggleNightMode && (
+          <PressableOpacity style={styles.button} onPress={() => setEnableNightMode(!enableNightMode)} disabledOpacity={0.4}>
+            <IonIcon name={enableNightMode ? 'moon' : 'moon-outline'} color="white" size={24} />
+          </PressableOpacity>
+        )}
+        <PressableOpacity style={styles.button} onPress={() => navigation.navigate('Devices')}>
+          <IonIcon name="settings-outline" color="white" size={24} />
+        </PressableOpacity>
+        <PressableOpacity style={styles.button} onPress={() => navigation.navigate('CodeScannerPage')}>
+          <IonIcon name="qr-code-outline" color="white" size={24} />
+        </PressableOpacity>
+      </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'black',
   },
-  preview: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
-  },
-  capture: {
+  captureButton: {
     position: 'absolute',
-    bottom: 20,
     alignSelf: 'center',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'white',
-    borderWidth: 2,
-    borderColor: 'white',
+    bottom: SAFE_AREA_PADDING.paddingBottom,
+  },
+  button: {
+    marginBottom: CONTENT_SPACING,
+    width: CONTROL_BUTTON_SIZE,
+    height: CONTROL_BUTTON_SIZE,
+    borderRadius: CONTROL_BUTTON_SIZE / 2,
+    backgroundColor: 'rgba(140, 140, 140, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  innerCircle: {
-    width: 60,
-    height: 60,
-    backgroundColor: 'red',
+  rightButtonRow: {
+    position: 'absolute',
+    right: SAFE_AREA_PADDING.paddingRight,
+    top: SAFE_AREA_PADDING.paddingTop,
   },
-  recordingSquare: {
-    width: 60,
-    height: 60,
-    backgroundColor: 'red',
+  text: {
+    color: 'white',
+    fontSize: 11,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
-});
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+})
 
 export default PostVideoScreen;
