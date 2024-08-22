@@ -51,7 +51,7 @@ function PostVideoScreen({ navigation }) {
   const camera = useRef<Camera>(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
   const microphone = Camera.getMicrophonePermissionStatus()
-  // const location = useLocationPermission()
+  const location = useLocationPermission()
   const zoom = useSharedValue(1)
   const isPressingButton = useSharedValue(false)
 
@@ -168,9 +168,9 @@ function PostVideoScreen({ navigation }) {
     console.log(`Camera: ${device?.name} | Format: ${f}`)
   }, [device?.name, format, fps])
 
-  // useEffect(() => {
-  //   location.requestPermission()
-  // }, [location])
+  useEffect(() => {
+    location.requestPermission()
+  }, [location])
 
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
@@ -185,6 +185,9 @@ function PostVideoScreen({ navigation }) {
 
   const videoHdr = format?.supportsVideoHdr && enableHdr
   const photoHdr = format?.supportsPhotoHdr && enableHdr && !videoHdr
+
+  console.log("---------POstVideoScreen-------------")
+  console.log(location)
 
   return (
     <View style={styles.container}>
@@ -219,7 +222,7 @@ function PostVideoScreen({ navigation }) {
                 photo={true}
                 video={true}
                 audio={microphone.hasPermission}
-                // enableLocation={location.hasPermission}
+                enableLocation={location.hasPermission}
                 frameProcessor={frameProcessor}
               />
             </TapGestureHandler>
