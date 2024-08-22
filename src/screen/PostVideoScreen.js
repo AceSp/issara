@@ -187,7 +187,25 @@ function PostVideoScreen({ navigation }) {
   const photoHdr = format?.supportsPhotoHdr && enableHdr && !videoHdr
 
   console.log("---------POstVideoScreen-------------")
-  console.log(location)
+  console.log("location:", location)
+  console.log("microphone:", microphone)
+  console.log("isFocussed:", isFocussed)
+  console.log("isForeground:", isForeground)
+  console.log("cameraPosition:", cameraPosition)
+  console.log("enableHdr:", enableHdr)
+  console.log("flash:", flash)
+  console.log("enableNightMode:", enableNightMode)
+  console.log("preferredDevice:", preferredDevice)
+  console.log("device:", device)
+  console.log("targetFps:", targetFps)
+  console.log("format:", format)
+  console.log("fps:", fps)
+  console.log("supportsFlash:", supportsFlash)
+  console.log("supportsHdr:", supportsHdr)
+  console.log("supports60Fps:", supports60Fps)
+  console.log("canToggleNightMode:", canToggleNightMode)
+  console.log("minZoom:", minZoom)
+  console.log("maxZoom:", maxZoom)
 
   return (
     <View style={styles.container}>
