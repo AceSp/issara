@@ -51,30 +51,45 @@ function PostVideoScreen({ navigation }) {
   const camera = useRef<Camera>(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
   const microphone = Camera.getMicrophonePermissionStatus()
+  console.log("microphone:", microphone)
   const location = useLocationPermission()
+  console.log("location:", location)
   const zoom = useSharedValue(1)
+  console.log("zoom:", zoom)
   const isPressingButton = useSharedValue(false)
+  console.log("isPressingButton:", isPressingButton)
 
   // check if camera page is active
   const isFocussed = useIsFocused()
+  console.log("isFocussed:", isFocussed)
   const isForeground = useIsForeground()
+  console.log("isForeground:", isForeground)
   const isActive = isFocussed && isForeground
+  console.log("isActive:", isActive)
 
   const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back')
+  console.log("cameraPosition:", cameraPosition)
   const [enableHdr, setEnableHdr] = useState(false)
+  console.log("enableHdr:", enableHdr)
   const [flash, setFlash] = useState<'off' | 'on'>('off')
+  console.log("flash:", flash)
   const [enableNightMode, setEnableNightMode] = useState(false)
+  console.log("enableNightMode:", enableNightMode)
 
   // camera device settings
   const [preferredDevice] = usePreferredCameraDevice()
+  console.log("preferredDevice:", preferredDevice)
   let device = useCameraDevice(cameraPosition)
+  console.log("device:", device)
 
   if (preferredDevice != null && preferredDevice.position === cameraPosition) {
     // override default device with the one selected by the user in settings
     device = preferredDevice
+    console.log("device (overridden):", device)
   }
 
   const [targetFps, setTargetFps] = useState(60)
+  console.log("targetFps:", targetFps)
 
   const screenAspectRatio = SCREEN_HEIGHT / SCREEN_WIDTH
   const format = useCameraFormat(device, [
@@ -84,17 +99,25 @@ function PostVideoScreen({ navigation }) {
     { photoAspectRatio: screenAspectRatio },
     { photoResolution: 'max' },
   ])
+  console.log("format:", format)
 
   const fps = Math.min(format?.maxFps ?? 1, targetFps)
+  console.log("fps:", fps)
 
   const supportsFlash = device?.hasFlash ?? false
+  console.log("supportsFlash:", supportsFlash)
   const supportsHdr = format?.supportsPhotoHdr
+  console.log("supportsHdr:", supportsHdr)
   const supports60Fps = useMemo(() => device?.formats.some((f) => f.maxFps >= 60), [device?.formats])
+  console.log("supports60Fps:", supports60Fps)
   const canToggleNightMode = device?.supportsLowLightBoost ?? false
+  console.log("canToggleNightMode:", canToggleNightMode)
 
   //#region Animated Zoom
   const minZoom = device?.minZoom ?? 1
+  console.log("minZoom:", minZoom)
   const maxZoom = Math.min(device?.maxZoom ?? 1, MAX_ZOOM_FACTOR)
+  console.log("maxZoom:", maxZoom)
 
   const cameraAnimatedProps = useAnimatedProps<CameraProps>(() => {
     const z = Math.max(Math.min(zoom.value, maxZoom), minZoom)
@@ -102,6 +125,7 @@ function PostVideoScreen({ navigation }) {
       zoom: z,
     }
   }, [maxZoom, minZoom, zoom])
+  console.log("cameraAnimatedProps:", cameraAnimatedProps)
   //#endregion
 
   //#region Callbacks
