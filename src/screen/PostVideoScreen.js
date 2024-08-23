@@ -50,8 +50,8 @@ const SCALE_FULL_ZOOM = 3
 function PostVideoScreen({ navigation }) {
   const camera = useRef<Camera>(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-  const microphone = Camera.getMicrophonePermissionStatus()
-  console.log("microphone:", microphone)
+  const microphoneStatus = Camera.getMicrophonePermissionStatus()
+  console.log("microphoneStatus:", microphoneStatus)
   const locationPermission = useLocationPermission()
   console.log("locationPermission:", locationPermission)
   const zoom = useSharedValue(1)
