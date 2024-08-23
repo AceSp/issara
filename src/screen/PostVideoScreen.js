@@ -48,12 +48,12 @@ Reanimated.addWhitelistedNativeProps({
 const SCALE_FULL_ZOOM = 3
 
 function PostVideoScreen({ navigation }) {
-  const camera = useRef<Camera>(null)
+  const camera = useRef(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-  const microphoneStatus = Camera.getMicrophonePermissionStatus()
-  console.log("microphoneStatus:", microphoneStatus)
-  const locationPermission = useLocationPermission()
-  console.log("locationPermission:", locationPermission)
+  const microphone = Camera.getMicrophonePermissionStatus()
+  console.log("microphone:", microphone)
+  const location = useLocationPermission()
+  console.log("location:", location)
   const zoom = useSharedValue(1)
   console.log("zoom:", zoom)
   const isPressingButton = useSharedValue(false)
@@ -67,11 +67,11 @@ function PostVideoScreen({ navigation }) {
   const isActive = isFocussed && isForeground
   console.log("isActive:", isActive)
 
-  const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('back')
+  const [cameraPosition, setCameraPosition] = useState('back')
   console.log("cameraPosition:", cameraPosition)
   const [enableHdr, setEnableHdr] = useState(false)
   console.log("enableHdr:", enableHdr)
-  const [flash, setFlash] = useState<'off' | 'on'>('off')
+  const [flash, setFlash] = useState('off')
   console.log("flash:", flash)
   const [enableNightMode, setEnableNightMode] = useState(false)
   console.log("enableNightMode:", enableNightMode)
@@ -119,7 +119,7 @@ function PostVideoScreen({ navigation }) {
   const maxZoom = Math.min(device?.maxZoom ?? 1, MAX_ZOOM_FACTOR)
   console.log("maxZoom:", maxZoom)
 
-  const cameraAnimatedProps = useAnimatedProps<CameraProps>(() => {
+  const cameraAnimatedProps = useAnimatedProps(() => {
     const z = Math.max(Math.min(zoom.value, maxZoom), minZoom)
     return {
       zoom: z,
@@ -290,35 +290,35 @@ function PostVideoScreen({ navigation }) {
       {/* <StatusBarBlurBackground /> */}
 
       <View style={styles.rightButtonRow}>
-        <PressableOpacity style={styles.button} onPress={onFlipCameraPressed} disabledOpacity={0.4}>
+        <TouchableOpacity style={styles.button} onPress={onFlipCameraPressed} disabledOpacity={0.4}>
           <IonIcon name="camera-reverse" color="white" size={24} />
-        </PressableOpacity>
+        </TouchableOpacity>
         {supportsFlash && (
-          <PressableOpacity style={styles.button} onPress={onFlashPressed} disabledOpacity={0.4}>
+          <TouchableOpacity style={styles.button} onPress={onFlashPressed} disabledOpacity={0.4}>
             <IonIcon name={flash === 'on' ? 'flash' : 'flash-off'} color="white" size={24} />
-          </PressableOpacity>
+          </TouchableOpacity>
         )}
         {supports60Fps && (
-          <PressableOpacity style={styles.button} onPress={() => setTargetFps((t) => (t === 30 ? 60 : 30))}>
+          <TouchableOpacity style={styles.button} onPress={() => setTargetFps((t) => (t === 30 ? 60 : 30))}>
             <Text style={styles.text}>{`${targetFps}\nFPS`}</Text>
-          </PressableOpacity>
+          </TouchableOpacity>
         )}
         {supportsHdr && (
-          <PressableOpacity style={styles.button} onPress={() => setEnableHdr((h) => !h)}>
+          <TouchableOpacity style={styles.button} onPress={() => setEnableHdr((h) => !h)}>
             <MaterialIcon name={enableHdr ? 'hdr' : 'hdr-off'} color="white" size={24} />
-          </PressableOpacity>
+          </TouchableOpacity>
         )}
         {canToggleNightMode && (
-          <PressableOpacity style={styles.button} onPress={() => setEnableNightMode(!enableNightMode)} disabledOpacity={0.4}>
+          <TouchableOpacity style={styles.button} onPress={() => setEnableNightMode(!enableNightMode)} disabledOpacity={0.4}>
             <IonIcon name={enableNightMode ? 'moon' : 'moon-outline'} color="white" size={24} />
-          </PressableOpacity>
+          </TouchableOpacity>
         )}
-        <PressableOpacity style={styles.button} onPress={() => navigation.navigate('Devices')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Devices')}>
           <IonIcon name="settings-outline" color="white" size={24} />
-        </PressableOpacity>
-        <PressableOpacity style={styles.button} onPress={() => navigation.navigate('CodeScannerPage')}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CodeScannerPage')}>
           <IonIcon name="qr-code-outline" color="white" size={24} />
-        </PressableOpacity>
+        </TouchableOpacity>
       </View>
     </View>
   )
