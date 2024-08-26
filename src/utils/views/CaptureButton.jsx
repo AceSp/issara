@@ -31,6 +31,7 @@ const _CaptureButton = ({
   ...props
 }) => {
   const isRecording = useRef(false)
+  const recordingProgress = useSharedValue(0)
   const isPressingButton = useSharedValue(false)
 
   //#region Camera Capture
@@ -79,57 +80,22 @@ const _CaptureButton = ({
 
   //#region Tap handler
   const tapHandler = useRef()
-  const onHandlerStateChanged = useCallback(
-    async ({ nativeEvent: event }) => {
-      // This is the gesture handler for the circular "shutter" button.
-      // Once the finger touches the button (State.BEGAN), a photo is being taken and "capture mode" is entered. (disabled tab bar)
-      // Also, we set `pressDownDate` to the time of the press down event, and start a 200ms timeout. If the `pressDownDate` hasn't changed
-      // after the 200ms, the user is still holding down the "shutter" button. In that case, we start recording.
-      //
-      // Once the finger releases the button (State.END/FAILED/CANCELLED), we leave "capture mode" (enable tab bar) and check the `pressDownDate`,
-      // if `pressDownDate` was less than 200ms ago, we know that the intention of the user is to take a photo. We check the `takePhotoPromise` if
-      // there already is an ongoing (or already resolved) takePhoto() call (remember that we called takePhoto() when the user pressed down), and
-      // if yes, use that. If no, we just try calling takePhoto() again
-      console.debug(`state: ${Object.keys(State)[event.state]}`)
-      switch (event.state) {
-        case State.BEGAN: {
-          // enter "recording mode"
-          recordingProgress.value = 0
-          isPressingButton.value = true
-          if (!isRecording.current) {
-            startRecording()
-            isRecording.current = true
-          } else {
-            stopRecording()
-            isRecording.current = false
-          }
-          setIsPressingButton(true)
-          return
-        }
-        case State.END:
-        case State.FAILED:
-        case State.CANCELLED: {
-          // exit "recording mode"
-          try {
-            if (pressDownDate.current == null) throw new Error('PressDownDate ref .current was null!')
-            const now = new Date()
-            const diff = now.getTime() - pressDownDate.current.getTime()
-            pressDownDate.current = undefined
-            await stopRecording()
-          } finally {
-            setTimeout(() => {
-              isPressingButton.value = false
-              setIsPressingButton(false)
-            }, 500)
-          }
-          return
-        }
-        default:
-          break
-      }
-    },
-    [isPressingButton, recordingProgress, setIsPressingButton, startRecording, stopRecording, takePhoto],
-  )
+  const onHandlerStateChanged = () => {
+    recordingProgress.value = 0
+    console.log("----------CaptureButton------------")
+    console.log(isRecording)
+    if (!isRecording.current) {
+      console.log("-------startRecording---------")
+      startRecording()
+      isRecording.current = true
+    } else {
+      console.log("-------stopRecording---------")
+      stopRecording()
+      isRecording.current = false
+    }
+    setIsPressingButton(true)
+    return
+  }
   //#endregion
   //#region Pan handler
   const panHandler = useRef()
