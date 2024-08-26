@@ -15,7 +15,6 @@ import Reanimated, {
 } from 'react-native-reanimated'
 import { CAPTURE_BUTTON_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH } from '../constants'
 
-const START_RECORDING_DELAY = 200
 const BORDER_WIDTH = CAPTURE_BUTTON_SIZE * 0.1
 
 const _CaptureButton = ({
