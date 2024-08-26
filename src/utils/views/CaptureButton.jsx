@@ -30,9 +30,7 @@ const _CaptureButton = ({
   style,
   ...props
 }) => {
-  const pressDownDate = useRef(undefined)
   const isRecording = useRef(false)
-  const recordingProgress = useSharedValue(0)
   const isPressingButton = useSharedValue(false)
 
   //#region Camera Capture
@@ -98,14 +96,13 @@ const _CaptureButton = ({
           // enter "recording mode"
           recordingProgress.value = 0
           isPressingButton.value = true
-          const now = new Date()
-          pressDownDate.current = now
-          setTimeout(() => {
-            if (pressDownDate.current === now) {
-              // user is still pressing down after 200ms, so his intention is to create a video
-              startRecording()
-            }
-          }, START_RECORDING_DELAY)
+          if (!isRecording.current) {
+            startRecording()
+            isRecording.current = true
+          } else {
+            stopRecording()
+            isRecording.current = false
+          }
           setIsPressingButton(true)
           return
         }
