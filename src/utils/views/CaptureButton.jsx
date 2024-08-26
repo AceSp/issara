@@ -36,20 +36,6 @@ const _CaptureButton = ({
   const isPressingButton = useSharedValue(false)
 
   //#region Camera Capture
-  const takePhoto = useCallback(async () => {
-    try {
-      if (camera.current == null) throw new Error('Camera ref is null!')
-
-      console.log('Taking photo...')
-      const photo = await camera.current.takePhoto({
-        flash: flash,
-        enableShutterSound: false,
-      })
-      onMediaCaptured(photo, 'photo')
-    } catch (e) {
-      console.error('Failed to take photo!', e)
-    }
-  }, [camera, flash, onMediaCaptured])
 
   const onStoppedRecording = useCallback(() => {
     isRecording.current = false
@@ -132,13 +118,7 @@ const _CaptureButton = ({
             const now = new Date()
             const diff = now.getTime() - pressDownDate.current.getTime()
             pressDownDate.current = undefined
-            if (diff < START_RECORDING_DELAY) {
-              // user has released the button within 200ms, so his intention is to take a single picture.
-              await takePhoto()
-            } else {
-              // user has held the button for more than 200ms, so he has been recording this entire time.
-              await stopRecording()
-            }
+            await stopRecording()
           } finally {
             setTimeout(() => {
               isPressingButton.value = false
