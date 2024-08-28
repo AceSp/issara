@@ -9,8 +9,10 @@ import {
   StyleSheet, 
   Text, 
   View,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform
 } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import {
   useCameraDevice,
@@ -44,6 +46,27 @@ Reanimated.addWhitelistedNativeProps({
 const SCALE_FULL_ZOOM = 3
 
 function PostVideoScreen({ navigation }) {
+  const openVideoGallery = async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Sorry, we need camera roll permissions to make this work!');
+        return;
+      }
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      console.log('Selected video:', result.uri);
+      // Handle the selected video here, e.g., navigate to a new screen with the video
+    }
+  };
   const camera = useRef(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
   const microphone = Camera.getMicrophonePermissionStatus()
@@ -202,7 +225,7 @@ function PostVideoScreen({ navigation }) {
         </View>
       )}
 
-      <TouchableOpacity style={[styles.captureButton, { left: SAFE_AREA_PADDING.paddingLeft + CONTROL_BUTTON_SIZE + CONTENT_SPACING }]} disabledOpacity={0.4}>
+      <TouchableOpacity style={[styles.captureButton, { left: SAFE_AREA_PADDING.paddingLeft + CONTROL_BUTTON_SIZE + CONTENT_SPACING }]} onPress={openVideoGallery} disabledOpacity={0.4}>
         <IonIcon name="cloud-upload" color="white" size={24} />
       </TouchableOpacity>
       <CaptureButton
