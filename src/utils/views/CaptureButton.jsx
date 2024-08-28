@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { PanGestureHandler, State, TapGestureHandler } from 'react-native-gesture-handler'
 import Reanimated, {
   cancelAnimation,
@@ -25,13 +25,11 @@ const _CaptureButton = ({
   cameraZoom,
   flash,
   enabled,
-  setIsPressingButton,
   style,
   ...props
 }) => {
-  const isRecording = useRef(false)
+  const isRecording = useSharedValue(false)
   const recordingProgress = useSharedValue(0)
-  const isPressingButton = useSharedValue(false)
 
   //#region Camera Capture
 
@@ -70,7 +68,7 @@ const _CaptureButton = ({
       })
       // TODO: wait until startRecording returns to actually find out if the recording has successfully started
       console.log('called startRecording()!')
-      isRecording.current = true
+      isRecording.value = true
     } catch (e) {
       console.error('failed to start recording!', e, 'camera')
     }
@@ -83,16 +81,15 @@ const _CaptureButton = ({
     recordingProgress.value = 0
     console.log("----------CaptureButton------------")
     console.log(isRecording)
-    if (!isRecording.current) {
+    if (!isRecording.value) {
       console.log("-------startRecording---------")
       startRecording()
-      isRecording.current = true
+      isRecording.value = true
     } else {
       console.log("-------stopRecording---------")
       stopRecording()
-      isRecording.current = false
+      isRecording.value = false
     }
-    setIsPressingButton(true)
     return
   }
   //#endregion
@@ -121,7 +118,7 @@ const _CaptureButton = ({
     () => ({
       transform: [
         {
-          scale: withSpring(isPressingButton.value ? 1 : 0, {
+          scale: withSpring(isRecording.value ? 1 : 0, {
             mass: 1,
             damping: 35,
             stiffness: 300,
@@ -129,12 +126,12 @@ const _CaptureButton = ({
         },
       ],
     }),
-    [isPressingButton],
+    [isRecording],
   )
   const buttonStyle = useAnimatedStyle(() => {
     let scale
     if (enabled) {
-      if (isPressingButton.value) {
+      if (isRecording.value) {
         scale = withRepeat(
           withSpring(1, {
             stiffness: 100,
@@ -167,16 +164,16 @@ const _CaptureButton = ({
         },
       ],
     }
-  }, [enabled, isPressingButton])
+  }, [enabled, isRecording])
 
   return (
-    <TapGestureHandler
-      enabled={enabled}
-      ref={tapHandler}
-      onHandlerStateChange={onHandlerStateChanged}
-      shouldCancelWhenOutside={false}
-      maxDurationMs={99999999} // <-- this prevents the TapGestureHandler from going to State.FAILED when the user moves his finger outside of the child view (to zoom)
-      simultaneousHandlers={panHandler}>
+    // <TapGestureHandler
+    //   enabled={enabled}
+    //   ref={tapHandler}
+    //   onHandlerStateChange={onHandlerStateChanged}
+    //   shouldCancelWhenOutside={false}
+    //   maxDurationMs={99999999} // <-- this prevents the TapGestureHandler from going to State.FAILED when the user moves his finger outside of the child view (to zoom)
+    //   simultaneousHandlers={panHandler}>
       <Reanimated.View {...props} style={[buttonStyle, style]}>
         <PanGestureHandler
           enabled={enabled}
@@ -187,11 +184,14 @@ const _CaptureButton = ({
           simultaneousHandlers={tapHandler}>
           <Reanimated.View style={styles.flex}>
             <Reanimated.View style={[styles.shadow, shadowStyle]} />
-            <View style={styles.button} />
+              <TouchableOpacity
+                onPress={onHandlerStateChanged}
+              >
+                <View style={styles.button} />
+              </TouchableOpacity>
           </Reanimated.View>
         </PanGestureHandler>
       </Reanimated.View>
-    </TapGestureHandler>
   )
 }
 

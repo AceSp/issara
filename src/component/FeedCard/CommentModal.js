@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Keyboard,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import Modal from 'react-native-modal'; // Import Modal from react-native-modal
 import Avatar from './Avatar';
@@ -98,7 +99,8 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
       isVisible={visible}
       onBackdropPress={onDismiss}
       onSwipeComplete={onDismiss}
-      swipeDirection="down"
+      // swipeDirection="down"
+      propagateSwipe={true}
       style={styles.modal} // Add style for modal
     >
       <View style={styles.container}>
@@ -108,14 +110,17 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
             <Icon name="close" size={24} color={iOSColors.black} />
           </TouchableOpacity>
         </View>
-        <FlatList
-          data={data?.getComments?.comments}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.commentInfo.id}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          ref={flatlistRef}
-        />
+        <ScrollView>
+          <FlatList
+            data={data?.getComments?.comments}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.commentInfo.id}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            ref={flatlistRef}
+            scrollEnabled={false}
+          />
+        </ScrollView>
         <View style={styles.footer}>
           <Avatar source={me.avatar} />
           <View style={styles.commentBox}>

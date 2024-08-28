@@ -45,9 +45,7 @@ function CommentItem(props) {
   return (
     <View>
       <View style={styles.topContainer}>
-        <Avatar 
-          source={props.commentInfo.author.avatar}
-          style={styles.avatar} />
+        <Avatar source={props.commentInfo.author.avatar} />
         <View style={styles.commentBox} >
           <View style={styles.commentBoxMeta}>
             <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{props.commentInfo.author.username}</Text>

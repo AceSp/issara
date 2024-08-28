@@ -16,7 +16,7 @@ import {
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import SearchScreen from '../screen/SearchScreen/SearchScreen';
-import PostVideoScreen from '../screen/PostVideoScreen';
+import PostVideoScreen from '../screen/PostVideoScreen/PostVideoScreen';
 import MenuScreen from '../screen/MenuScreen/MenuScreen';
 import NotificationScreen from '../screen/Notification/NotificationScreen';
 import PostScreen from '../screen/PostScreen/PostScreen';
@@ -89,6 +89,7 @@ import PostJobDetailScreen from '../screen/JobScreen/PostJobDetailScreen';
 import PostJobPictureScreen from '../screen/JobScreen/PostJobPictureScreen';
 import FollowedListScreen from '../screen/GroupScreen/FollowedListScreen';
 import GokgokgokLogo from '../assets/Images/gokgokgokLogo'
+import { MediaScreen } from '../screen/PostVideoScreen/MediaScreen';
 
 const BTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -125,21 +126,6 @@ function BottomTab(props) {
         }}
       />
       <BTab.Screen
-        name="Job"
-        component={JobFeedScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: 'งาน',
-          tabBarIcon: ({ color: tintColor }) => (
-            <Icon 
-              name="account-tie"
-              color={tintColor}
-              type="material-community"
-            />
-          )
-        }}
-      />
-      <BTab.Screen
         name="Market"
         component={ShopFeedScreen}
         options={{
@@ -163,6 +149,24 @@ function BottomTab(props) {
           tabBarIcon: ({ color: tintColor }) => (
             <Icon 
               name="video"
+              color={tintColor}
+              type="material-community"
+            />
+          ),
+          tabBarButton: (buttonProps) => <TouchableOpacity 
+            {...buttonProps} 
+            onPress={() => props.navigation.navigate('PostVideo')} />
+        }}
+      />
+      <BTab.Screen
+        name="Job"
+        component={JobFeedScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: 'งาน',
+          tabBarIcon: ({ color: tintColor }) => (
+            <Icon 
+              name="account-tie"
               color={tintColor}
               type="material-community"
             />
@@ -431,7 +435,16 @@ export function MainStack(props) {
         component={SearchScreen} 
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="PostVideo" component={PostVideoScreen} />
+      <Stack.Screen 
+        name="PostVideo" 
+        component={PostVideoScreen} 
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="MediaScreen" 
+        component={MediaScreen} 
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="Notification" component={NotificationScreen} />
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />

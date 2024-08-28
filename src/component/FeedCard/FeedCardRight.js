@@ -8,11 +8,11 @@ import {
     View,
     StyleSheet,
     Dimensions,
-    TouchableOpacity
+    TouchableOpacity,
+    Text
 } from 'react-native';
 import {
     Icon,
-    Text
 } from 'react-native-elements';
 import {
     Card,
@@ -23,7 +23,6 @@ import {
 } from 'react-native-paper';
 import { iOSColors, iOSUIKitTall } from 'react-native-typography';
 import Share from 'react-native-share';
-import Image from 'react-native-fast-image';
 
 import { colors } from '../../utils/constants'
 import LIKE_POST_MUTATION from '../../graphql/mutations/likePost';
@@ -138,51 +137,6 @@ function FeedCardRight({
         likePost({
             variables: { postId: postInfo.id },
             optimisticResponse,
-            update: (cache, { data: { likePost } }) => {
-                const data = cache.readQuery({
-                    query: GET_POSTS_QUERY,
-                    variables: { cursor: null, limit: null, isJob: null },
-                });
-
-                if (data && data.getPosts && data.getPosts.sections) {
-                    const updatedSections = data.getPosts.sections.map(section => {
-                        if (section.data) {
-                            return {
-                                ...section,
-                                data: section.data.map(item => {
-                                    if (item.postInfo.id === postInfo.id) {
-                                        return {
-                                            ...item,
-                                            postInfo: {
-                                                ...item.postInfo,
-                                                likeCount: likePost.postInfo.likeCount,
-                                                isLiked: likePost.relation.isLiked,
-                                            },
-                                            relation: {
-                                                ...item.relation,
-                                                isLiked: likePost.relation.isLiked,
-                                            },
-                                        };
-                                    }
-                                    return item;
-                                }),
-                            };
-                        }
-                        return section;
-                    });
-
-                    cache.writeQuery({
-                        query: GET_POSTS_QUERY,
-                        variables: { cursor: null, limit: null, isJob: null },
-                        data: {
-                            getPosts: {
-                                ...data.getPosts,
-                                sections: updatedSections,
-                            },
-                        },
-                    });
-                }
-            },
         });
     }
 
@@ -250,7 +204,7 @@ function FeedCardRight({
                     size={35}
                 />
                 <Text style={styles.buttonText}>
-                    {formatNumber(postInfo.likeCount + (liked ? 1 : 0))}
+                    {formatNumber(postInfo.likeCount)}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity
