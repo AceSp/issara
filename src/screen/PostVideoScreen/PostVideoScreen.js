@@ -202,6 +202,9 @@ function PostVideoScreen({ navigation }) {
         </View>
       )}
 
+      <TouchableOpacity style={[styles.captureButton, { left: SAFE_AREA_PADDING.paddingLeft + CONTROL_BUTTON_SIZE + CONTENT_SPACING }]} disabledOpacity={0.4}>
+        <IonIcon name="cloud-upload" color="white" size={24} />
+      </TouchableOpacity>
       <CaptureButton
         style={styles.captureButton}
         camera={camera}
