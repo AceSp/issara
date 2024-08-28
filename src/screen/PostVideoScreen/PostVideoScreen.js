@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   Platform
 } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
+import {launchImageLibrary} from 'react-native-image-picker'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import {
   useCameraDevice,
@@ -55,17 +55,24 @@ function PostVideoScreen({ navigation }) {
       }
     }
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 1,
-    });
+    const options = {
+      mediaType: 'video',
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+    };
 
-    if (!result.cancelled) {
-      console.log('Selected video:', result.uri);
-      // Handle the selected video here, e.g., navigate to a new screen with the video
-    }
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const source = response.uri || response.assets[0].uri;
+        console.log('Selected video:', source);
+        // Handle the selected video here, e.g., navigate to a new screen with the video
+      }
+    });
   };
   const camera = useRef(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
