@@ -31,9 +31,7 @@ const uploadFileInChunks = async (filePath) => {
         formData.append('totalSize', fileSize.toString());
         formData.append('fileName', file.name);
 
-        await fetch(uploadUrl, {
-            method: 'POST',
-            body: formData,
+        await axios.post(uploadUrl, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': 'Bearer YOUR_TOKEN_HERE'
