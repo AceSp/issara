@@ -26,12 +26,54 @@ const uploadFileInChunks = async (filePath) => {
             formData.append('totalSize', fileSize.toString());
             formData.append('fileName', fileName);
 
-            const response = await axios.post(uploadUrl, formData, {
+            console.log('Sending request:', {
+                url: uploadUrl,
+                method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': 'Bearer YOUR_TOKEN_HERE'
                 },
+                formData: {
+                    chunk: 'Blob',
+                    offset: offset.toString(),
+                    totalSize: fileSize.toString(),
+                    fileName: fileName
+                }
             });
+
+            try {
+                const response = await axios.post(uploadUrl, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': 'Bearer YOUR_TOKEN_HERE'
+                    },
+                });
+                console.log('Server response:', response.data);
+            } catch (error) {
+                console.error('Upload failed:', {
+                    message: error.message,
+                    status: error.response ? error.response.status : 'No response',
+                    data: error.response ? error.response.data : 'No response data',
+                    request: {
+                        url: uploadUrl,
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': 'Bearer YOUR_TOKEN_HERE'
+                        },
+                        formData: {
+                            chunk: 'Blob',
+                            offset: offset.toString(),
+                            totalSize: fileSize.toString(),
+                            fileName: fileName
+                        }
+                    }
+                });
+                await BackgroundService.updateNotification({
+                    taskDesc: 'File upload Failed',
+                });
+                throw error; // Re-throw the error to stop the upload process
+            }
 
             console.log('Server response:', response.data);
 
