@@ -1,6 +1,7 @@
 import BackgroundService from 'react-native-background-actions';
 import axios from 'axios';
 import RNFS from 'react-native-fs';
+import RNFetchBlob from 'react-native-blob-util';
 
 const uploadFileInChunks = async (filePath) => {
     const serverUrl = 'http://localhost:3004/upload'; // Replace with your actual server URL
@@ -15,14 +16,7 @@ const uploadFileInChunks = async (filePath) => {
             const formData = new FormData();
             
             // Convert base64 to Blob
-            const byteCharacters = atob(chunk);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], {type: 'application/octet-stream'});
-            
+            const blob = RNFetchBlob.wrap(Buffer.from(chunk, 'base64'));
             formData.append('chunk', blob, 'chunk');
             formData.append('offset', offset.toString());
             formData.append('totalSize', fileSize.toString());
