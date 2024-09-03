@@ -18,22 +18,21 @@ const uploadFileInChunks = async (filePath) => {
     try {
       const fileSize = file.size;
       let offset = 0;
+      const now = Date.now();
       while (offset < fileSize) {
         //here we are reading only a small chunk of the file.
         const chunk = await RNFS.read(filePath, chunkSize, offset, 'base64');
-        console.log('Chunk data:', chunk); // Debug log to check the chunk data
-        console.log('Chunk data:', chunk); // Debug log to check the chunk data
         const formData = new FormData();
         formData.append('chunk', {
             uri: `data:application/octet-stream;base64,${chunk}`,
+            // uri: `file://${filePath}`,
             type: 'application/octet-stream',
             name: 'chunk'
         });
-        console.log('FormData chunk:', formData); // Debug log to check the FormData object
-        console.log('FormData chunk:', formData); // Debug log to check the FormData object
+        // formData.append('chunkData', chunk);
         formData.append('offset', offset.toString());
         formData.append('totalSize', fileSize.toString());
-        formData.append('fileName', file.name);
+        formData.append('fileName', now.toString());
 
         await axios.post(uploadUrl, formData, {
             headers: {
