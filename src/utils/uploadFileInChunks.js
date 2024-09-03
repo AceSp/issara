@@ -23,11 +23,7 @@ const uploadFileInChunks = async (filePath) => {
         //here we are reading only a small chunk of the file.
         const chunk = await RNFS.read(filePath, chunkSize, offset, 'base64');
         const formData = new FormData();
-        formData.append('chunk', {
-            type: 'application/octet-stream',
-            name: 'chunk',
-            data: chunk
-        });
+        formData.append('chunk', chunk);
         // formData.append('chunkData', chunk);
         formData.append('offset', offset.toString());
         formData.append('totalSize', fileSize.toString());
