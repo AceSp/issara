@@ -3,105 +3,55 @@ import axios from 'axios';
 import RNFS from 'react-native-fs';
 
 const uploadFileInChunks = async (filePath) => {
-    const uploadUrl = 'http://localhost:3004/upload';
-    const chunkSize = 511500;
+    const serverUrl = 'http://localhost:3004/upload'; // Replace with your actual server URL
+    const chunkSize = 1024 * 1024; // 1MB chunks
     const file = await RNFS.stat(filePath);
+    const fileSize = file.size;
+    let offset = 0;
 
     try {
-        const fileSize = file.size;
-        let offset = 0;
-        const now = Date.now();
-        const fileName = `${now}_video.mp4`; // Assuming it's an MP4 file
-
         while (offset < fileSize) {
             const chunk = await RNFS.read(filePath, chunkSize, offset, 'base64');
             const formData = new FormData();
             
-            // Create a Blob from the base64 string
-            const blob = await fetch(`data:application/octet-stream;base64,${chunk}`).then(r => r.blob());
+            // Convert base64 to Blob
+            const byteCharacters = atob(chunk);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], {type: 'application/octet-stream'});
             
-            // Append the Blob as a file
             formData.append('chunk', blob, 'chunk');
             formData.append('offset', offset.toString());
             formData.append('totalSize', fileSize.toString());
-            formData.append('fileName', fileName);
+            formData.append('fileName', file.name);
 
-            console.log('Sending request:', {
-                url: uploadUrl,
-                method: 'POST',
+            const response = await axios.post(serverUrl, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'Authorization': 'Bearer YOUR_TOKEN_HERE'
                 },
-                formData: {
-                    chunk: 'Blob',
-                    offset: offset.toString(),
-                    totalSize: fileSize.toString(),
-                    fileName: fileName
-                }
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    console.log(`Chunk upload progress: ${percentCompleted}%`);
+                },
             });
 
-            try {
-                const response = await axios.post(uploadUrl, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Authorization': 'Bearer YOUR_TOKEN_HERE'
-                    },
-                });
-                console.log('Server response:', response.data);
-            } catch (error) {
-                console.error('Upload failed:', {
-                    message: error.message,
-                    status: error.response ? error.response.status : 'No response',
-                    data: error.response ? error.response.data : 'No response data',
-                    request: {
-                        url: uploadUrl,
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                            'Authorization': 'Bearer YOUR_TOKEN_HERE'
-                        },
-                        formData: {
-                            chunk: 'Blob',
-                            offset: offset.toString(),
-                            totalSize: fileSize.toString(),
-                            fileName: fileName
-                        }
-                    }
-                });
-                await BackgroundService.updateNotification({
-                    taskDesc: 'File upload Failed',
-                });
-                throw error; // Re-throw the error to stop the upload process
-            }
+            console.log(`Chunk uploaded successfully. Server response:`, response.data);
 
-            console.log('Server response:', response.data);
-
-            let percentage = Math.round((offset / fileSize) * 100);
-            console.log('filesize, offset ', fileSize, offset);
-            await BackgroundService.updateNotification({
-                progressBar: {
-                    max: 100,
-                    value: percentage,
-                },
-                taskDesc: `Uploading file: ${percentage}% completed`,
-            });
             offset += chunkSize;
+            const totalProgress = Math.round((offset / fileSize) * 100);
+            console.log(`Total upload progress: ${totalProgress}%`);
         }
-        console.log('Upload complete');
-        await BackgroundService.updateNotification({
-            taskDesc: 'File Uploaded',
-        });
+
+        console.log('Video upload completed successfully');
+        return 'Upload successful';
     } catch (error) {
-      console.error('Upload failed:', {
-          message: error.message,
-          status: error.response ? error.response.status : 'No response',
-          data: error.response ? error.response.data : 'No response data',
-      });
-      await BackgroundService.updateNotification({
-          taskDesc: 'File upload Failed',
-      });
+        console.error('Error uploading video:', error);
+        throw error;
     }
 };
+
 
 export default uploadFileInChunks;
