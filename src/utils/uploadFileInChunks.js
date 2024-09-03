@@ -51,7 +51,25 @@ const uploadFileInChunks = async (filePath) => {
             taskDesc: 'File Uploaded',
         });
     } catch (error) {
-      console.error('Upload failed:', error.response ? error.response.data : error.message);
+      console.error('Upload failed:', {
+          message: error.message,
+          status: error.response ? error.response.status : 'No response',
+          data: error.response ? error.response.data : 'No response data',
+          request: {
+              url: uploadUrl,
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+                  'Authorization': 'Bearer YOUR_TOKEN_HERE'
+              },
+              formData: {
+                  chunk: 'Blob',
+                  offset: offset.toString(),
+                  totalSize: fileSize.toString(),
+                  fileName: fileName
+              }
+          }
+      });
       await BackgroundService.updateNotification({
           taskDesc: 'File upload Failed',
       });
