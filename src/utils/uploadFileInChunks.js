@@ -1,6 +1,5 @@
 import BackgroundService from 'react-native-background-actions';
-import axios from 'axios';
-import RNFS from 'react-native-fs';
+import RNFetchBlob from 'react-native-blob-util';
 
 const uploadFileInChunks = async (filePath) => {
     const uploadUrl =
@@ -21,27 +20,16 @@ const uploadFileInChunks = async (filePath) => {
       const now = Date.now();
       while (offset < fileSize) {
         //here we are reading only a small chunk of the file.
-        const chunk = await RNFS.read(filePath, chunkSize, offset, 'base64');
+        const chunk = await RNFetchBlob.fs.readFile(filePath, 'base64');
         const formData = new FormData();
-        // Convert base64 to Blob
-        const byteCharacters = atob(chunk);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], {type: 'video/mp4'}); // Adjust MIME typ 
-
-        formData.append('chunk', blob, `chunk_${offset}.mp4`); // Append as file wi 
+        formData.append('chunk', chunk);
         formData.append('offset', offset.toString());
         formData.append('totalSize', fileSize.toString());
         formData.append('fileName', now.toString());
 
-        await axios.post(uploadUrl, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+        await RNFetchBlob.fetch('POST', uploadUrl, {
+            'Content-Type': 'multipart/form-data',
+        }, formData);
 
         let percentage = Math.round((offset / fileSize) * 100);
         console.log('filesize, offset ', fileSize, offset);
