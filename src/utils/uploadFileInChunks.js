@@ -1,51 +1,84 @@
 import BackgroundService from 'react-native-background-actions';
 import axios from 'axios';
 import RNFS from 'react-native-fs';
-import RNFetchBlob from 'react-native-blob-util';
 
 const uploadFileInChunks = async (filePath) => {
-    const serverUrl = 'http://localhost:3004/upload'; // Replace with your actual server URL
-    const chunkSize = 1024 * 1024; // 1MB chunks
+    const uploadUrl =
+      'http://localhost:3004/upload';
+    /*
+    NOTE: For base64 the chunk size should be a multiple of 3. 
+    Please go through this (~1min) https://stackoverflow.com/a/7920834
+    https://javascript.plainenglish.io/large-file-uploads-in-the-background-with-react-native-1b9fe49e367c
+    This guy say he experiment with 500kb so I'll leave it at this for now.
+    Might do some experiment myself later
+    */
+    const chunkSize = 511500; 
     const file = await RNFS.stat(filePath);
-    const fileSize = file.size;
-    let offset = 0;
 
     try {
-        while (offset < fileSize) {
-            const chunk = await RNFS.read(filePath, chunkSize, offset, 'base64');
-            const formData = new FormData();
-            
-            // Convert base64 to Blob
-            const blob = RNFetchBlob.wrap(Buffer.from(chunk, 'base64'));
-            formData.append('chunk', blob, 'chunk');
-            formData.append('offset', offset.toString());
-            formData.append('totalSize', fileSize.toString());
-            formData.append('fileName', file.name);
-
-            const response = await axios.post(serverUrl, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                onUploadProgress: (progressEvent) => {
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    console.log(`Chunk upload progress: ${percentCompleted}%`);
-                },
-            });
-
-            console.log(`Chunk uploaded successfully. Server response:`, response.data);
-
-            offset += chunkSize;
-            const totalProgress = Math.round((offset / fileSize) * 100);
-            console.log(`Total upload progress: ${totalProgress}%`);
+      const fileSize = file.size;
+      let offset = 0;
+      const now = Date.now();
+      while (offset < fileSize) {
+        //here we are reading only a small chunk of the file.
+        const chunk = await RNFS.read(filePath, chunkSize, offset, 'base64');
+        const formData = new FormData();
+        // Convert base64 to Blob
+        const byteCharacters = atob(chunk);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {type: 'video/mp4'}); // Adjust MIME typ 
 
-        console.log('Video upload completed successfully');
-        return 'Upload successful';
+        formData.append('chunk', blob, `chunk_${offset}.mp4`); // Append as file wi 
+        formData.append('offset', offset.toString());
+        formData.append('totalSize', fileSize.toString());
+        formData.append('fileName', now.toString());
+
+        await axios.post(uploadUrl, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        let percentage = Math.round((offset / fileSize) * 100);
+        console.log('filesize, offset ', fileSize, offset);
+        await BackgroundService.updateNotification({
+          progressBar: {
+            max: 100,
+            value: percentage,
+          },
+          taskDesc: `Uploading file: ${percentage}% completed`,
+        });
+        offset += chunkSize;
+      }
+      console.log('Upload complete');
+      await BackgroundService.updateNotification({
+        taskDesc: 'File Uploaded',
+      });
     } catch (error) {
-        console.error('Error uploading video:', error);
-        throw error;
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Data:', error.response.data);
+        console.error('Status:', error.response.status);
+        console.error('Headers:', error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.error('Request:', error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error:', error.message);
+      }
+      console.error('Config:', error.config);
+      await BackgroundService.updateNotification({
+        taskDesc: 'File upload Failed',
+      });
     }
-};
+  };
 
-
-export default uploadFileInChunks;
+  export default uploadFileInChunks;
