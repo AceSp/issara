@@ -2,6 +2,21 @@ import BackgroundService from 'react-native-background-actions';
 import RNFS from 'react-native-fs';
 import axios from 'axios';
 
+// Axios interceptor to log request details
+axios.interceptors.request.use(request => {
+  console.log('Starting Request', JSON.stringify(request, null, 2));
+  return request;
+});
+
+// Axios interceptor to log response details
+axios.interceptors.response.use(response => {
+  console.log('Response:', JSON.stringify(response, null, 2));
+  return response;
+}, error => {
+  console.error('Response Error:', JSON.stringify(error, null, 2));
+  return Promise.reject(error);
+});
+
 const uploadFileInChunks = async (filePath) => {
   const uploadUrl =
     'http://localhost:3004/upload';
@@ -58,7 +73,9 @@ const uploadFileInChunks = async (filePath) => {
     });
   } catch (error) {
     console.error('Error during chunk upload:', error);
-    console.log(error.respond)
+    console.log('Error Response:', error.response);
+    console.log('Error Request:', error.request);
+    console.log('Error Config:', error.config);
     await BackgroundService.updateNotification({
       taskDesc: 'File upload Failed',
     });
