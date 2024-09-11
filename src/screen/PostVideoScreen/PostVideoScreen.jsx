@@ -12,7 +12,8 @@ import {
   TouchableOpacity,
   Platform,
   NativeModules,
-  NativeEventEmitter
+  NativeEventEmitter,
+  Modal
 } from 'react-native'
 import {launchImageLibrary} from 'react-native-image-picker'
 import { TapGestureHandler } from 'react-native-gesture-handler'
@@ -70,6 +71,7 @@ function PostVideoScreen({ navigation }) {
   const { state: { me } } = useContext(store);
   const camera = useRef(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
+  const [isModalVisible, setModalVisible] = useState(false)
   const microphone = Camera.getMicrophonePermissionStatus()
   const location = useLocationPermission()
   const zoom = useSharedValue(1)
@@ -230,6 +232,7 @@ function PostVideoScreen({ navigation }) {
       const source = result.uri || result.assets[0].uri;
       console.log('Selected video:', source);
       // Handle the selected video here, e.g., navigate to a new screen with the video
+      setModalVisible(true);
     }
     console.log("------------PostVideoScreen------------")
     console.log(result)
@@ -410,6 +413,18 @@ function PostVideoScreen({ navigation }) {
         <IonIcon name="cloud-upload" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
+      <Modal
+        visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}
+        transparent={true}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>Empty Modal</Text>
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
       <View style={styles.rightButtonRow}>
         <TouchableOpacity style={styles.button} onPress={onFlipCameraPressed} disabledOpacity={0.4}>
@@ -449,6 +464,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalText: {
+    color: 'white',
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
   emptyContainer: {
     flex: 1,
