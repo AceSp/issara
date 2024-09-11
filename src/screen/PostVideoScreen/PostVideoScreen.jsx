@@ -416,24 +416,6 @@ function PostVideoScreen({ navigation }) {
         visible={isModalVisible}
         onDismiss={() => setModalVisible(false)}
       />
-      <Modal
-        visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
-        transparent={false}
-      >
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>Enter Text</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Type something..."
-            placeholderTextColor="gray"
-          />
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-
       <View style={styles.rightButtonRow}>
         <TouchableOpacity style={styles.button} onPress={onFlipCameraPressed} disabledOpacity={0.4}>
           <IonIcon name="camera-reverse" color="white" size={24} />
@@ -477,21 +459,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalText: {
-    color: 'black',
+    color: 'white',
     fontSize: 18,
     marginBottom: 20,
-  },
-  textInput: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    width: '80%',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    color: 'black',
   },
 
   emptyContainer: {
