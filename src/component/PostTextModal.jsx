@@ -23,11 +23,17 @@ const PostTextModal = ({ visible, onDismiss }) => {
       isVisible={visible}
       onBackdropPress={onDismiss}
       onSwipeComplete={onDismiss}
-      // swipeDirection="down"
+      swipeDirection="down"
       propagateSwipe={true}
       style={styles.modal} // Add style for modal
     >
-      <View style={styles.modalContainer}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Comments</Text>
+          <TouchableOpacity onPress={onDismiss}>
+            <Icon name="close" size={24} color={iOSColors.black} />
+          </TouchableOpacity>
+        </View>
         <Text style={styles.modalText}>Enter Text</Text>
         <TextInput
           style={styles.textInput}
@@ -36,9 +42,6 @@ const PostTextModal = ({ visible, onDismiss }) => {
           value={text}
           onChangeText={setText}
         />
-        <TouchableOpacity onPress={onDismiss}>
-          <Text style={styles.closeButtonText}>Close</Text>
-        </TouchableOpacity>
       </View>
     </Modal>
   );
@@ -49,11 +52,20 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     margin: 0,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  container: {
     backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: height * 0.4,
+    paddingBottom: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: iOSColors.lightGray,
   },
   modalText: {
     color: 'black',
