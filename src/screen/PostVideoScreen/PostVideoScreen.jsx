@@ -281,7 +281,7 @@ function PostVideoScreen({ navigation }) {
         }
         case 'onFinishTrimming': {
           console.log('onFinishTrimming', event);
-          handleUpload(event.outputPath)
+          navigation.navigate('PostTextScreen', { videoPath: event.outputPath });
           closeEditor();
           break;
         }
