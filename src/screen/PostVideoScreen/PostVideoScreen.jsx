@@ -58,6 +58,7 @@ import { usePreferredCameraDevice } from '../../utils/hooks/usePreferredCameraDe
 import axios from 'axios'
 import uploadFileInChunks from '../../utils/uploadFileInChunks'
 import { store } from '../../utils/store'
+import PostTextModal from '../../component/PostTextModal'
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -231,18 +232,15 @@ function PostVideoScreen({ navigation }) {
     } else {
       const source = result.uri || result.assets[0].uri;
       console.log('Selected video:', source);
+      isValidFile(result.assets[0].uri || '').then((res) =>
+        console.log(res)
+      );
       // Handle the selected video here, e.g., navigate to a new screen with the video
       setModalVisible(true);
     }
-    console.log("------------PostVideoScreen------------")
-    console.log(result)
-    isValidFile(result.assets[0].uri || '').then((res) =>
-      console.log(res)
-    );
 
-    showEditor(result.assets[0]?.uri || '', {
-      // maxDuration: 20,
-    });
+    // showEditor(result.assets[0]?.uri || '', {
+    // });
   }
 
   const handleUpload = async (filePath) => {
@@ -376,7 +374,8 @@ function PostVideoScreen({ navigation }) {
             + CONTENT_SPACING 
           }
         ]} 
-        onPress={openVideoGallery} 
+        // onPress={openVideoGallery} 
+        onPress={() => setModalVisible(true)} 
         disabledOpacity={0.4}
       >
         <IonIcon name="cloud-upload" color="white" size={24} />
@@ -413,6 +412,10 @@ function PostVideoScreen({ navigation }) {
         <IonIcon name="cloud-upload" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
+      <PostTextModal 
+        visible={isModalVisible}
+        onDismiss={() => setModalVisible(false)}
+      />
       <Modal
         visible={isModalVisible}
         onRequestClose={() => setModalVisible(false)}
@@ -476,10 +479,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
   },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
+
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
