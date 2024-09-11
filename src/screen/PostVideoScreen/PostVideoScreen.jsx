@@ -281,7 +281,7 @@ function PostVideoScreen({ navigation }) {
         }
         case 'onFinishTrimming': {
           console.log('onFinishTrimming', event);
-          navigation.navigate('PostTextScreen', { videoPath: event.outputPath });
+          handleUpload(event.outputPath)
           closeEditor();
           break;
         }
@@ -389,13 +389,13 @@ function PostVideoScreen({ navigation }) {
         enabled={isCameraInitialized && isActive}
       />
       <TouchableOpacity 
-        style={[
-          styles.captureButton, 
-          { 
-            left: SAFE_AREA_PADDING.paddingLeft + 200 
-            + CONTROL_BUTTON_SIZE 
-            + CONTENT_SPACING 
-          }
+      style={[
+        styles.captureButton, 
+        { 
+          left: SAFE_AREA_PADDING.paddingLeft + 200 
+          + CONTROL_BUTTON_SIZE 
+          + CONTENT_SPACING 
+        }
         ]} 
         onPress={async () => {
           const files = await listFiles()
