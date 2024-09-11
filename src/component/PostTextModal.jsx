@@ -4,7 +4,8 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  TextInput
 } from 'react-native';
 import Modal from 'react-native-modal'; // Import Modal from react-native-modal
 
@@ -13,6 +14,8 @@ const { width, height } = Dimensions.get('window');
 
 const PostTextModal = ({ visible, onDismiss }) => {
   const { state: { me } } = useContext(store);
+  const [text, setText] = useState('');
+
   return (
     <Modal
       visible={visible}
@@ -25,8 +28,15 @@ const PostTextModal = ({ visible, onDismiss }) => {
       style={styles.modal} // Add style for modal
     >
       <View style={styles.modalContainer}>
-        <Text style={styles.modalText}>Empty Modal</Text>
-        <TouchableOpacity onPress={() => setModalVisible(false)}>
+        <Text style={styles.modalText}>Enter Text</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Type something..."
+          placeholderTextColor="gray"
+          value={text}
+          onChangeText={setText}
+        />
+        <TouchableOpacity onPress={onDismiss}>
           <Text style={styles.closeButtonText}>Close</Text>
         </TouchableOpacity>
       </View>
@@ -43,15 +53,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'white',
   },
   modalText: {
-    color: 'white',
+    color: 'black',
     fontSize: 18,
     marginBottom: 20,
   },
+  textInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    width: '80%',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    color: 'black',
+  },
   closeButtonText: {
-    color: 'white',
+    color: 'black',
     fontSize: 16,
   },
 });

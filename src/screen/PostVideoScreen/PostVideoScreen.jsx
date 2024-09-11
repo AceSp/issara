@@ -412,10 +412,6 @@ function PostVideoScreen({ navigation }) {
         <IonIcon name="cloud-upload" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
-      <PostTextModal 
-        visible={isModalVisible}
-        onDismiss={() => setModalVisible(false)}
-      />
       <View style={styles.rightButtonRow}>
         <TouchableOpacity style={styles.button} onPress={onFlipCameraPressed} disabledOpacity={0.4}>
           <IonIcon name="camera-reverse" color="white" size={24} />
