@@ -419,10 +419,15 @@ function PostVideoScreen({ navigation }) {
       <Modal
         visible={isModalVisible}
         onRequestClose={() => setModalVisible(false)}
-        transparent={true}
+        transparent={false}
       >
         <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>Empty Modal</Text>
+          <Text style={styles.modalText}>Enter Text</Text>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Type something..."
+            placeholderTextColor="gray"
+          />
           <TouchableOpacity onPress={() => setModalVisible(false)}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
@@ -472,12 +477,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'white',
   },
   modalText: {
-    color: 'white',
+    color: 'black',
     fontSize: 18,
     marginBottom: 20,
+  },
+  textInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    width: '80%',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    color: 'black',
   },
 
   emptyContainer: {
