@@ -11,7 +11,7 @@ function PostPreviewScreen({
 }) {
   return (
     <View style={styles.container}>
-      <Text>This is the PostTextScreen</Text>
+      <VideoPlayer uri={uri} style={styles.video} />
     </View>
   );
 }
@@ -19,9 +19,10 @@ function PostPreviewScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5fcff',
+    backgroundColor: '#000',
+  },
+  video: {
+    flex: 1,
   },
 });
 
