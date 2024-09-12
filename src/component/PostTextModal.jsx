@@ -80,10 +80,11 @@ const styles = StyleSheet.create({
   textInput: {
     height: 40,
     borderWidth: 0,
-    width: '80%',
+    width: '90%',
     marginBottom: 20,
     paddingHorizontal: 10,
     color: 'black',
+    alignSelf: 'center',
     backgroundColor: 'red'
   },
   closeButtonText: {
