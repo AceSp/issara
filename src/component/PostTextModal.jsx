@@ -4,7 +4,8 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  TextInput
+  TextInput,
+  TouchableOpacity
 } from 'react-native';
 import Modal from 'react-native-modal'; 
 import {
@@ -18,6 +19,10 @@ const { width, height } = Dimensions.get('window');
 const PostTextModal = ({ visible, onDismiss }) => {
   const { state: { me } } = useContext(store);
   const [text, setText] = useState('');
+
+  const handleHashtagPress = () => {
+    setText(prevText => prevText + ' #hashtag');
+  };
 
   return (
     <Modal
@@ -44,6 +49,9 @@ const PostTextModal = ({ visible, onDismiss }) => {
           multiline
           maxLength={320}
         />
+        <TouchableOpacity onPress={handleHashtagPress} style={styles.hashtagButton}>
+          <Text style={styles.hashtagButtonText}>Add Hashtag</Text>
+        </TouchableOpacity>
       </View>
     </Modal>
   );
@@ -91,6 +99,16 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: 'black',
+    fontSize: 16,
+  },
+  hashtagButton: {
+    alignSelf: 'center',
+    backgroundColor: iOSColors.blue,
+    padding: 10,
+    borderRadius: 5,
+  },
+  hashtagButtonText: {
+    color: 'white',
     fontSize: 16,
   },
 });
