@@ -102,7 +102,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   hashtagButton: {
-    alignSelf: 'center',
+    alignSelf: 'flex-start',
+    marginLeft: 20,
     backgroundColor: iOSColors.blue,
     padding: 10,
     borderRadius: 5,
