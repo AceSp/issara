@@ -4,12 +4,15 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
   TextInput
 } from 'react-native';
-import Modal from 'react-native-modal'; // Import Modal from react-native-modal
+import Modal from 'react-native-modal'; 
+import {
+  IconButton
+} from 'react-native-paper'
 
 import { store } from '../utils/store';
+import { iOSColors } from 'react-native-typography';
 const { width, height } = Dimensions.get('window');
 
 const PostTextModal = ({ visible, onDismiss }) => {
@@ -30,17 +33,15 @@ const PostTextModal = ({ visible, onDismiss }) => {
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Comments</Text>
-          <TouchableOpacity onPress={onDismiss}>
-            <Icon name="close" size={24} color={iOSColors.black} />
-          </TouchableOpacity>
+          <IconButton onPress={onDismiss} icon='close' size={24} />
         </View>
-        <Text style={styles.modalText}>Enter Text</Text>
         <TextInput
           style={styles.textInput}
           placeholder="Type something..."
           placeholderTextColor="gray"
           value={text}
           onChangeText={setText}
+          multiline
         />
       </View>
     </Modal>
@@ -63,9 +64,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
+    paddingLeft: 15,
     borderBottomWidth: 1,
     borderBottomColor: iOSColors.lightGray,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   modalText: {
     color: 'black',
@@ -74,12 +79,12 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: 40,
-    borderColor: 'gray',
     borderWidth: 0,
     width: '80%',
     marginBottom: 20,
     paddingHorizontal: 10,
     color: 'black',
+    backgroundColor: 'red'
   },
   closeButtonText: {
     color: 'black',
