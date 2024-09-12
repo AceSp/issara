@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   textInput: {
-    height: 40,
+    height: 120,
     borderWidth: 0,
     width: '90%',
     marginBottom: 20,
