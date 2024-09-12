@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: 'black',
     alignSelf: 'center',
-    backgroundColor: 'red'
+    backgroundColor: 'red',
+    textAlignVertical: 'top'
   },
   closeButtonText: {
     color: 'black',
