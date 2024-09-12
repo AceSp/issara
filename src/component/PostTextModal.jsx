@@ -42,6 +42,7 @@ const PostTextModal = ({ visible, onDismiss }) => {
           value={text}
           onChangeText={setText}
           multiline
+          maxLength={320}
         />
       </View>
     </Modal>
