@@ -89,11 +89,18 @@ function Sponsor(props) {
     //   </NativeAdView>
     // )
     return (
-        <View></View>
+        <View style={styles.emptyCard}></View>
     )
 }
 
 const styles = StyleSheet.create({
+  emptyCard: {
+    width: '100%',
+    height: 400,
+    borderRadius: 50,
+    backgroundColor: 'transparent',
+    marginTop: 20,
+  },
 })
 
 export default memo(Sponsor);
