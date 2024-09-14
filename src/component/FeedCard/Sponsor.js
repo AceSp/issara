@@ -99,6 +99,7 @@ function Sponsor(props) {
                 :
                 null
             } 
+            style={{ width: '100%' }}
             >
             <View>
                 <Card.Title
