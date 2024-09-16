@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, SafeAreaView } from 'react-native';
 import { VideoPlayer } from '../Video/views';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -17,6 +17,8 @@ function FeedCard({
   onPress,
   navigation
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <SafeAreaView style={styles.fullScreenCard}>
       <View style={styles.videoContainer}>
@@ -34,9 +36,11 @@ function FeedCard({
       />
       <View style={styles.bottomContent}>
         <Text style={styles.username}>@{postInfo.author.username}</Text>
-        <Text style={styles.postText} numberOfLines={2} ellipsizeMode="tail">
-          {postInfo.text}
-        </Text>
+        <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+          <Text style={styles.postText} numberOfLines={isExpanded ? 0 : 2} ellipsizeMode="tail">
+            {postInfo.text}
+          </Text>
+        </TouchableOpacity>
       </View>
       <Sponsor 
         {...sponsor}
