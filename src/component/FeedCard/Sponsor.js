@@ -20,7 +20,11 @@ import {
 
 moment.locale('th');
 
-function Sponsor(props) {
+function Sponsor({
+  text,
+  shop,
+  isAdmob
+}) {
     // if(props.isAdmob) return (
     //   <NativeAdView 
     //     style={{
@@ -89,16 +93,16 @@ function Sponsor(props) {
     //   </NativeAdView>
     // )
     return (
-        <View style={styles.emptyCard}></View>
+      <View style={styles.emptyCard}></View>
     )
 }
 
 const styles = StyleSheet.create({
   emptyCard: {
     width: '100%',
-    height: 100,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Dark transparent background
+    height: 80,
+    borderRadius: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
     marginTop: 20,
   },
 })
