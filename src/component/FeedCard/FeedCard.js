@@ -37,10 +37,10 @@ function FeedCard({
         <Text style={styles.postText} numberOfLines={2} ellipsizeMode="tail">
           {postInfo.text}
         </Text>
-        <Sponsor 
-          {...sponsor}
-        />
       </View>
+      <Sponsor 
+        {...sponsor}
+      />
     </SafeAreaView>
   );
 }
@@ -63,9 +63,9 @@ const styles = StyleSheet.create({
   },
   bottomContent: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 130,
     left: 10,
-    right: 60,
+    right: 80,
     maxHeight: 80,
   },
   videoContainer: {
