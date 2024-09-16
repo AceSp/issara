@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     alignItems: 'center',
     paddingHorizontal: 10,
+    height: 120
   },
   avatar: {
     width: 100,
@@ -59,19 +60,17 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    backgroundColor: 'red',
+    justifyContent: 'center',
     padding: 10,
-    height: 120
+    height: '100%'
   },
   itemName: {
     ...iOSUIKitTall.subheadEmphasized,
     color: iOSColors.white,
-    fontSize: 30
   },
   text: {
     ...iOSUIKitTall.footnote,
     color: iOSColors.white,
-    fontSize: 20
   },
 })
 
