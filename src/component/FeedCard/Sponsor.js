@@ -59,7 +59,9 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    backgroundColor: 'red'
+    backgroundColor: 'red',
+    padding: 10,
+    height: 120
   },
   itemName: {
     ...iOSUIKitTall.subheadEmphasized,
