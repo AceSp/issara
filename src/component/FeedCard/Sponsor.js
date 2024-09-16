@@ -65,11 +65,11 @@ const styles = StyleSheet.create({
     height: '100%'
   },
   itemName: {
-    ...iOSUIKitTall.subheadEmphasized,
+    ...iOSUIKitTall.title3Emphasized,
     color: iOSColors.white,
   },
   text: {
-    ...iOSUIKitTall.footnote,
+    ...iOSUIKitTall.subhead,
     color: iOSColors.white,
   },
 })
