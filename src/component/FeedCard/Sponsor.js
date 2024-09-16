@@ -98,12 +98,32 @@ function Sponsor({
 }
 
 const styles = StyleSheet.create({
-  emptyCard: {
+  container: {
+    flexDirection: 'row',
     width: '100%',
     height: 80,
     borderRadius: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     marginTop: 20,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  itemName: {
+    ...iOSUIKitTall.subheadEmphasized,
+    color: iOSColors.white,
+  },
+  text: {
+    ...iOSUIKitTall.footnote,
+    color: iOSColors.white,
   },
 })
 
