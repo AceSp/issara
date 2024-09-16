@@ -25,105 +25,51 @@ function Sponsor({
   shop,
   isAdmob
 }) {
-    // if(props.isAdmob) return (
-    //   <NativeAdView 
-    //     style={{
-    //       width: "100%",
-    //       alignSelf: 'center',
-    //       height: 125,
-    //     }}
-    //     ref={nativeAdViewRef}
-    //     enableTestMode={true}
-    //     adUnitID="ca-app-pub-3940256099942544/2247696110"
-    //   >
-    //     <View
-    //       style={{
-    //         height: "100%",
-    //         width: "100%",
-    //       }}
-    //     >
-    //       <View
-    //         style={{
-    //           height: 100,
-    //           width: "100%",
-    //           flexDirection: "row",
-    //           justifyContent: "flex-start",
-    //           alignItems: "center",
-    //           paddingHorizontal: 10,
-    //         }}
-    //       >
-    //         <IconView
-    //           style={styles.image}
-    //         />
-    //         <View
-    //           style={{
-    //             width: "65%",
-    //             maxWidth: "65%",
-    //             paddingHorizontal: 6,
-    //             alignSelf: 'flex-start',
-    //             marginTop: 10
-    //           }}
-    //         >
-    //           <HeadlineView
-    //             numberOfLines={2}
-    //             style={[iOSUIKitTall.subheadEmphasized, styles.lineHeight]}
-    //           />
-    //           <TaglineView
-    //             numberOfLines={2}
-    //             style={[iOSUIKitTall.footnote, styles.lineHeight]}
-    //           />
-
-    //         </View>
-    //       </View>
-    //       <View style={styles.bottomView}>
-    //         <View style={styles.sponsorTag}>
-    //             <Text style={[
-    //                 iOSUIKitTall.caption2,
-    //                 { color: iOSColors.red }
-    //                 ]}>
-    //                 ผู้สนับสนุนคอลัมน์
-    //             </Text>
-    //         </View>
-    //         <AdvertiserView
-    //           style={[iOSUIKitTall.caption2, styles.sponsorName]}
-    //         />
-    //       </View>
-
-    //     </View>
-    //   </NativeAdView>
-    // )
-    return (
-      <View style={styles.emptyCard}></View>
-    )
+  console.log("----------Sponsor--------------------")
+  console.log(shop)
+  return (
+  <View style={styles.container}>
+    {/* <Image source={{ uri: shop.avatar }} style={styles.avatar} /> */}
+    <Image 
+      source={{ uri: 'https://avatars.githubusercontent.com/u/97165289' }} 
+      style={styles.avatar} />
+    <View style={styles.textContainer}>
+      <Text style={styles.itemName}>{shop.itemName}</Text>
+      <Text style={styles.text}>{text}</Text>
+    </View>
+  </View>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     width: '100%',
-    height: 80,
     borderRadius: 6,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    marginTop: 20,
     alignItems: 'center',
     paddingHorizontal: 10,
   },
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 4,
+    margin: 10,
+    marginRight: 20,
   },
   textContainer: {
     flex: 1,
+    backgroundColor: 'red'
   },
   itemName: {
     ...iOSUIKitTall.subheadEmphasized,
     color: iOSColors.white,
+    fontSize: 30
   },
   text: {
     ...iOSUIKitTall.footnote,
     color: iOSColors.white,
+    fontSize: 20
   },
 })
 
