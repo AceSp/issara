@@ -96,9 +96,9 @@ function Sponsor(props) {
 const styles = StyleSheet.create({
   emptyCard: {
     width: '100%',
-    height: 400,
-    borderRadius: 50,
-    backgroundColor: 'transparent',
+    height: 100,
+    borderRadius: 20,
+    backgroundColor: 'white',
     marginTop: 20,
   },
 })
