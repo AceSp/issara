@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     borderRadius: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Dark transparent background
     marginTop: 20,
   },
 })
