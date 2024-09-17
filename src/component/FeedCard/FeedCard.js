@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     bottom: 130,
     left: 10,
     right: 10,
-    flexDirection: 'row',
+    flexDirection: isExpanded ? 'column' : 'row',
     width: width - 80
     // maxHeight: 80,
   },
