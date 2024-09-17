@@ -47,7 +47,7 @@ function FeedCard({
           styles.bottomContent, 
           { 
             flexDirection: isExpanded ? 'column' : 'row',
-            backgroundColor: isExpanded ? 'rgba(0, 0, 0, 0.7)' : 'transparent'
+            backgroundColor: isExpanded ? 'rgba(0, 0, 0, 0.4)' : 'transparent'
           }
         ]}>
         <View style={styles.textContainer}>
@@ -87,10 +87,11 @@ const styles = StyleSheet.create({
   },
   bottomContent: {
     position: 'absolute',
-    bottom: 130,
-    left: 10,
-    right: 10,
-    width: width - 80
+    bottom: 120,
+    left: 0,
+    width: width,
+    padding: 10,
+    paddingRight: 80
     // maxHeight: 80,
   },
   videoContainer: {
