@@ -1,17 +1,39 @@
-import * as React from 'react';
+import React, { 
+  useState, 
+} from 'react';
 import { 
   View, 
   Text, 
   StyleSheet 
 } from 'react-native';
-import { VideoPlayer } from '../Video/views';
+import { VideoPlayer } from '../../component/Video/views';
+import PostTextModal from '../../component/PostTextModal';
 
 function PostPreviewScreen({
-  uri
+  route
 }) {
+  const { 
+    uri
+  } = route.params;
+  const [paused, setPaused] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false)
+  const toggleVideo = () => {
+    setPaused(!paused);
+  }
+  console.log("-----------PostPreviewScreen")
+  console.log(uri)
   return (
     <View style={styles.container}>
-      <VideoPlayer uri={uri} style={styles.video} />
+      <VideoPlayer 
+        source={{uri}} 
+        paused={paused}
+        onPress={toggleVideo}
+        style={styles.video} 
+      />
+      <PostTextModal 
+        visible={isModalVisible}
+        onDismiss={() => setModalVisible(false)}
+       />
     </View>
   );
 }
