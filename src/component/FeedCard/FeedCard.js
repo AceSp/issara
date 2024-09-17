@@ -43,16 +43,14 @@ function FeedCard({
         navigation={navigation}
       />
       <View style={styles.bottomContent}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.username}>@{postInfo.author.username}</Text>
-            <Text style={styles.postText} numberOfLines={isExpanded ? 20 : 2} ellipsizeMode="tail">
-              {postInfo.text}
-            </Text>
-          </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.username}>@{postInfo.author.itemName}</Text>
+          <Text style={styles.postText} numberOfLines={isExpanded ? 20 : 2} ellipsizeMode="tail">
+            {postInfo.text}
+          </Text>
         </View>
         <TouchableOpacity 
-          style={{ alignSelf: 'flex-end', marginRight: 10 }}
+          style={styles.readMoreButton}
           onPress={() => setIsExpanded(!isExpanded)}>
           <Text>Read more...</Text>
         </TouchableOpacity>
@@ -82,12 +80,12 @@ const styles = StyleSheet.create({
   },
   bottomContent: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 130,
     left: 10,
     right: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    width: width - 80
     // maxHeight: 80,
   },
   videoContainer: {
@@ -112,6 +110,14 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
   },
+  readMoreButton: {
+    alignSelf: 'flex-end', 
+    flex: 2
+  },
+  textContainer: {
+    flexDirection: 'column', 
+    flex: 5
+  }
 });
 
 export default FeedCard;
