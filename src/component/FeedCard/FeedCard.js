@@ -9,6 +9,7 @@ import {
   TouchableOpacity, 
   SafeAreaView 
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { VideoPlayer } from '../Video/views';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { BOTTOM_TAB_HEIGHT } from '../../utils/constants'
@@ -42,12 +43,14 @@ function FeedCard({
         relation={relation}
         navigation={navigation}
       />
-      <View 
+      <LinearGradient
+        colors={isExpanded ? ['rgba(0, 0, 0, 0.4)', 'transparent'] : ['transparent', 'transparent']}
+        start={{ x: 0, y: 1 }}
+        end={{ x: 0, y: 0 }}
         style={[
           styles.bottomContent, 
           { 
             flexDirection: isExpanded ? 'column' : 'row',
-            backgroundColor: isExpanded ? 'rgba(0, 0, 0, 0.4)' : 'transparent'
           }
         ]}>
         <View style={styles.textContainer}>
