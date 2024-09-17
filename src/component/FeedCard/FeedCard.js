@@ -43,17 +43,19 @@ function FeedCard({
         navigation={navigation}
       />
       <View style={styles.bottomContent}>
-        <View style={styles.textContainer}>
+        <View style={[styles.textContainer, { flex: isExpanded ? 1 : 5 }]}>
           <Text style={styles.username}>@{postInfo.author.itemName}</Text>
           <Text style={styles.postText} numberOfLines={isExpanded ? 20 : 2} ellipsizeMode="tail">
             {postInfo.text}
           </Text>
         </View>
-        <TouchableOpacity 
-          style={styles.readMoreButton}
-          onPress={() => setIsExpanded(!isExpanded)}>
-          <Text>Read more...</Text>
-        </TouchableOpacity>
+        {!isExpanded && (
+          <TouchableOpacity 
+            style={styles.readMoreButton}
+            onPress={() => setIsExpanded(!isExpanded)}>
+            <Text>Read more...</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <Sponsor 
         {...sponsor}
