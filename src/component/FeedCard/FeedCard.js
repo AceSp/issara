@@ -87,7 +87,8 @@ const styles = StyleSheet.create({
     bottom: 130,
     left: 10,
     right: 10,
-    width: width - 80
+    width: width - 80,
+    backgroundColor: isExpanded ? 'rgba(0, 0, 0, 0.7)' : 'transparent'
     // maxHeight: 80,
   },
   videoContainer: {
