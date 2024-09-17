@@ -42,7 +42,11 @@ function FeedCard({
         relation={relation}
         navigation={navigation}
       />
-      <View style={styles.bottomContent}>
+      <View 
+        style={[
+          styles.bottomContent, 
+          { flexDirection: isExpanded ? 'column' : 'row' }
+        ]}>
         <View style={styles.textContainer}>
           <Text style={styles.username}>@{postInfo.author.itemName}</Text>
           <Text style={styles.postText} numberOfLines={isExpanded ? 20 : 2} ellipsizeMode="tail">
@@ -83,7 +87,6 @@ const styles = StyleSheet.create({
     bottom: 130,
     left: 10,
     right: 10,
-    flexDirection: isExpanded ? 'column' : 'row',
     width: width - 80
     // maxHeight: 80,
   },
