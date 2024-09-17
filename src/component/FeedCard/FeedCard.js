@@ -43,19 +43,19 @@ function FeedCard({
         navigation={navigation}
       />
       <View style={styles.bottomContent}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.username}>@{postInfo.author.username}</Text>
             <Text style={styles.postText} numberOfLines={isExpanded ? 20 : 2} ellipsizeMode="tail">
               {postInfo.text}
             </Text>
           </View>
-          <TouchableOpacity 
-            style={{ marginLeft: 10 }}
-            onPress={() => setIsExpanded(!isExpanded)}>
-            <Text>Read more...</Text>
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity 
+          style={{ alignSelf: 'flex-end', marginRight: 10 }}
+          onPress={() => setIsExpanded(!isExpanded)}>
+          <Text>Read more...</Text>
+        </TouchableOpacity>
       </View>
       <Sponsor 
         {...sponsor}
@@ -82,11 +82,12 @@ const styles = StyleSheet.create({
   },
   bottomContent: {
     position: 'absolute',
-    bottom: 130,
+    bottom: 10,
     left: 10,
-    right: 80,
+    right: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     // maxHeight: 80,
   },
   videoContainer: {
