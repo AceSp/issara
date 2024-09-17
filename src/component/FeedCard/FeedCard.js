@@ -45,7 +45,10 @@ function FeedCard({
       <View 
         style={[
           styles.bottomContent, 
-          { flexDirection: isExpanded ? 'column' : 'row' }
+          { 
+            flexDirection: isExpanded ? 'column' : 'row',
+            backgroundColor: isExpanded ? 'rgba(0, 0, 0, 0.7)' : 'transparent'
+          }
         ]}>
         <View style={styles.textContainer}>
           <Text style={styles.username}>@{postInfo.author.itemName}</Text>
@@ -87,8 +90,7 @@ const styles = StyleSheet.create({
     bottom: 130,
     left: 10,
     right: 10,
-    width: width - 80,
-    backgroundColor: isExpanded ? 'rgba(0, 0, 0, 0.7)' : 'transparent'
+    width: width - 80
     // maxHeight: 80,
   },
   videoContainer: {
