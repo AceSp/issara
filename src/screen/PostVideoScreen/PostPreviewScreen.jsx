@@ -1,5 +1,6 @@
 import React, { 
   useState, 
+  useEffect 
 } from 'react';
 import { 
   View, 
@@ -11,6 +12,7 @@ import {
   closeEditor, 
   showEditor 
 } from 'react-native-video-trim';
+import { NativeModules, NativeEventEmitter } from 'react-native';
 
 import { VideoPlayer } from '../../component/Video/views';
 import PostTextModal from '../../component/PostTextModal';
@@ -113,6 +115,12 @@ function PostPreviewScreen({
       >
         <IonIcon name="create" color="white" size={24} />
       </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.editButton} 
+        onPress={() => showEditor(uri)}
+      >
+        <IonIcon name="cut" color="white" size={24} />
+      </TouchableOpacity>
       <PostTextModal 
         visible={isModalVisible}
         onDismiss={() => setModalVisible(false)}
@@ -133,6 +141,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editButton: {
+    position: 'absolute',
+    top: 20,
+    right: 90,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 25,
     width: 50,
