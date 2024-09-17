@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flexDirection: 'column', 
-    flex: 5
+    flex: isExpanded ? 1 : 5
   }
 });
 
