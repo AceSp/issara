@@ -194,7 +194,9 @@ const Register = (props) => {
     let referrerToken = '';
     PlayInstallReferrer.getInstallReferrerInfo((installReferrerInfo, error) => {
       if (!error) {
-        console.log("Install referrer = " + installReferrerInfo.installReferrer);
+        const referrerMatch = installReferrerInfo.installReferrer.match(/referrer\?=(.*)/);
+        const referrerToken = referrerMatch ? referrerMatch[1] : '';
+        console.log("Referrer token = " + referrerToken);
       } else {
         console.log("Failed to get install referrer info!");
         console.log("Response code: " + error.responseCode);
