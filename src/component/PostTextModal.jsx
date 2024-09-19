@@ -16,12 +16,12 @@ import { store } from '../utils/store';
 import { iOSColors } from 'react-native-typography';
 const { width, height } = Dimensions.get('window');
 
-const PostTextModal = ({ visible, onDismiss }) => {
+const PostTextModal = ({ visible, onDismiss, onPost }) => {
   const { state: { me } } = useContext(store);
   const [text, setText] = useState('');
 
   const handleHashtagPress = () => {
-    setText(prevText => prevText + ' #hashtag');
+    setText(prevText => prevText + ' #');
   };
 
   return (
@@ -37,7 +37,7 @@ const PostTextModal = ({ visible, onDismiss }) => {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Comments</Text>
+          <Text style={styles.headerText}>คำบรรยายวิดีโอ</Text>
           <IconButton onPress={onDismiss} icon='close' size={24} />
         </View>
         <TextInput
@@ -50,7 +50,7 @@ const PostTextModal = ({ visible, onDismiss }) => {
           maxLength={320}
         />
         <TouchableOpacity onPress={handleHashtagPress} style={styles.hashtagButton}>
-          <Text style={styles.hashtagButtonText}>Add Hashtag</Text>
+          <Text style={styles.hashtagButtonText}># แฮชแท็ก</Text>
         </TouchableOpacity>
       </View>
     </Modal>
@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: 'black',
     alignSelf: 'center',
-    backgroundColor: 'red',
     textAlignVertical: 'top'
   },
   closeButtonText: {
@@ -104,12 +103,11 @@ const styles = StyleSheet.create({
   hashtagButton: {
     alignSelf: 'flex-start',
     marginLeft: 20,
-    backgroundColor: iOSColors.blue,
+    backgroundColor: iOSColors.lightGray,
     padding: 10,
     borderRadius: 5,
   },
   hashtagButtonText: {
-    color: 'white',
     fontSize: 16,
   },
 });
