@@ -52,6 +52,9 @@ const PostTextModal = ({ visible, onDismiss, onPost }) => {
         <TouchableOpacity onPress={handleHashtagPress} style={styles.hashtagButton}>
           <Text style={styles.hashtagButtonText}># แฮชแท็ก</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={onPost} style={styles.postButton}>
+          <Text style={styles.postButtonText}>Post</Text>
+        </TouchableOpacity>
       </View>
     </Modal>
   );
@@ -108,6 +111,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   hashtagButtonText: {
+    fontSize: 16,
+  },
+  postButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: iOSColors.blue,
+    padding: 10,
+    borderRadius: 5,
+  },
+  postButtonText: {
+    color: 'white',
     fontSize: 16,
   },
 });
