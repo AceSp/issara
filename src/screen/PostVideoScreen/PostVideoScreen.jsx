@@ -11,7 +11,8 @@ import {
   TouchableOpacity,
   Platform,
   NativeModules,
-  NativeEventEmitter,
+  NativeEventEmitter, 
+  Image
 } from 'react-native'
 import {launchImageLibrary} from 'react-native-image-picker'
 import { TapGestureHandler } from 'react-native-gesture-handler'
