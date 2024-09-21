@@ -1,6 +1,7 @@
 import React, { 
   useState, 
-  useEffect 
+  useEffect,
+  useContext 
 } from 'react';
 import { 
   View, 
@@ -13,10 +14,13 @@ import {
   showEditor 
 } from 'react-native-video-trim';
 import { NativeModules, NativeEventEmitter } from 'react-native';
+import BackgroundService from 'react-native-background-actions';
+import IonIcon from 'react-native-vector-icons/Ionicons';
 
 import { VideoPlayer } from '../../component/Video/views';
 import PostTextModal from '../../component/PostTextModal';
-import IonIcon from 'react-native-vector-icons/Ionicons';
+import uploadFileInChunks from '../../utils/uploadFileInChunks'
+import { store } from '../../utils/store';
 
 function PostPreviewScreen({
   route
@@ -24,13 +28,17 @@ function PostPreviewScreen({
   // const { 
   //   uri
   // } = route.params;
+  const uri = 'file:///data/user/0/com.gokgokgok/cache/rn_image_picker_lib_temp_75ad52c0-8c9b-47a0-80cc-e3170be56654.mp4'
+  const { state: { me } } = useContext(store);
+
+  const [source, setSource] = useState(uri);
   const [paused, setPaused] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false)
   const toggleVideo = () => {
     setPaused(!paused);
   }
 
-  const handleUpload = async (filePath) => {
+  const handleUpload = async (filePath, text, tags) => {
     const options = {
       taskName: 'FileUpload',
       taskTitle: 'Uploading File',
@@ -43,7 +51,7 @@ function PostPreviewScreen({
       //change this for opening the app from notification
       linkingURI: 'uploadFile',
     };
-    await BackgroundService.start(() => uploadFileInChunks(filePath, me.id), options);
+    await BackgroundService.start(() => uploadFileInChunks(filePath, me?.id, text, tags), options);
   };
 
   useEffect(() => {
@@ -69,7 +77,7 @@ function PostPreviewScreen({
         }
         case 'onFinishTrimming': {
           console.log('onFinishTrimming', event);
-          handleUpload(event.outputPath)
+          setSource(event.outputPath)
           closeEditor();
           break;
         }
@@ -100,11 +108,10 @@ function PostPreviewScreen({
       subscription.remove();
     };
   }, []);
-  const uri = 'file:///data/user/0/com.gokgokgok/cache/rn_image_picker_lib_temp_75ad52c0-8c9b-47a0-80cc-e3170be56654.mp4'
   return (
     <View style={styles.container}>
       <VideoPlayer 
-        source={{uri}} 
+        source={{ uri: source }} 
         paused={paused}
         onPress={toggleVideo}
         style={styles.video} 
@@ -124,6 +131,8 @@ function PostPreviewScreen({
       <PostTextModal 
         visible={isModalVisible}
         onDismiss={() => setModalVisible(false)}
+        onPost={handleUpload}
+        source={source}
        />
     </View>
   );
