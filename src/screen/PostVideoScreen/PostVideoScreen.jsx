@@ -319,7 +319,7 @@ function PostVideoScreen({ navigation }) {
           { 
             right: SAFE_AREA_PADDING.paddingRight 
             + CONTROL_BUTTON_SIZE 
-            + CONTENT_SPACING 
+            + CONTENT_SPACING,
           }
         ]} 
         onPress={onFlipCameraPressed} 
