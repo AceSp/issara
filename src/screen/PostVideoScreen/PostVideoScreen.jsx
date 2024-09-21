@@ -313,31 +313,23 @@ function PostVideoScreen({ navigation }) {
         flash={'off'}
         enabled={isCameraInitialized && isActive}
       />
-      <TouchableOpacity 
-        style={[
-          styles.captureButton, 
-          { 
-            left: SAFE_AREA_PADDING.paddingLeft + 200 
-            + CONTROL_BUTTON_SIZE 
-            + CONTENT_SPACING 
-          }
-        ]} 
-        onPress={async () => {
-          const files = await listFiles()
-          // await cleanFiles()
-          console.log("-----------POstVideoScreen----listFiles")
-          console.log(files);
-          BackgroundService.stop();
-          handleUpload(files[0])
-        }}
-        disabledOpacity={0.4}
-      >
-        <IonIcon name="cloud-upload" color="white" size={24} />
+      <TouchableOpacity onPress={onFlipCameraPressed} disabledOpacity={0.4}>
+        <IonIcon name="camera-reverse" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
       <View style={styles.rightButtonRow}>
-        <TouchableOpacity style={styles.button} onPress={onFlipCameraPressed} disabledOpacity={0.4}>
-          <IonIcon name="camera-reverse" color="white" size={24} />
+        <TouchableOpacity 
+          onPress={async () => {
+            const files = await listFiles()
+            // await cleanFiles()
+            console.log("-----------POstVideoScreen----listFiles")
+            console.log(files);
+            BackgroundService.stop();
+            handleUpload(files[0])
+          }}
+          disabledOpacity={0.4}
+        >
+          <IonIcon name="cloud-upload" color="white" size={24} />
         </TouchableOpacity>
       </View>
     </View>
@@ -353,15 +345,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignSelf: 'center',
     bottom: SAFE_AREA_PADDING.paddingBottom,
-  },
-  button: {
-    marginBottom: CONTENT_SPACING,
-    width: CONTROL_BUTTON_SIZE,
-    height: CONTROL_BUTTON_SIZE,
-    borderRadius: CONTROL_BUTTON_SIZE / 2,
-    backgroundColor: 'rgba(140, 140, 140, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   rightButtonRow: {
     position: 'absolute',
