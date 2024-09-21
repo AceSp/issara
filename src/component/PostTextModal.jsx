@@ -24,24 +24,9 @@ const PostTextModal = ({
 }) => {
   const { state: { me } } = useContext(store);
   const [text, setText] = useState('');
-  const [tagText, setTagText] = useState('');
-  const [tags, setTags] = useState([]);
-
-  const handleSpacePress = (newText) => {
-    if (newText.endsWith(' ')) {
-      const words = newText.split(' ');
-      const lastWord = words[words.length - 2];
-      if (lastWord.startsWith('#')) {
-        setTags(prevTags => [...prevTags, lastWord]);
-        setTagText('');
-      }
-    }
-    setText(newText);
-  };
 
   const handleHashtagPress = () => {
     setText(prevText => prevText + ' #');
-    setTagText('');
   };
 
   return (
@@ -65,7 +50,7 @@ const PostTextModal = ({
           placeholder="Type something..."
           placeholderTextColor="gray"
           value={text}
-          onChangeText={handleSpacePress}
+          onChangeText={setText}
           multiline
           maxLength={320}
         />
