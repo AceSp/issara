@@ -295,7 +295,8 @@ function PostVideoScreen({ navigation }) {
           { 
             left: SAFE_AREA_PADDING.paddingLeft 
             + CONTROL_BUTTON_SIZE 
-            + CONTENT_SPACING 
+            + CONTENT_SPACING,
+            bottom: CONTROL_BUTTON_SIZE
           }
         ]} 
         onPress={openVideoGallery} 
@@ -320,6 +321,7 @@ function PostVideoScreen({ navigation }) {
             right: SAFE_AREA_PADDING.paddingRight 
             + CONTROL_BUTTON_SIZE 
             + CONTENT_SPACING,
+            bottom: CONTROL_BUTTON_SIZE
           }
         ]} 
         onPress={onFlipCameraPressed} 
@@ -327,7 +329,7 @@ function PostVideoScreen({ navigation }) {
         <IonIcon name="camera-reverse" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
-      <View style={styles.rightButtonRow}>
+      {/* <View style={styles.rightButtonRow}>
         <TouchableOpacity 
           onPress={async () => {
             const files = await listFiles()
@@ -341,7 +343,7 @@ function PostVideoScreen({ navigation }) {
         >
           <IonIcon name="cloud-upload" color="white" size={24} />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   )
 }
