@@ -3,7 +3,6 @@ import {
   useRef, 
   useState, 
   useCallback, 
-  useContext
 } from 'react'
 import { 
   StyleSheet, 
@@ -13,7 +12,6 @@ import {
   Platform,
   NativeModules,
   NativeEventEmitter,
-  Modal
 } from 'react-native'
 import {launchImageLibrary} from 'react-native-image-picker'
 import { TapGestureHandler } from 'react-native-gesture-handler'
@@ -55,10 +53,6 @@ import { CaptureButton } from '../../utils/views/CaptureButton'
 import IonIcon from 'react-native-vector-icons/Ionicons'
 import { useIsFocused } from '@react-navigation/core'
 import { usePreferredCameraDevice } from '../../utils/hooks/usePreferredCameraDevice'
-import axios from 'axios'
-import uploadFileInChunks from '../../utils/uploadFileInChunks'
-import { store } from '../../utils/store'
-import PostTextModal from '../../component/PostTextModal'
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -69,10 +63,8 @@ const SCALE_FULL_ZOOM = 3
 
 function PostVideoScreen({ navigation }) {
 
-  const { state: { me } } = useContext(store);
   const camera = useRef(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-  const [isModalVisible, setModalVisible] = useState(false)
   const microphone = Camera.getMicrophonePermissionStatus()
   const location = useLocationPermission()
   const zoom = useSharedValue(1)
@@ -232,87 +224,19 @@ function PostVideoScreen({ navigation }) {
     } else {
       const source = result.uri || result.assets[0].uri;
       console.log('Selected video:', source);
+      console.log(result)
       isValidFile(result.assets[0].uri || '').then((res) =>
         console.log(res)
       );
       // Handle the selected video here, e.g., navigate to a new screen with the video
-      setModalVisible(true);
+      navigation.navigate('PostPreview', { uri: source })
     }
 
     // showEditor(result.assets[0]?.uri || '', {
     // });
   }
 
-  const handleUpload = async (filePath) => {
-    const options = {
-      taskName: 'FileUpload',
-      taskTitle: 'Uploading File',
-      taskDesc: 'Progress',
-      taskIcon: {
-        name: 'ic_launcher',
-        type: 'mipmap',
-      },
-      color: '#ff00ff',
-      //change this for opening the app from notification
-      linkingURI: 'uploadFile',
-    };
-    await BackgroundService.start(() => uploadFileInChunks(filePath, me.id), options);
-  };
 
-  useEffect(() => {
-    const eventEmitter = new NativeEventEmitter(NativeModules.VideoTrim);
-    const subscription = eventEmitter.addListener('VideoTrim', (event) => {
-      switch (event.name) {
-        case 'onLoad': {
-          // on media loaded successfully
-          console.log('onLoadListener', event);
-          break;
-        }
-        case 'onShow': {
-          console.log('onShowListener', event);
-          break;
-        }
-        case 'onHide': {
-          console.log('onHide', event);
-          break;
-        }
-        case 'onStartTrimming': {
-          console.log('onStartTrimming', event);
-          break;
-        }
-        case 'onFinishTrimming': {
-          console.log('onFinishTrimming', event);
-          handleUpload(event.outputPath)
-          closeEditor();
-          break;
-        }
-        case 'onCancelTrimming': {
-          console.log('onCancelTrimming', event);
-          break;
-        }
-        case 'onCancel': {
-          console.log('onCancel', event);
-          break;
-        }
-        case 'onError': {
-          console.log('onError', event);
-          break;
-        }
-        case 'onLog': {
-          console.log('onLog', event);
-          break;
-        }
-        case 'onStatistics': {
-          console.log('onStatistics', event);
-          break;
-        }
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
   // const frameProcessor = useFrameProcessor((frame) => {
   //   'worklet'
 
@@ -327,7 +251,7 @@ function PostVideoScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {device == null ? (
+      {device != null ? (
           <Reanimated.View onTouchEnd={onFocusTap} style={StyleSheet.absoluteFill}>
             <TapGestureHandler onEnded={onDoubleTap} numberOfTaps={2}>
               <ReanimatedCamera
@@ -374,8 +298,7 @@ function PostVideoScreen({ navigation }) {
             + CONTENT_SPACING 
           }
         ]} 
-        // onPress={openVideoGallery} 
-        onPress={() => setModalVisible(true)} 
+        onPress={openVideoGallery} 
         disabledOpacity={0.4}
       >
         <IonIcon name="cloud-upload" color="white" size={24} />
@@ -391,13 +314,13 @@ function PostVideoScreen({ navigation }) {
         enabled={isCameraInitialized && isActive}
       />
       <TouchableOpacity 
-      style={[
-        styles.captureButton, 
-        { 
-          left: SAFE_AREA_PADDING.paddingLeft + 200 
-          + CONTROL_BUTTON_SIZE 
-          + CONTENT_SPACING 
-        }
+        style={[
+          styles.captureButton, 
+          { 
+            left: SAFE_AREA_PADDING.paddingLeft + 200 
+            + CONTROL_BUTTON_SIZE 
+            + CONTENT_SPACING 
+          }
         ]} 
         onPress={async () => {
           const files = await listFiles()
@@ -451,18 +374,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalText: {
-    color: 'white',
-    fontSize: 18,
-    marginBottom: 20,
-  },
-
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
