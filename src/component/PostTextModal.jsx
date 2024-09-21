@@ -29,6 +29,16 @@ const PostTextModal = ({
     setText(prevText => prevText + ' #');
   };
 
+  const extractTags = (text) => {
+    const regex = /#(\w+)/g;
+    const tags = [];
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+      tags.push(match[1]);
+    }
+    return tags;
+  };
+
   return (
     <Modal
       visible={visible}
@@ -57,7 +67,10 @@ const PostTextModal = ({
         <TouchableOpacity onPress={handleHashtagPress} style={styles.hashtagButton}>
           <Text style={styles.hashtagButtonText}># แฮชแท็ก</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => onPost(source, text)} style={styles.postButton}>
+        <TouchableOpacity onPress={() => {
+          const tags = extractTags(text);
+          onPost(source, text, tags);
+        }} style={styles.postButton}>
           <Text style={styles.postButtonText}>Post</Text>
         </TouchableOpacity>
       </View>
