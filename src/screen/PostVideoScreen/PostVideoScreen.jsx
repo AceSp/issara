@@ -302,7 +302,10 @@ function PostVideoScreen({ navigation }) {
         onPress={openVideoGallery} 
         disabledOpacity={0.4}
       >
-        <IonIcon name="cloud-upload" color="white" size={24} />
+        <Image 
+          source={{ uri: 'https://example.com/preview-image.jpg' }} 
+          style={{ width: 24, height: 24 }} 
+        />
       </TouchableOpacity>
       <CaptureButton
         style={styles.captureButton}
