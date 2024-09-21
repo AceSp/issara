@@ -292,6 +292,11 @@ function PostVideoScreen({ navigation }) {
       <TouchableOpacity 
         style={[
           styles.captureButton, 
+          { 
+            left: SAFE_AREA_PADDING.paddingLeft 
+            + CONTROL_BUTTON_SIZE 
+            + CONTENT_SPACING 
+          }
         ]} 
         onPress={openVideoGallery} 
         disabledOpacity={0.4}
@@ -311,6 +316,11 @@ function PostVideoScreen({ navigation }) {
       <TouchableOpacity 
         style={[
           styles.captureButton, 
+          { 
+            right: SAFE_AREA_PADDING.paddingRight 
+            + CONTROL_BUTTON_SIZE 
+            + CONTENT_SPACING 
+          }
         ]} 
         onPress={onFlipCameraPressed} 
         disabledOpacity={0.4}>
