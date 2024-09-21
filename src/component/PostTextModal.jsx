@@ -16,9 +16,16 @@ import { store } from '../utils/store';
 import { iOSColors } from 'react-native-typography';
 const { width, height } = Dimensions.get('window');
 
-const PostTextModal = ({ visible, onDismiss, onPost }) => {
+const PostTextModal = ({ 
+  visible, 
+  onDismiss, 
+  onPost,
+  source
+}) => {
   const { state: { me } } = useContext(store);
   const [text, setText] = useState('');
+  const [tagText, setTagText] = useState('');
+  const [tags, setTags] = useState([]);
 
   const handleHashtagPress = () => {
     setText(prevText => prevText + ' #');
@@ -52,7 +59,7 @@ const PostTextModal = ({ visible, onDismiss, onPost }) => {
         <TouchableOpacity onPress={handleHashtagPress} style={styles.hashtagButton}>
           <Text style={styles.hashtagButtonText}># แฮชแท็ก</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={onPost} style={styles.postButton}>
+        <TouchableOpacity onPress={() => onPost(source, text)} style={styles.postButton}>
           <Text style={styles.postButtonText}>Post</Text>
         </TouchableOpacity>
       </View>
