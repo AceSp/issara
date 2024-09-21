@@ -292,11 +292,6 @@ function PostVideoScreen({ navigation }) {
       <TouchableOpacity 
         style={[
           styles.captureButton, 
-          { 
-            left: SAFE_AREA_PADDING.paddingLeft 
-            + CONTROL_BUTTON_SIZE 
-            + CONTENT_SPACING 
-          }
         ]} 
         onPress={openVideoGallery} 
         disabledOpacity={0.4}
@@ -313,7 +308,12 @@ function PostVideoScreen({ navigation }) {
         flash={'off'}
         enabled={isCameraInitialized && isActive}
       />
-      <TouchableOpacity onPress={onFlipCameraPressed} disabledOpacity={0.4}>
+      <TouchableOpacity 
+        style={[
+          styles.captureButton, 
+        ]} 
+        onPress={onFlipCameraPressed} 
+        disabledOpacity={0.4}>
         <IonIcon name="camera-reverse" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
