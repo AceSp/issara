@@ -171,6 +171,26 @@ function PostVideoScreen({ navigation }) {
     location.requestPermission()
   }, [location])
 
+  useEffect(async () => {
+    const permission = await MediaLibrary.requestPermissionsAsync();
+    if (!permission.granted) {
+      console.log('Permission not granted');
+      return null;
+    }
+
+    const media = await MediaLibrary.getAssetsAsync({
+      first: 1,
+      sortBy: ['creationTime'],
+      mediaType: ['photo', 'video'],
+    });
+
+    if (media.assets.length > 0) {
+      return media.assets[0];
+    }
+
+    return null;
+  }, [])
+
   async function checkImagePermission() {
     if (Platform.OS === 'android') {
       const result = await check(PERMISSIONS.ANDROID.CAMERA)
@@ -237,7 +257,6 @@ function PostVideoScreen({ navigation }) {
     // showEditor(result.assets[0]?.uri || '', {
     // });
   }
-
 
   // const frameProcessor = useFrameProcessor((frame) => {
   //   'worklet'
