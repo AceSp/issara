@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalButton: {
-    position: 'absolute',
-    top: 20,
+    position: 'relative',
+    bottom: 20,
     right: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 25,
@@ -158,8 +158,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    position: 'absolute',
-    top: 20,
+    position: 'relative',
+    bottom: 20,
     right: 90,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 25,
