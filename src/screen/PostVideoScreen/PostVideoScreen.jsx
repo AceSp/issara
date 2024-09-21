@@ -15,6 +15,7 @@ import {
   Image
 } from 'react-native'
 import {launchImageLibrary} from 'react-native-image-picker'
+import MediaLibrary from 'react-native-media-library'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import {
   useCameraDevice,
