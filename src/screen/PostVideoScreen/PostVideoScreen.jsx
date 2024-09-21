@@ -172,23 +172,10 @@ function PostVideoScreen({ navigation }) {
   }, [location])
 
   useEffect(async () => {
-    const permission = await MediaLibrary.requestPermissionsAsync();
-    if (!permission.granted) {
-      console.log('Permission not granted');
-      return null;
+    const lastItemUri = await getLastGalleryItem();
+    if (lastItemUri) {
+      setPreviewImage(lastItemUri);
     }
-
-    const media = await MediaLibrary.getAssetsAsync({
-      first: 1,
-      sortBy: ['creationTime'],
-      mediaType: ['photo', 'video'],
-    });
-
-    if (media.assets.length > 0) {
-      return media.assets[0];
-    }
-
-    return null;
   }, [])
 
   async function checkImagePermission() {
@@ -324,7 +311,7 @@ function PostVideoScreen({ navigation }) {
         disabledOpacity={0.4}
       >
         <Image 
-          source={{ uri: 'https://example.com/preview-image.jpg' }} 
+          source={{ uri: previewImage || 'https://example.com/preview-image.jpg' }} 
           style={{ width: 24, height: 24 }} 
         />
       </TouchableOpacity>
