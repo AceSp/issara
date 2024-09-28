@@ -3,10 +3,10 @@
 
  const VideoPreviewItem = ({ item, navigation }) => {
      return (
-         <View style={{ flex: 1, margin: 2, width: '30%', aspectRatio: 1 }}>
+         <View style={{ flex: 1/3, aspectRatio: 0.7, margin: 1 }}>
              <Image
                 source={{ uri: item.postInfo.thumbnail }}
-                style={{ width: '100%', height: '100%', aspectRatio: 1 }}
+                style={{ width: '100%', height: '100%' }}
              />
          </View>
      );
