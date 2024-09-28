@@ -503,7 +503,7 @@ export default function UserProfileScreen(props) {
                 keyExtractor={item => item.postInfo.id}
                 renderItem={_renderItem}
                 numColumns={3}
-                columnWrapperStyle={{ justifyContent: 'space-between' }}
+                columnWrapperStyle={{ justifyContent: 'flex-start' }}
                 onEndReachedThreshold={0.9}
                 onEndReached={() => data.getUserPosts.pageInfo.hasNextPage ? loadMore() : null}     
                 removeClippedSubviews={true}
