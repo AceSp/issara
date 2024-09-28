@@ -497,13 +497,13 @@ export default function UserProfileScreen(props) {
                         userData={user_data.getUser}
                         navigation={props.navigation}
                     />}
-                contentContainerStyle={{ alignSelf: 'stretch' }}
+                contentContainerStyle={{ flex: 1, alignSelf: 'stretch' }}
                 // data={data.getUserPosts.posts}
                 data={testPosts}
                 keyExtractor={item => item.postInfo.id}
                 renderItem={_renderItem}
                 numColumns={3}
-                columnWrapperStyle={{ justifyContent: 'flex-start', paddingHorizontal: 10 }}
+                columnWrapperStyle={{ justifyContent: 'flex-start', backgroundColor: 'red' }}
                 onEndReachedThreshold={0.9}
                 onEndReached={() => data.getUserPosts.pageInfo.hasNextPage ? loadMore() : null}     
                 removeClippedSubviews={true}
