@@ -18,7 +18,7 @@ import { BOTTOM_TAB_HEIGHT } from '../utils/constants'
 const { height, width } = Dimensions.get('window');
 
 const UserVideoScreen = (props) => {
-  const param = props.route.params || {};
+  const param = props.route.params;
   const { state: { me } } = useContext(store);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -26,7 +26,7 @@ const UserVideoScreen = (props) => {
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(
     GET_USER_POSTS_QUERY,
     {
-        variables: { postId: param.postId }
+        variables: { userId: param.userId }
     }
   );
 
