@@ -32,6 +32,15 @@ const UserVideoScreen = (props) => {
 
   const flatlistRef = useRef();
 
+  useEffect(() => {
+    if (data && postId) {
+      const index = data.getPosts.posts.findIndex(post => post.postInfo.id === postId);
+      if (index !== -1) {
+        flatlistRef.current.scrollToIndex({ index, animated: true });
+      }
+    }
+  }, [data, postId]);
+
   function loadMore() {
     fetchMore({
       variables: {
