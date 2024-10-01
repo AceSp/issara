@@ -108,9 +108,13 @@ export default function UserProfileScreen(props) {
       });
   }
 
-  const _renderItem = ({ item }) => <VideoPreviewItem
-      item={item}
-      navigation={props.navigation} />
+  const _renderItem = ({ item }) => (
+      <VideoPreviewItem
+          item={item}
+          onPress={() => props.navigation.navigate('UserVideoScreen', { postId: item.postInfo.id })}
+          navigation={props.navigation}
+      />
+  )
 
   if (loading || user_loading) return (
       <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}>
