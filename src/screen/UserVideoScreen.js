@@ -19,6 +19,7 @@ const { height, width } = Dimensions.get('window');
 
 const UserVideoScreen = (props) => {
   const param = props.route.params;
+  const { postId } = param;
   const { state: { me } } = useContext(store);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
