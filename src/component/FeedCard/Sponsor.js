@@ -2,10 +2,12 @@ import React, { memo, useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  Image
+  Image,
+  Dimensions
 } from 'react-native';
 import {
   Card,
+  IconButton,
   Text,
   TouchableRipple
 } from 'react-native-paper';
@@ -16,32 +18,71 @@ import {
     iOSColors, 
     iOSUIKitTall 
 } from 'react-native-typography';
+import Modal from 'react-native-modal'; 
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import { DEFAULT_AVATAR } from '../../utils/constants';
+import ShopScreen from '../../screen/shopScreen/ShopScreen';
 // import AdmobSponsor from './AdmobSponsor';
 
 moment.locale('th');
 
+const { width, height } = Dimensions.get('window');
+
 function Sponsor({
   text,
   shop,
+  navigation,
   isAdmob
 }) {
-  console.log("----------Sponsor--------------------")
-  console.log(shop)
+  const [modalVisible, setIsModalVisible] = useState(false);
+  const dismissModal = () => {
+    setIsModalVisible(false)
+  }
   return (
-  <View style={styles.container}>
-    {/* <Image source={{ uri: shop.avatar }} style={styles.avatar} /> */}
+  <TouchableOpacity 
+    onPress={() => setIsModalVisible(true)}
+    style={styles.container}>
     <Image 
-      source={{ uri: 'https://avatars.githubusercontent.com/u/97165289' }} 
+      source={{ uri: shop.avatar ? shop.avatar : DEFAULT_AVATAR }} 
       style={styles.avatar} />
+    {/* <Image 
+      source={{ uri: 'https://avatars.githubusercontent.com/u/97165289' }} 
+      style={styles.avatar} /> */}
     <View style={styles.textContainer}>
       <Text style={styles.itemName}>{shop.itemName}</Text>
       <Text style={styles.text}>{text}</Text>
     </View>
-  </View>
+    <Modal
+      visible={modalVisible}
+      onDismiss={dismissModal}
+      isVisible={modalVisible}
+      onBackdropPress={dismissModal}
+      onSwipeComplete={dismissModal}
+      swipeDirection="down"
+      propagateSwipe={true}
+      style={styles.modal} // Add style for modal
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Comments</Text>
+          <IconButton icon='close' onPress={dismissModal} />
+        </View>
+        <ShopScreen shopId={shop.id} navigation={navigation} />
+      </View>
+    </Modal>
+  </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 4,
+    margin: 10,
+    marginRight: 20,
+  },
   container: {
     flexDirection: 'row',
     width: '100%',
@@ -51,26 +92,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     height: 120
   },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 4,
-    margin: 10,
-    marginRight: 20,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: iOSColors.lightGray,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  itemName: {
+    ...iOSUIKitTall.title3White,
+    margin: 5
+  },
+  modal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: height * 0.9,
+    paddingBottom: 20,
   },
   textContainer: {
     flex: 1,
-    justifyContent: 'center',
     padding: 10,
-    height: '100%'
-  },
-  itemName: {
-    ...iOSUIKitTall.title3Emphasized,
-    color: iOSColors.white,
   },
   text: {
-    ...iOSUIKitTall.subhead,
-    color: iOSColors.white,
+    ...iOSUIKitTall.bodyWhite,
+    margin: 5
   },
 })
 
