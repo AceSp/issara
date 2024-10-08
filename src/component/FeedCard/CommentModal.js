@@ -10,7 +10,7 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import Modal from 'react-native-modal'; // Import Modal from react-native-modal
+import Modal from 'react-native-modal'; 
 import Avatar from './Avatar';
 import { Icon } from 'react-native-elements';
 import { useMutation, useQuery } from '@apollo/client';
@@ -29,6 +29,7 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
   const { state: { me } } = useContext(store);
   const [text, setText] = useState('');
   const [showNewComment, setShow] = useState(false);
+  const [parentId, setParentId] = useState(postId);
 
   const { loading, error, data, fetchMore } = useQuery(GET_COMMENTS_QUERY, {
     variables: {
@@ -49,17 +50,89 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     }
   }, [visible]);
 
+  const setReply = (commentId) => {
+    inputRef.current.focus()
+    setParentId(commentId)
+  }
+
   const submit = () => {
     createComment({
       variables: {
         text: text,
-        parentId: postId,
+        parentId,
       },
       optimisticResponse: {
-        // ... (keep the optimisticResponse as is)
+        __typename: 'Mutation',
+        createComment: {
+          __typename: 'CreateComment',
+          relation: {
+            __typename: 'Relation',
+            id: Math.round(Math.random()* -1000000).toString(),
+            isLiked: false,
+            isCoined: null,
+            isViewed: null,
+            isSaved: null,
+            userCoinCount: null
+          },
+          commentInfo: {
+            __typename: 'CommentInfo',
+            id: Math.round(Math.random()* -1000000).toString(),
+            text: text,
+            likeCount: 0,
+            commentCount: 0,
+            createdAt: new Date(),
+            author: {
+                __typename: 'Author',
+                id: Math.round(Math.random()* -1000000).toString(),
+                itemName: me.itemName,
+                avatar: me.avatar,
+            } 
+          } 
+      }
       },
       update: (store, { data: { createComment } }) => {
-        // ... (keep the update logic as is)
+        const storedData = store.readQuery({ 
+          query: GET_COMMENTS_QUERY,
+          variables: {
+          pk: postId,
+          getNewComments: showNewComment
+        }
+        });
+
+        const data = JSON.parse(JSON.stringify(storedData));
+        if(!data.getComments.comments) {
+          store.writeQuery({ query: GET_COMMENTS_QUERY, 
+            variables: {
+              pk: postId,
+              getNewComments: showNewComment
+            }, 
+            data: { 
+                getComments: {
+                __typename: 'getComments',
+                pageInfo: {
+                  __typename: 'PageInfo',
+                  hasNextPage: false,
+                  endCursor: createComment.commentInfo.id
+                },
+                comments: [createComment]
+              }  
+            } 
+          });
+        } else if(!data.getComments.comments.find(c => c.commentInfo.id === createComment.commentInfo.id)) {
+          store.writeQuery({ query: GET_COMMENTS_QUERY, 
+            variables: {
+              pk: postId,
+              getNewComments: showNewComment
+            }, 
+            data: { 
+                getComments: {
+                __typename: 'GetComments',
+                pageInfo: {...data.getComments.pageInfo},
+                comments: [createComment, ...data.getComments.comments]
+              }  
+            } 
+          });
+        }
       },
     });
     Keyboard.dismiss();
@@ -86,11 +159,15 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     <CommentItem
       {...postData}
       {...item}
+      setReply={setReply}
     />
   );
 
   if (loading) return <Loading />;
   if (error) return <Text>Error: {error.message}</Text>;
+
+  console.log('-------------CommentModal------------')
+  console.log(parentId)
 
   return (
     <Modal
@@ -127,6 +204,7 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
             <TextInput
               style={styles.inputBox}
               value={text}
+              onDismiss={() => setParentId(postId)}
               placeholder="Write a comment..."
               onChangeText={(value) => setText(value)}
               ref={inputRef}
