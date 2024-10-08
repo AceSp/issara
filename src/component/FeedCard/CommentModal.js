@@ -9,6 +9,7 @@ import {
   Keyboard,
   Dimensions,
   ScrollView,
+  KeyboardEvent,
 } from 'react-native';
 import Modal from 'react-native-modal'; 
 import Avatar from './Avatar';
@@ -48,6 +49,14 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     if (visible) {
       viewPost({ variables: { postId: postId } });
     }
+
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      inputRef.current.blur();
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+    };
   }, [visible]);
 
   const setReply = (commentId) => {
