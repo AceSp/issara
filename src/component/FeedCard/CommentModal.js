@@ -51,7 +51,9 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     }
 
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      inputRef.current.blur();
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
     });
 
     return () => {
