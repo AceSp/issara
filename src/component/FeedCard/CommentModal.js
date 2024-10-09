@@ -177,8 +177,6 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
   if (loading) return <Loading />;
   if (error) return <Text>Error: {error.message}</Text>;
 
-  console.log('-------------CommentModal------------')
-  console.log(parentId)
 
   return (
     <Modal
@@ -215,7 +213,7 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
             <TextInput
               style={styles.inputBox}
               value={text}
-              onDismiss={() => setParentId(postId)}
+              onBlur={() => setParentId(postId)}
               placeholder="Write a comment..."
               onChangeText={(value) => setText(value)}
               ref={inputRef}
