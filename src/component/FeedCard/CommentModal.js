@@ -111,14 +111,15 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
         });
 
         const data = JSON.parse(JSON.stringify(storedData));
-        if(!data.getComments.comments) {
-          store.writeQuery({ query: GET_COMMENTS_QUERY, 
+        if (!data.getComments.comments) {
+          store.writeQuery({
+            query: GET_COMMENTS_QUERY,
             variables: {
               pk: postId,
               getNewComments: showNewComment
-            }, 
-            data: { 
-                getComments: {
+            },
+            data: {
+              getComments: {
                 __typename: 'getComments',
                 pageInfo: {
                   __typename: 'PageInfo',
@@ -126,23 +127,50 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
                   endCursor: createComment.commentInfo.id
                 },
                 comments: [createComment]
-              }  
-            } 
+              }
+            }
           });
-        } else if(!data.getComments.comments.find(c => c.commentInfo.id === createComment.commentInfo.id)) {
-          store.writeQuery({ query: GET_COMMENTS_QUERY, 
-            variables: {
-              pk: postId,
-              getNewComments: showNewComment
-            }, 
-            data: { 
+        } else if (!data.getComments.comments.find(c => c.commentInfo.id === createComment.commentInfo.id)) {
+          if (parentId === postId) {
+            store.writeQuery({
+              query: GET_COMMENTS_QUERY,
+              variables: {
+                pk: postId,
+                getNewComments: showNewComment
+              },
+              data: {
                 getComments: {
-                __typename: 'GetComments',
-                pageInfo: {...data.getComments.pageInfo},
-                comments: [createComment, ...data.getComments.comments]
-              }  
-            } 
-          });
+                  __typename: 'GetComments',
+                  pageInfo: { ...data.getComments.pageInfo },
+                  comments: [createComment, ...data.getComments.comments]
+                }
+              }
+            });
+          } else {
+            const updatedComments = data.getComments.comments.map(comment => {
+              if (comment.commentInfo.id === parentId) {
+                return {
+                  ...comment,
+                  replies: [...(comment.replies || []), createComment]
+                };
+              }
+              return comment;
+            });
+            store.writeQuery({
+              query: GET_COMMENTS_QUERY,
+              variables: {
+                pk: postId,
+                getNewComments: showNewComment
+              },
+              data: {
+                getComments: {
+                  __typename: 'GetComments',
+                  pageInfo: { ...data.getComments.pageInfo },
+                  comments: updatedComments
+                }
+              }
+            });
+          }
         }
       },
     });
