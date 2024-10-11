@@ -78,16 +78,7 @@ function CommentItem(props) {
           props.showReplyButton 
           ? null
           : <TouchableOpacity 
-              onPress={() => props.navigation.navigate('MoreComment', 
-              { 
-                comment: {
-                  commentInfo: props.commentInfo,
-                  relation: props.relation
-                }, 
-                textAutoFocus: true,
-                postInfo: props.postInfo
-              }
-              )}>
+              onPress={() => props.setReply(props.commentInfo.id)}>
             <Text style={{marginHorizontal: 20}}>ตอบกลับ</Text>
           </TouchableOpacity>
         }
@@ -103,7 +94,7 @@ function CommentItem(props) {
       })} 
       underlayColor='#dddcf5'>
       <View style={styles.bottomContainer}>
-        {props.commentInfo.commentCount? <Text style={{fontWeight: 'bold'}}>ดูการตอบกลับอีก {props.commentInfo.commentCount} รายการ</Text> : <View></View> }
+        {props.commentInfo.commentCount? <Text style={{fontWeight: 'bold'}}>ดูการตอบกลับอีก {props.replies.length} รายการ</Text> : <View></View> }
       </View>
       </TouchableOpacity>
     </View>
