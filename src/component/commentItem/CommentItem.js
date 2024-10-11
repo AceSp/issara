@@ -25,81 +25,129 @@ function CommentItem(props) {
 
   const [likeComment, {data}] = useMutation(LIKE_COMMENT_MUTATION);
 
-  const [ liked, setLiked ] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
 
   useEffect(() => {
-    if(liked != props.relation.isLiked) {
-        setLiked(props.relation.isLiked);
+    if (liked !== props.relation.isLiked) {
+      setLiked(props.relation.isLiked);
     }
-  },[props.relation.isLiked])
+  }, [props.relation.isLiked]);
 
   const likePress = () => {
     setLiked(!liked);
-    likeComment({ 
-      variables: {commentId: props.commentInfo.id}
+    likeComment({
+      variables: { commentId: props.commentInfo.id }
     });
-  } 
+  };
 
-  let likeCount = props.commentInfo.likeCount + (props.relation.isLiked? (liked? 0 : -1 ) : (liked? 1 : 0))
+  let likeCount = props.commentInfo.likeCount + (props.relation.isLiked ? (liked ? 0 : -1) : (liked ? 1 : 0));
 
   return (
     <View>
       <View style={styles.topContainer}>
         <Avatar source={props.commentInfo.author.avatar} />
-        <View style={styles.commentBox} >
+        <View style={styles.commentBox}>
           <View style={styles.commentBoxMeta}>
             <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{props.commentInfo.author.username}</Text>
-            <Text style={{margin: 1.5}}>   {moment(props.commentInfo.createdAt).fromNow()}</Text>
+            <Text style={{ margin: 1.5 }}>{moment(props.commentInfo.createdAt).fromNow()}</Text>
           </View>
-         
+
           <Text>
-           {props.commentInfo.text}
+            {props.commentInfo.text}
           </Text>
         </View>
       </View>
       <View style={styles.middleContainer}>
         <TouchableOpacity onPress={() => likePress()}>
           <View style={styles.likeButton}>
-          {liked? 
-          <Icon 
-                  name="thumbs-up" 
-                  type='font-awesome'
-                  color={iOSColors.red}  
-                  size={18} />
-          :  
-          <Text>ถูกใจ</Text> 
-                  }
-          {likeCount > 0?
-          <Text>  {likeCount}</Text> 
-          : null}
-          </View>    
+            {liked ?
+              <Icon
+                name="thumbs-up"
+                type='font-awesome'
+                color={iOSColors.red}
+                size={18} />
+              :
+              <Text>ถูกใจ</Text>
+            }
+            {likeCount > 0 ?
+              <Text>  {likeCount}</Text>
+              : null}
+          </View>
         </TouchableOpacity>
         {
-          props.showReplyButton 
-          ? null
-          : <TouchableOpacity 
+          props.showReplyButton
+            ? null
+            : <TouchableOpacity
               onPress={() => props.setReply(props.commentInfo.id)}>
-            <Text style={{marginHorizontal: 20}}>ตอบกลับ</Text>
-          </TouchableOpacity>
+              <Text style={{ marginHorizontal: 20 }}>ตอบกลับ</Text>
+            </TouchableOpacity>
         }
       </View>
-      <TouchableOpacity 
-      onPress={() => props.navigation.navigate('MoreComment', 
-      { 
-        comment: {
-          commentInfo: props.commentInfo,
-          relation: props.relation
-        }, 
-        postInfo: props.postInfo
-      })} 
-      underlayColor='#dddcf5'>
-      <View style={styles.bottomContainer}>
-        {props.commentInfo.commentCount? <Text style={{fontWeight: 'bold'}}>ดูการตอบกลับอีก {props.replies.length} รายการ</Text> : <View></View> }
-      </View>
+      <TouchableOpacity
+        onPress={() => setShowReplies(!showReplies)}
+        underlayColor='#dddcf5'>
+        <View style={styles.bottomContainer}>
+          {props.commentInfo.commentCount ? <Text style={{ fontWeight: 'bold' }}>ดูการตอบกลับอีก {props.replies.length} รายการ</Text> : <View></View>}
+        </View>
       </TouchableOpacity>
+      {showReplies && (
+        <View style={styles.repliesContainer}>
+          {props.replies.map(reply => (
+            <View key={reply.id} style={styles.replyItem}>
+              <Text>{reply.text}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  commentBox: {
+    backgroundColor: '#ffe8e8',
+    marginVertical: 0,
+    marginRight: 20,
+    marginHorizontal: 10,
+    borderRadius: 20,
+    padding: 10
+  },
+  commentBoxMeta: {
+    flexDirection: 'row',
+    alignItems: 'flex-end'
+  },
+  topContainer: {
+    flexDirection: 'row',
+    width: 380,
+    marginHorizontal: 20,
+    marginTop: 10,
+  },
+  middleContainer: {
+    flexDirection: 'row',
+    marginLeft: 80,
+    marginBottom: 5,
+    marginTop: 10
+  },
+  bottomContainer: {
+    flexDirection: 'row',
+    marginLeft: 80,
+    marginBottom: 5,
+  },
+  likeButton: {
+    flexDirection: 'row'
+  },
+  repliesContainer: {
+    marginLeft: 80,
+    marginTop: 10,
+    paddingLeft: 20,
+    borderLeftWidth: 2,
+    borderLeftColor: '#ccc'
+  },
+  replyItem: {
+    marginBottom: 10
+  }
+});
 
 const styles = StyleSheet.create({
   commentBox: {
