@@ -151,9 +151,7 @@ export default function UserHeader(props) {
 const styles = StyleSheet.create({
     toggleButtonsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
         width: '100%',
-        paddingHorizontal: 10,
     },
     avatar: {
         alignSelf: 'center',
