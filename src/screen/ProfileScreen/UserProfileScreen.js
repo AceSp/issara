@@ -14,7 +14,9 @@ import UserHeader from './Component/UserHeader';
 // import BackgroundUpload from 'react-native-background-upload';
 
 import GET_USER_QUERY from '../../graphql/queries/getUser';
-import GET_POST_QUERY from '../../graphql/queries/getPosts';
+import GET_POST_QUERY from '../../graphql/queries/getUserPosts';
+import GET_LIKED_POST_QUERY from '../../graphql/queries/getLikePosts';
+import GET_SAVED_POST_QUERY from '../../graphql/queries/getSavedPosts';
 import VideoPreviewItem from './Component/VideoPreviewItem';
 import { useQuery } from '@apollo/client';
 import Loading from '../../component/Loading';
@@ -29,14 +31,14 @@ export default function UserProfileScreen(props) {
   const [uploadProgress, setUploadProgress] = useState(-1);
 
   const {
-      loading: user_loading,
-      error: user_error,
-      data: user_data
+    loading: user_loading,
+    error: user_error,
+    data: user_data
   } = useQuery(
-      GET_USER_QUERY,
-      {
-          variables: { userId: param.userId }
-      }
+    GET_USER_QUERY,
+    {
+    variables: { userId: param.userId }
+    }
   );
 
   // const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(
@@ -45,7 +47,37 @@ export default function UserProfileScreen(props) {
   //         variables: { userId: param.userId }
   //     }
   // );
-  const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(GET_POST_QUERY);
+    const { 
+        loading, 
+        error, 
+        data, 
+        fetchMore, 
+        refetch, 
+        networkStatus 
+    } = useQuery(GET_POST_QUERY);
+    const { 
+        loading: liked_loading, 
+        error: liked_error, 
+        data: liked_data, 
+        fetchMore: liked_fetchMore, 
+        refetch: liked_refetch, 
+        networkStatus: liked_networkStatus 
+    } = useQuery(GET_LIKED_POST_QUERY);
+    const { 
+        loading: saved_loading, 
+        error: saved_error, 
+        data: saved_data, 
+        fetchMore: saved_fetchMore, 
+        refetch: saved_refetch, 
+        networkStatus: saved_networkStatus 
+    } = useQuery(GET_SAVED_POST_QUERY);
+
+  useEffect(() => {
+    if(!param.userId)
+        props.navigation.setParams({
+            userId: me.id,
+        });
+  }, [param.userId]);
 
   // useEffect(() => {
   //     console.log('start')
@@ -87,19 +119,19 @@ export default function UserProfileScreen(props) {
       fetchMore({
           variables: {
             id: param.userId,
-            cursor: data.getPosts.pageInfo.endCursor
+            cursor: data.getUserPosts.pageInfo.endCursor
           },
           updateQuery: (previousResult, { fetchMoreResult }) => {
-              const newPosts = fetchMoreResult.getPosts.posts;
-              const pageInfo = fetchMoreResult.getPosts.pageInfo;
+              const newPosts = fetchMoreResult.getUserPosts.posts;
+              const pageInfo = fetchMoreResult.getUserPosts.pageInfo;
 
               return newPosts.length
                   ? {
                       // Put the new.posts at the end of the list and update `pageInfo`
                       // so we have the new `endCursor` and `hasNextPage` values
-                      getPosts: {
-                          __typename: previousResult.getPosts.__typename,
-                          posts: [...previousResult.getPosts.posts, ...newPosts],
+                      getUserPosts: {
+                          __typename: previousResult.getUserPosts.__typename,
+                          posts: [...previousResult.getUserPosts.posts, ...newPosts],
                           pageInfo
                       }
                   }
@@ -108,13 +140,10 @@ export default function UserProfileScreen(props) {
       });
   }
 
-  const _renderItem = ({ item }) => (
-      <VideoPreviewItem
-          item={item}
-          onPress={() => props.navigation.navigate('UserVideoScreen', { postId: item.postInfo.id })}
-          navigation={props.navigation}
-      />
-  )
+  const _renderItem = ({ item, index }) => <VideoPreviewItem
+    index={index}
+    item={item}
+    navigation={props.navigation} />
 
   if (loading || user_loading) return (
       <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}>
@@ -123,7 +152,7 @@ export default function UserProfileScreen(props) {
   )
   if (error) return <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}><Text>`Error! ${error.message}`</Text></View>
   if (user_error) return <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}><Text>`Error! ${user_error.message}`</Text></View>
-  if (!loading && !user_loading && !data.getPosts.posts) {
+  if (!loading && !user_loading && !data.getUserPosts.posts) {
       return (
           <ScrollView>
               <UserHeader
@@ -139,8 +168,6 @@ export default function UserProfileScreen(props) {
       )
   }
 
-  console.log("--------userProfileScreen------------")
-  console.log(data.getPosts)
   return (
     <View style={{ flex: 1, backgroundColor: '#f1f6f8' }} >
         <FlatList
@@ -150,12 +177,12 @@ export default function UserProfileScreen(props) {
                   navigation={props.navigation}
               />}
             contentContainerStyle={{ alignSelf: 'stretch' }}
-            data={data.getPosts.posts}
+            data={data.getUserPosts.posts}
             keyExtractor={item => item.postInfo.id}
             renderItem={_renderItem}
             numColumns={3}
             onEndReachedThreshold={0.9}
-            // onEndReached={() => data.getPosts.pageInfo.hasNextPage ? loadMore() : null}     
+            // onEndReached={() => data.getUserPosts.pageInfo.hasNextPage ? loadMore() : null}     
             onEndReached={null}     
             removeClippedSubviews={true}
             refreshing={networkStatus === 4}
