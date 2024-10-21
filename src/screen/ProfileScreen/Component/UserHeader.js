@@ -152,7 +152,6 @@ const styles = StyleSheet.create({
     toggleButtonsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        paddingVertical: 10,
         width: '100%',
     },
     avatar: {
