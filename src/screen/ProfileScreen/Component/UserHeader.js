@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         width: '100%',
+        paddingHorizontal: 10,
     },
     avatar: {
         alignSelf: 'center',
@@ -176,7 +177,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: colors.LIGHT_GRAY,
         opacity: 50,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        width: '100%',
     },
     statHead: {
         flexDirection: 'row',
