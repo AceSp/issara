@@ -139,9 +139,9 @@ export default function UserHeader(props) {
                 </View>
                 <Divider />
                 <ToggleButton.Row style={[styles.toggleButtonsContainer, { width: '100%' }]} onValueChange={value => console.log(value)} value="left">
-                    <ToggleButton icon="format-list-bulleted" value="left" />
-                    <ToggleButton icon="bookmark" value="center" />
-                    <ToggleButton icon="heart" value="right" />
+                    <ToggleButton icon="format-list-bulleted" value="left" style={{ flex: 1 }} />
+                    <ToggleButton icon="bookmark" value="center" style={{ flex: 1 }} />
+                    <ToggleButton icon="heart" value="right" style={{ flex: 1 }} />
                 </ToggleButton.Row>
             </View>
         </View>
@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
     toggleButtonsContainer: {
         flexDirection: 'row',
         width: '100%',
+        justifyContent: 'space-between',
     },
     avatar: {
         alignSelf: 'center',
