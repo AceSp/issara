@@ -140,8 +140,8 @@ export default function UserHeader(props) {
                 <Divider />
                 <ToggleButton.Row style={styles.toggleButtonsContainer} onValueChange={value => console.log(value)} value="left">
                     <ToggleButton icon="format-list-bulleted" value="left" />
-                    <ToggleButton icon="account" value="center" />
-                    <ToggleButton icon="settings" value="right" />
+                    <ToggleButton icon="bookmark" value="center" />
+                    <ToggleButton icon="heart" value="right" />
                 </ToggleButton.Row>
             </View>
         </View>
