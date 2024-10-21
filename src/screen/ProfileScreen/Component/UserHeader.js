@@ -16,7 +16,8 @@ import {
 } from 'react-native-elements';
 import {
     Avatar,
-    Divider
+    Divider,
+    ToggleButton
 } from 'react-native-paper';
 import {
     Button
