@@ -29,6 +29,7 @@ export default function UserProfileScreen(props) {
   const { state: { me } } = useContext(store);
 
   const [uploadProgress, setUploadProgress] = useState(-1);
+  const [currentToggleValue, setCurrentToggleValue] = useState('left');
 
   const {
     loading: user_loading,
@@ -41,36 +42,30 @@ export default function UserProfileScreen(props) {
     }
   );
 
-  // const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(
-  //     GET_USER_POST_QUERY,
-  //     {
-  //         variables: { userId: param.userId }
-  //     }
-  // );
-    const { 
-        loading, 
-        error, 
-        data, 
-        fetchMore, 
-        refetch, 
-        networkStatus 
-    } = useQuery(GET_POST_QUERY);
-    const { 
-        loading: liked_loading, 
-        error: liked_error, 
-        data: liked_data, 
-        fetchMore: liked_fetchMore, 
-        refetch: liked_refetch, 
-        networkStatus: liked_networkStatus 
-    } = useQuery(GET_LIKED_POST_QUERY);
-    const { 
-        loading: saved_loading, 
-        error: saved_error, 
-        data: saved_data, 
-        fetchMore: saved_fetchMore, 
-        refetch: saved_refetch, 
-        networkStatus: saved_networkStatus 
-    } = useQuery(GET_SAVED_POST_QUERY);
+  const { 
+    loading, 
+    error, 
+    data, 
+    fetchMore, 
+    refetch, 
+    networkStatus 
+  } = useQuery(GET_POST_QUERY);
+  const { 
+    loading: liked_loading, 
+    error: liked_error, 
+    data: liked_data, 
+    fetchMore: liked_fetchMore, 
+    refetch: liked_refetch, 
+    networkStatus: liked_networkStatus 
+  } = useQuery(GET_LIKED_POST_QUERY);
+  const { 
+    loading: saved_loading, 
+    error: saved_error, 
+    data: saved_data, 
+    fetchMore: saved_fetchMore, 
+    refetch: saved_refetch, 
+    networkStatus: saved_networkStatus 
+  } = useQuery(GET_SAVED_POST_QUERY);
 
   useEffect(() => {
     if(!param.userId)
@@ -79,79 +74,34 @@ export default function UserProfileScreen(props) {
         });
   }, [param.userId]);
 
-  // useEffect(() => {
-  //     console.log('start')
-  //     if (param?.uploadIdArr) {
+  const onToggleChange = (value) => {
+    setCurrentToggleValue(value);
+  };
 
-  //         if (param?.uploadIdArr.length === 0) {
-  //             post(param?.postText);
-  //         }
-
-  //         let progresses = [];
-  //         let uploadFinished = 0;
-  //         for (let [index, uploadId] of param?.uploadIdArr.entries()) {
-  //             progresses.push(0);
-  //             BackgroundUpload.addListener('progress', uploadId, (data) => {
-  //                 // console.log(`Progress: ${data.progress}%`)
-  //                 progresses[index] = data.progress;
-  //                 setUploadProgress(Math.min(...progresses));
-  //             })
-  //             BackgroundUpload.addListener('error', uploadId, (data) => {
-  //                 console.log(`Error: ${data.error}%`)
-  //             })
-  //             BackgroundUpload.addListener('cancelled', uploadId, (data) => {
-  //                 console.log(`Cancelled!`)
-  //             })
-  //             BackgroundUpload.addListener('completed', uploadId, (data) => {
-  //                 // data includes responseCode: number and responseBody: Object
-  //                 uploadFinished++;
-  //                 if (uploadFinished === param?.uploadIdArr.length) {
-  //                     post(param?.postText);
-  //                     setUploadProgress(-1);
-  //                 }
-  //                 console.log('Completed!');
-  //             });
-  //         }
-  //     }
-  // }, [param]);
-
-  function loadMore() {
-      fetchMore({
-          variables: {
-            id: param.userId,
-            cursor: data.getUserPosts.pageInfo.endCursor
-          },
-          updateQuery: (previousResult, { fetchMoreResult }) => {
-              const newPosts = fetchMoreResult.getUserPosts.posts;
-              const pageInfo = fetchMoreResult.getUserPosts.pageInfo;
-
-              return newPosts.length
-                  ? {
-                      // Put the new.posts at the end of the list and update `pageInfo`
-                      // so we have the new `endCursor` and `hasNextPage` values
-                      getUserPosts: {
-                          __typename: previousResult.getUserPosts.__typename,
-                          posts: [...previousResult.getUserPosts.posts, ...newPosts],
-                          pageInfo
-                      }
-                  }
-                  : previousResult;
-          }
-      });
-  }
+  const getCurrentData = () => {
+    switch (currentToggleValue) {
+      case 'left':
+        return data.getUserPosts.posts;
+      case 'center':
+        return liked_data.getLikedPosts.posts;
+      case 'right':
+        return saved_data.getSavedPosts.posts;
+      default:
+        return [];
+    }
+  };
 
   const _renderItem = ({ item, index }) => <VideoPreviewItem
     index={index}
     item={item}
     navigation={props.navigation} />
 
-  if (loading || user_loading) return (
+  if (loading || user_loading || liked_loading || saved_loading) return (
       <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}>
           <Loading />
       </View>
   )
-  if (error) return <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}><Text>`Error! ${error.message}`</Text></View>
-  if (user_error) return <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}><Text>`Error! ${user_error.message}`</Text></View>
+  if (error || user_error || liked_error || saved_error) return <View style={{ flex: 1, backgroundColor: '#f1f6f8' }}><Text>`Error! ${error?.message || user_error?.message || liked_error?.message || saved_error?.message}`</Text></View>
   if (!loading && !user_loading && !data.getUserPosts.posts) {
       return (
           <ScrollView>
@@ -159,6 +109,8 @@ export default function UserProfileScreen(props) {
                   userData={user_data.getUser}
                   navigation={props.navigation}
                   me_following={me.following}
+                  currentToggleValue={currentToggleValue}
+                  onToggleChange={onToggleChange}
               />
               <View style={{ alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', height: 300 }}>
                   <Text>ยังไม่มีโพสต์</Text>
@@ -175,9 +127,11 @@ export default function UserProfileScreen(props) {
               <UserHeader
                   userData={user_data.getUser}
                   navigation={props.navigation}
+                  currentToggleValue={currentToggleValue}
+                  onToggleChange={onToggleChange}
               />}
             contentContainerStyle={{ alignSelf: 'stretch' }}
-            data={data.getUserPosts.posts}
+            data={getCurrentData()}
             keyExtractor={item => item.postInfo.id}
             renderItem={_renderItem}
             numColumns={3}
