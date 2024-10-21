@@ -138,12 +138,38 @@ export default function UserHeader(props) {
                     }
                 </View>
                 <Divider />
+                <View style={styles.toggleButtonsContainer}>
+                    <TouchableOpacity style={styles.toggleButton}>
+                        <Text style={styles.toggleButtonText}>Tab 1</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.toggleButton}>
+                        <Text style={styles.toggleButtonText}>Tab 2</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.toggleButton}>
+                        <Text style={styles.toggleButtonText}>Tab 3</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
+    toggleButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingVertical: 10,
+    },
+    toggleButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        backgroundColor: colors.PRIMARY,
+        borderRadius: 5,
+    },
+    toggleButtonText: {
+        color: 'white',
+        fontSize: 16,
+    },
     avatar: {
         alignSelf: 'center',
     },
