@@ -136,7 +136,36 @@ export default function UserProfileScreen(props) {
             renderItem={_renderItem}
             numColumns={3}
             onEndReachedThreshold={0.9}
-            onEndReached={() => data.getUserPosts.pageInfo.hasNextPage ? loadMore() : null}     
+            onEndReached={() => {
+              if (currentToggleValue === 'left' && data.getUserPosts.pageInfo.hasNextPage) {
+                fetchMore({
+                  variables: {
+                    cursor: data.getUserPosts.pageInfo.endCursor,
+                  },
+                  updateQuery: (previousResult, { fetchMoreResult }) => {
+                    // Update logic here
+                  }
+                });
+              } else if (currentToggleValue === 'center' && saved_data.getSavedPosts.pageInfo.hasNextPage) {
+                saved_fetchMore({
+                  variables: {
+                    cursor: saved_data.getSavedPosts.pageInfo.endCursor,
+                  },
+                  updateQuery: (previousResult, { fetchMoreResult }) => {
+                    // Update logic here
+                  }
+                });
+              } else if (currentToggleValue === 'right' && liked_data.getLikedPosts.pageInfo.hasNextPage) {
+                liked_fetchMore({
+                  variables: {
+                    cursor: liked_data.getLikedPosts.pageInfo.endCursor,
+                  },
+                  updateQuery: (previousResult, { fetchMoreResult }) => {
+                    // Update logic here
+                  }
+                });
+              }
+            }}
             // onEndReached={null}     
             removeClippedSubviews={true}
             refreshing={networkStatus === 4}
