@@ -15,7 +15,7 @@ import UserHeader from './Component/UserHeader';
 
 import GET_USER_QUERY from '../../graphql/queries/getUser';
 import GET_POST_QUERY from '../../graphql/queries/getUserPosts';
-import GET_LIKED_POST_QUERY from '../../graphql/queries/getLikePosts';
+import GET_LIKED_POST_QUERY from '../../graphql/queries/getLikedPosts';
 import GET_SAVED_POST_QUERY from '../../graphql/queries/getSavedPosts';
 import VideoPreviewItem from './Component/VideoPreviewItem';
 import { useQuery } from '@apollo/client';
@@ -83,9 +83,9 @@ export default function UserProfileScreen(props) {
       case 'left':
         return data.getUserPosts.posts;
       case 'center':
-        return liked_data.getLikedPosts.posts;
-      case 'right':
         return saved_data.getSavedPosts.posts;
+      case 'right':
+        return liked_data.getLikedPosts.posts;
       default:
         return [];
     }
@@ -136,8 +136,8 @@ export default function UserProfileScreen(props) {
             renderItem={_renderItem}
             numColumns={3}
             onEndReachedThreshold={0.9}
-            // onEndReached={() => data.getUserPosts.pageInfo.hasNextPage ? loadMore() : null}     
-            onEndReached={null}     
+            onEndReached={() => data.getUserPosts.pageInfo.hasNextPage ? loadMore() : null}     
+            // onEndReached={null}     
             removeClippedSubviews={true}
             refreshing={networkStatus === 4}
             onRefresh={() => refetch()}
