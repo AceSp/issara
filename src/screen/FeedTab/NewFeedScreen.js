@@ -115,7 +115,8 @@ const NewFeedScreen = (props) => {
         data={data.getPosts.posts}
         renderItem={renderItem}
         keyExtractor={item => item.postInfo.id}
-        onEndReached={data.getPosts.pageInfo.hasNextPage ? loadMore() : null}
+        onEndReached={data.getPosts.pageInfo.hasNextPage ? loadMore : null}
+        onEndReachedThreshold={1}
         removeClippedSubviews={true}
         refreshing={networkStatus === 4}
         onRefresh={refetch}
