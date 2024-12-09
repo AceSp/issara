@@ -1,6 +1,7 @@
 import React, {
   useState,
-  useEffect
+  forwardRef,
+  useImperativeHandle
 } from 'react';
 import { 
   View, 
@@ -21,13 +22,6 @@ import FeedCardRight from './FeedCardRight';
 import Sponsor from './Sponsor';
 
 const { height, width } = Dimensions.get('window');
-
-import React, {
-  useState,
-  useEffect,
-  forwardRef,
-  useImperativeHandle
-} from 'react';
 
 const FeedCard = forwardRef(({
   postInfo,
