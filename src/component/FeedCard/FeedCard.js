@@ -39,14 +39,24 @@ const FeedCard = forwardRef(({
   navigation
 }, ref) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [videoRef, setVideoRef] = useState(null);
 
   const [viewPost, { data }] = useMutation(VIEW_POST_MUTATION);
+
+  useImperativeHandle(ref, () => ({
+    preload: () => {
+      if (videoRef) {
+        videoRef.preload();
+      }
+    }
+  }));
 
   const onEnd = () => {
     viewPost({
       variables: { postId: postInfo.id },
     });
   }
+
   return (
     <SafeAreaView style={styles.fullScreenCard}>
       <View style={styles.videoContainer}>
@@ -56,6 +66,7 @@ const FeedCard = forwardRef(({
           onPress={() => onPress(index)}
           onEnd={onEnd}
           style={styles.video}
+          ref={setVideoRef}
         />
       </View>
       {/* <FeedCardRight
@@ -98,7 +109,7 @@ const FeedCard = forwardRef(({
       }
     </SafeAreaView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   fullScreenCard: {
