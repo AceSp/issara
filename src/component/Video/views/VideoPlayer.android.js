@@ -14,8 +14,8 @@ import Video from 'react-native-video';
 
 const { width, height } = Dimensions.get('window');
 
-export const VideoPlayer = ({ source, paused, onPress, onEnd, index }) => {
-  const videoRef = useRef(null);
+export const VideoPlayer = React.forwardRef(({ source, paused, onPress, onEnd, index }, ref) => {
+  const videoRef = ref || useRef(null);
 
   // useEffect(() => {
   //   if (!paused) {
@@ -42,7 +42,7 @@ export const VideoPlayer = ({ source, paused, onPress, onEnd, index }) => {
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={() => onPress(index)}>
         <Video
-          ref={videoRef}
+          ref={videoRef.current}
           source={source}
           style={styles.video}
           resizeMode="cover"
