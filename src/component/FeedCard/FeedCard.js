@@ -16,7 +16,7 @@ import { iOSUIKitTall } from 'react-native-typography'
 import { useMutation } from '@apollo/client';
 
 import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
-import { VideoPlayer } from '../Video/views';
+import VideoPlayer from '../Video/views/VideoPlayer.android';
 import { BOTTOM_TAB_HEIGHT } from '../../utils/constants'
 import FeedCardRight from './FeedCardRight';
 import Sponsor from './Sponsor';
@@ -60,7 +60,7 @@ const FeedCard = forwardRef(({
           onPress={() => onPress(index)}
           onEnd={onEnd}
           style={styles.video}
-          ref={setVideoRef}
+          ref={videoRef}
         />
       </View>
       {/* <FeedCardRight
