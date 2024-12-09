@@ -22,7 +22,14 @@ import Sponsor from './Sponsor';
 
 const { height, width } = Dimensions.get('window');
 
-function FeedCard({
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle
+} from 'react';
+
+const FeedCard = forwardRef(({
   postInfo,
   relation,
   sponsor,
@@ -30,7 +37,7 @@ function FeedCard({
   paused,
   onPress,
   navigation
-}) {
+}, ref) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const [viewPost, { data }] = useMutation(VIEW_POST_MUTATION);

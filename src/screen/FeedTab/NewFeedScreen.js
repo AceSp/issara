@@ -24,6 +24,8 @@ const NewFeedScreen = (props) => {
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [nextVideoIndex, setNextVideoIndex] = useState(null);
+  const videoRefs = useRef([]);
+  const [nextVideoIndex, setNextVideoIndex] = useState(null);
 
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(GET_POSTS_QUERY);
   const [createPost, { createpost_data }] = useMutation(CREATE_POST_MUTATION);
@@ -38,6 +40,19 @@ const NewFeedScreen = (props) => {
     }
     checkFirstTime();
   }, []);
+
+  useEffect(() => {
+    if (currentlyPlaying !== null && data && data.getPosts.posts.length > 0) {
+      const nextIndex = (currentlyPlaying + 1) % data.getPosts.posts.length;
+      setNextVideoIndex(nextIndex);
+    }
+  }, [currentlyPlaying, data]);
+
+  useEffect(() => {
+    if (nextVideoIndex !== null && videoRefs.current[nextVideoIndex]) {
+      videoRefs.current[nextVideoIndex].preload();
+    }
+  }, [nextVideoIndex]);
 
   function loadMore() {
     console.log("----------newfeedScreen--------loadmore")
@@ -101,6 +116,7 @@ const NewFeedScreen = (props) => {
       paused={index !== currentlyPlaying || isPaused}
       onPress={togglePause}
       navigation={props.navigation}
+      ref={ref => videoRefs.current[index] = ref}
     />
   ), [currentlyPlaying, isPaused, togglePause, props.navigation]);
 
