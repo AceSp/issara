@@ -21,16 +21,15 @@ const { height, width } = Dimensions.get('window');
 
 const NewFeedScreen = (props) => {
   const { state: { me } } = useContext(store);
-  const [posts, setPosts] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState(-1);
-  const [uploadError, setUploadError] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [nextVideoIndex, setNextVideoIndex] = useState(null);
 
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(GET_POSTS_QUERY);
   const [createPost, { createpost_data }] = useMutation(CREATE_POST_MUTATION);
 
   const flatlistRef = useRef();
+  const videoRef = useRef([]);
 
   useEffect(() => {
     const checkFirstTime = async () => {

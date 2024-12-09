@@ -1,5 +1,6 @@
 import React, {
-  useState
+  useState,
+  useEffect
 } from 'react';
 import { 
   View, 
@@ -10,8 +11,11 @@ import {
   SafeAreaView 
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { iOSUIKitTall } from 'react-native-typography'
+import { useMutation } from '@apollo/client';
+
+import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
 import { VideoPlayer } from '../Video/views';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { BOTTOM_TAB_HEIGHT } from '../../utils/constants'
 import FeedCardRight from './FeedCardRight';
 import Sponsor from './Sponsor';
@@ -28,6 +32,14 @@ function FeedCard({
   navigation
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const [viewPost, { data }] = useMutation(VIEW_POST_MUTATION);
+
+  const onEnd = () => {
+    viewPost({
+      variables: { postId: postInfo.id },
+    });
+  }
   return (
     <SafeAreaView style={styles.fullScreenCard}>
       <View style={styles.videoContainer}>
@@ -35,17 +47,18 @@ function FeedCard({
           source={{ uri: postInfo.video, type: 'm3u8' }}
           paused={paused}
           onPress={() => onPress(index)}
+          onEnd={onEnd}
           style={styles.video}
         />
       </View>
-      <FeedCardRight
+      {/* <FeedCardRight
         postInfo={postInfo}
         relation={relation}
         navigation={navigation}
-      />
+      /> */}
       <LinearGradient
         colors={isExpanded ? ['rgba(0, 0, 0, 0.4)', 'transparent'] : ['transparent', 'transparent']}
-        start={{ x: 0, y: 1 }}
+        start={{ x: 0, y: 0.5 }}
         end={{ x: 0, y: 0 }}
         style={[
           styles.bottomContent, 
@@ -62,12 +75,20 @@ function FeedCard({
         <TouchableOpacity 
           style={styles.readMoreButton}
           onPress={() => setIsExpanded(!isExpanded)}>
-          <Text>Read more...</Text>
+          <Text style={iOSUIKitTall.subheadWhite}>
+            {isExpanded ? 'ซ่อน' : 'อ่านเพิ่มเติม'}
+          </Text>
         </TouchableOpacity>
-      </View>
-      <Sponsor 
-        {...sponsor}
-      />
+      </LinearGradient>
+      {
+        sponsor 
+        ?
+        <Sponsor 
+          {...sponsor}
+          navigation={navigation}
+        />
+        : null
+      }
     </SafeAreaView>
   );
 }
