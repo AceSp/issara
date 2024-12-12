@@ -7,7 +7,8 @@ import {
     View,
     StyleSheet,
     Dimensions,
-    Text
+    Text,
+    TouchableOpacity
 } from 'react-native';
 
 import {
@@ -106,6 +107,12 @@ export default function UserHeader(props) {
                         style={styles.avatar}
                         source={props.userData.avatar ? { uri: props.userData.avatar } : DEFAULT_AVATAR}
                     />
+                    <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => console.log("changing avatar")}
+                    >
+                        <Text style={styles.editButtonText}>Edit</Text>
+                    </TouchableOpacity>
                     <Text style={[iOSUIKitTall.bodyEmphasized, styles.usernameText]}>
                         {props.userData.itemName}
                     </Text>
@@ -164,6 +171,18 @@ const styles = StyleSheet.create({
     },
     avatar: {
         alignSelf: 'center',
+    },
+    editButton: {
+        position: 'absolute',
+        top: 60,
+        right: 10,
+        backgroundColor: colors.PRIMARY,
+        padding: 5,
+        borderRadius: 5,
+    },
+    editButtonText: {
+        color: 'white',
+        fontSize: 12,
     },
     Root: {
         backgroundColor: '#f1f6f8',
