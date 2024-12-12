@@ -197,8 +197,7 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         padding: 10,
-        alignItems: 'stretch',
-        alignSelf: 'stretch',
+        alignSelf: 'center',
     },
     Profile: {
         flex: 1,
@@ -263,6 +262,7 @@ const styles = StyleSheet.create({
         width: 80,
         marginBottom: 20,
         alignItems: 'center',
+        alignSelf: 'center',
     },
     topicIcon: {
         marginRight: 10
