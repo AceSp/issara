@@ -259,6 +259,8 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap'
     },
     avatarContainer: {
+        position: 'relative',
+        width: 80,
         marginBottom: 20,
         alignItems: 'center',
     },
