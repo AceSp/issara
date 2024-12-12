@@ -28,7 +28,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useMutation } from '@apollo/client';
 
 import formatNumber from '../../../utils/formatNumber';
-import { colors } from '../../../utils/constants';
+import { colors, DEFAULT_AVATAR } from '../../../utils/constants';
 import FollowButton from '../../../component/FollowButton';
 import PostBox from '../../../component/PostBox';
 import {
@@ -79,7 +79,7 @@ export default function UserHeader(props) {
 
     function _renderReadmoreTruncated(handlePress) {
         return (
-            <Text style={{ color: iOSColors.red, marginTop: 5 }} onPress={handlePress}>
+            <Text style={{ color: iOSColors.orange, marginTop: 5 }} onPress={handlePress}>
                 Read more
             </Text>
         );
@@ -87,15 +87,16 @@ export default function UserHeader(props) {
 
     function _renderReadmoreRevealed(handlePress) {
         return (
-            <Text style={{ color: iOSColors.red, marginTop: 5 }} onPress={handlePress}>
+            <Text style={{ color: iOSColors.orange, marginTop: 5 }} onPress={handlePress}>
                 Show less
             </Text>
         );
     }
 
-    console.log("------userHeader-------")
-    console.log(me.id)
-    console.log(props.userData?.id == me.id)
+    console.log("------userHeader-------");
+    console.log("props.userData?.id:", props.userData?.id);
+    console.log("me.id:", me.id);
+    console.log("Comparison result:", props.userData?.id === me.id); 
     return (
         <View style={styles.Root}>
             <View style={styles.Profile}>
@@ -103,7 +104,7 @@ export default function UserHeader(props) {
                     <Avatar.Image
                         size={80}
                         style={styles.avatar}
-                        source={props.userData.avatar ? { uri: props.userData.avatar } : require('../../../assets/pic/profile.jpg')}
+                        source={props.userData.avatar ? { uri: props.userData.avatar } : DEFAULT_AVATAR}
                     />
                     <Text style={[iOSUIKitTall.bodyEmphasized, styles.usernameText]}>
                         {props.userData.itemName}
@@ -125,7 +126,7 @@ export default function UserHeader(props) {
                         แคมเปญ ขั้นตอนออร์แกนิค จ๊อกกี้คอปเตอร์เทเลกราฟโหลยโท่ย ฮิตเหมยโทรโข่งโบว์ ดิกชันนารีบู๊มอยส์เจอไรเซอร์เอาท์ ควิกโปรเจ็คท์เยนฟลุคกาญจน์ ซังเต คอลเล็กชั่นฟาสต์ฟู้ดบาร์บี้ ซากุระดีมานด์เมจิก เทควันโดมั้ยเซอร์โหงวเฮ้งแดนเซอร์ เมคอัพ﻿กรรมาชน อึ๋มโปรดิวเซอร์ห่วย ม็อบเตี๊ยมกาญจน์ แจ๊กเก็ตเบนโลบ๋อย มาร์จินเอ็นทรานซ์ ช็อปปิ้งเอ็นทรานซ์จูเนียร์ออร์แกนฟยอร์ด
                     </Text>
                     </ReadMore> */}
-                    {props.userdata?.id == me.id 
+                    {props.userData?.id == me.id 
                         ? null
                         : <FollowButton
                             followText="ติดตาม"
@@ -138,10 +139,17 @@ export default function UserHeader(props) {
                     }
                 </View>
                 <Divider />
-                <ToggleButton.Row style={[styles.toggleButtonsContainer, { width: '100%' }]} onValueChange={value => props.onToggleChange(value)} value={props.currentToggleValue}>
-                    <ToggleButton icon="format-list-bulleted" value="left" style={{ flex: 1 }} />
-                    <ToggleButton icon="bookmark" value="center" style={{ flex: 1 }} />
-                    <ToggleButton icon="heart" value="right" style={{ flex: 1 }} />
+                <ToggleButton.Row 
+                    style={[
+                        styles.toggleButtonsContainer, 
+                        { width: '100%' }
+                    ]} 
+                    onValueChange={value => props.onToggleChange(value)} 
+                    value={props.currentToggleValue}
+                >
+                    <ToggleButton icon="format-list-bulleted" value={0} style={{ flex: 1 }} />
+                    <ToggleButton icon="bookmark" value={1} style={{ flex: 1 }} />
+                    <ToggleButton icon="heart" value={2} style={{ flex: 1 }} />
                 </ToggleButton.Row>
             </View>
         </View>
