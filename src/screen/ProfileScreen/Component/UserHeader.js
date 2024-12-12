@@ -15,6 +15,9 @@ import {
     Icon
 } from 'react-native-elements';
 import {
+    TouchableOpacity
+} from 'react-native';
+import {
     Avatar,
     Divider,
     ToggleButton
@@ -107,12 +110,14 @@ export default function UserHeader(props) {
                         style={styles.avatar}
                         source={props.userData.avatar ? { uri: props.userData.avatar } : DEFAULT_AVATAR}
                     />
-                    <TouchableOpacity
-                        style={styles.editButton}
+                    <Icon
+                        name="pencil"
+                        type="font-awesome"
+                        color="white"
+                        size={16}
+                        containerStyle={styles.editIconButton}
                         onPress={() => console.log("changing avatar")}
-                    >
-                        <Text style={styles.editButtonText}>Edit</Text>
-                    </TouchableOpacity>
+                    />
                     <Text style={[iOSUIKitTall.bodyEmphasized, styles.usernameText]}>
                         {props.userData.itemName}
                     </Text>
@@ -172,17 +177,16 @@ const styles = StyleSheet.create({
     avatar: {
         alignSelf: 'center',
     },
-    editButton: {
+    editIconButton: {
         position: 'absolute',
-        top: 60,
-        right: 10,
+        bottom: -5,
+        right: -5,
         backgroundColor: colors.PRIMARY,
-        padding: 5,
-        borderRadius: 5,
-    },
-    editButtonText: {
-        color: 'white',
-        fontSize: 12,
+        borderRadius: 20,
+        width: 30,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     Root: {
         backgroundColor: '#f1f6f8',
