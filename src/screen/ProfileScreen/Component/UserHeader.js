@@ -15,9 +15,6 @@ import {
     Icon
 } from 'react-native-elements';
 import {
-    TouchableOpacity
-} from 'react-native';
-import {
     Avatar,
     Divider,
     ToggleButton
@@ -105,19 +102,21 @@ export default function UserHeader(props) {
         <View style={styles.Root}>
             <View style={styles.Profile}>
                 <View style={styles.header}>
-                    <Avatar.Image
-                        size={80}
-                        style={styles.avatar}
-                        source={props.userData.avatar ? { uri: props.userData.avatar } : DEFAULT_AVATAR}
-                    />
-                    <Icon
-                        name="pencil"
-                        type="font-awesome"
-                        color="white"
-                        size={16}
-                        containerStyle={styles.editIconButton}
-                        onPress={() => console.log("changing avatar")}
-                    />
+                    <View style={styles.avatarContainer}>
+                        <Avatar.Image
+                            size={80}
+                            style={styles.avatar}
+                            source={props.userData.avatar ? { uri: props.userData.avatar } : DEFAULT_AVATAR}
+                        />
+                        <Icon
+                            name="pencil"
+                            type="font-awesome"
+                            color="white"
+                            size={16}
+                            containerStyle={styles.editIconButton}
+                            onPress={() => console.log("changing avatar")}
+                        />
+                    </View>
                     <Text style={[iOSUIKitTall.bodyEmphasized, styles.usernameText]}>
                         {props.userData.itemName}
                     </Text>
@@ -258,6 +257,10 @@ const styles = StyleSheet.create({
     aboutText: {
         paddingHorizontal: 10,
         flexWrap: 'wrap'
+    },
+    avatarContainer: {
+        marginBottom: 20,
+        alignItems: 'center',
     },
     topicIcon: {
         marginRight: 10
