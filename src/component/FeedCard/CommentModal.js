@@ -23,6 +23,7 @@ import CREATE_COMMENT_MUTATION from '../../graphql/mutations/createComment';
 import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
 import CommentItem from '../commentItem/CommentItem';
 import Loading from '../Loading';
+import AvatarWrapper from '../AvatarWrapper';
 
 const { width, height } = Dimensions.get('window');
 
@@ -98,8 +99,9 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
                 itemName: me.itemName,
                 avatar: me.avatar,
             } 
-          } 
-      }
+          },
+          replies: [] 
+        }
       },
       update: (store, { data: { createComment } }) => {
         const storedData = store.readQuery({ 
@@ -150,7 +152,11 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
             const updatedComments = data.getComments.comments.map(comment => {
               if (comment.commentInfo.id === parentId) {
                 return {
-                  ...comment,
+                  relation: comment.relation,
+                  commentInfo: {
+                    ...comment.commentInfo,
+                    commentCount: comment.commentInfo.commentCount + 1
+                  },
                   replies: [...(comment.replies || []), createComment]
                 };
               }
@@ -202,9 +208,11 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     />
   );
 
-  if (loading) return <Loading />;
+  console.log("----------CommentModal-----------")
+  console.log(loading)
+  console.log(!me)
+  if (loading || !me) return <Loading />;
   if (error) return <Text>Error: {error.message}</Text>;
-
 
   return (
     <Modal
@@ -236,7 +244,10 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
           />
         </ScrollView>
         <View style={styles.footer}>
-          <Avatar source={me.avatar} />
+          <AvatarWrapper 
+            uri={me.avatar}
+            label={me.itemName[0]}
+          />
           <View style={styles.commentBox}>
             <TextInput
               style={styles.inputBox}
@@ -255,7 +266,7 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
           {text !== '' && (
             <TouchableOpacity onPress={submit}>
               <View style={styles.sendButton}>
-                <Icon name="send" size={24} color={iOSColors.red} />
+                <Icon name="send" size={24} color={iOSColors.orange} />
               </View>
             </TouchableOpacity>
           )}

@@ -1,0 +1,399 @@
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Keyboard
+} from 'react-native';
+import { Icon, Avatar } from 'react-native-elements';
+
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
+import { useCollapsibleStack } from 'react-navigation-collapsible';
+
+import DetailFeedCard from './component/DetailFeedCard';
+import GET_POST_QUERY from '../../graphql/queries/getPost';
+import GET_SPONSOR_QUERY from '../../graphql/queries/getSponsor';
+import GET_COMMENTS_QUERY from '../../graphql/queries/getComments';
+import CREATE_COMMENT_MUTATION from '../../graphql/mutations/createComment';
+import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
+import ME_SUBSCRIPTION from '../../graphql/subscriptions/me';
+import Loading from '../../component/Loading';
+import POST_STAT_SUBSCRIPTION from '../../graphql/subscriptions/me';
+import ME_QUERY from '../../graphql/queries/me';
+import { getMeData } from '../../utils/store';
+import CommentItem from '../../component/commentItem/CommentItem';
+import FullScreenLoading from '../FullScreenLoading';
+import { colors } from '../../utils/constants';
+import { setShowCommentData, getShowCommentData } from '../../utils/store';
+import reactotron from 'reactotron-react-native';
+
+const HEADER_MAX_HEIGHT = 200;// set the initial height
+const HEADER_MIN_HEIGHT = 60;// set the height on scroll
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+
+const DetailScreen = (props) => {
+  const { 
+    postId,
+    sponsorId
+  } = props.route.params;
+
+  const { 
+    loading: me_loading, 
+    error: me_error, 
+    data: me_data, 
+    subscribeToMore: me_subscribeToMore 
+  } = useQuery(ME_QUERY);
+
+  const { loading, error, data } = useQuery(
+    GET_POST_QUERY,
+    { variables: { _id: postId } }
+    );
+
+  const { 
+    loading: sponsor_loading, 
+    error: sponsor_error, 
+    data: sponsor_data
+  } = useQuery(
+    GET_SPONSOR_QUERY,
+    { variables: { _id: sponsorId } }
+    );
+
+  const [createComment, {data: createComment_data}] = useMutation(CREATE_COMMENT_MUTATION);
+  const [viewPost, {data: view_data, loading: view_loading}] = useMutation(VIEW_POST_MUTATION);
+
+  const [ me, setMe ] = useState({});
+  const [ text, setText ] = useState('');
+  const [ showNewComment, setShow ] = useState(false);
+
+  const { 
+    loading: Comment_loading, 
+    error: Comment_error, 
+    data: Comment_data,
+    fetchMore
+  } = useQuery(GET_COMMENTS_QUERY,
+    { 
+      variables: {
+        post_id: postId,
+        getNewComments: showNewComment
+      }
+    }
+    );
+
+  const inputRef = useRef();
+  const flatlistRef = useRef();
+
+  async function getMe() {
+    const meData = JSON.parse(await getMeData());
+    setMe(meData);
+  }
+
+  async function getShow() {
+    const showData = JSON.parse(await getShowCommentData());
+    setShow(showData);
+  }
+
+  function changeShow() {
+    setShow(!showNewComment);
+    setShowCommentData(!showNewComment);
+  };
+
+  useLayoutEffect(() => {
+    getShow();
+  }, [])
+
+  useEffect(() => {
+
+    getMe();
+
+    viewPost({ variables: {_id: postId} })
+  }, []);
+
+  useEffect(() => {
+    if(me_data) {
+      me_subscribeToMore({
+        document: ME_SUBSCRIPTION,
+              updateQuery: (prev, { subscriptionData }) => {
+                if(!subscriptionData.data) {
+                  return prev;
+                }
+  
+                const newData = subscriptionData.data.me
+      
+                return Object.assign({}, prev, {
+                  me: {
+                    ...newData
+                  }
+                });
+     
+                }           
+      })
+    }
+  }, [me_data]);
+
+  function focusInput() {
+      if(Comment_data.getComments.comments) {
+        flatlistRef.current.scrollToIndex({ index: 0, viewPosition: 0.16 });
+      };
+  };
+
+  function loadMore() {
+      if(!Comment_data.getComments.pageInfo.hasNextPage) {
+        return
+      }
+      fetchMore({
+        variables: { 
+          post_id: postId,
+          cursor: Comment_data.getComments.pageInfo.endCursor
+         },
+         updateQuery: (previousResult, { fetchMoreResult }) => {
+          const newComments = fetchMoreResult.getComments.comments;
+          const pageInfo = fetchMoreResult.getComments.pageInfo;
+      
+          return newComments.length
+            ? {
+                // Put the new comments at the end of the list and update `pageInfo`
+                // so we have the new `endCursor` and `hasNextPage` values
+                getComments: {
+                  __typename: previousResult.getComments.__typename,
+                  comments: [...previousResult.getComments.comments, ...newComments],
+                  pageInfo
+                }
+              }
+            : previousResult;
+        }
+      });
+    
+  }
+
+  function submit() {
+    createComment({ 
+      variables: { 
+          text : text,
+          _id: postId
+       },
+       optimisticResponse: {
+           __typename: 'Mutation',
+           createComment: {
+             __typename: 'createComment',
+             postInfo: {...data.getPost.postInfo},
+             comment: {
+               __typename: 'Comment',
+              userRelation: {
+                __typename: 'UserRelation',
+                _id: Math.round(Math.random()* -1000000).toString(),
+                isLiked: false,
+                isCoined: null,
+                isViewed: null,
+                isSaved: null,
+                userCoinCount: null
+              },
+              commentInfo: {
+               __typename: 'CommentInfo',
+               _id: Math.round(Math.random()* -1000000).toString(),
+               text: text,
+               likeCount: 0,
+               replyCount: 0,
+               createdAt: new Date(),
+               author: {
+                   __typename: 'User',
+                   _id: Math.round(Math.random()* -1000000).toString(),
+                   username: me.username,
+                   avatar: me.avatar,
+               } 
+              }
+             } 
+          }
+        },
+          update: (store, { data: { createComment } }) => {
+               const storedData = store.readQuery({ 
+                 query: GET_COMMENTS_QUERY,
+                 variables: {
+                  post_id: postId,
+                  getNewComments: showNewComment
+                }
+                });
+
+                const data = JSON.parse(JSON.stringify(storedData));
+                if(!data.getComments.comments) {
+                  store.writeQuery({ query: GET_COMMENTS_QUERY, 
+                    variables: {
+                      post_id: postId,
+                      getNewComments: showNewComment
+                    }, 
+                    data: { 
+                        getComments: {
+                        __typename: 'getComments',
+                        pageInfo: {
+                          __typename: 'PageInfo',
+                          hasNextPage: false,
+                          endCursor: createComment.comment.commentInfo._id
+                        },
+                        comments: [
+                            {
+                                __typename: 'Comment',
+                                commentInfo: { ...createComment.comment.commentInfo },
+                                userRelation: {
+                                  __typename: 'UserRelation',
+                                  isLiked: false,
+                                  isCoined: false,
+                                  userCoinCount: false
+                                }
+                            },
+                        ]
+
+                      }  
+                    } 
+                })
+
+                } else if(!data.getComments.comments.find(c => c.commentInfo._id === createComment.comment.commentInfo._id)) {
+                   store.writeQuery({ query: GET_COMMENTS_QUERY, 
+                    variables: {
+                      post_id: postId,
+                      getNewComments: showNewComment
+                    }, 
+                       data: { 
+                           getComments: {
+                           __typename: 'getComments',
+                           pageInfo: {...data.getComments.pageInfo},
+                           comments: [
+                               {
+                                   __typename: 'Comment',
+                                   commentInfo: { ...createComment.comment.commentInfo },
+                                   userRelation: { ...createComment.comment.userRelation }
+                               },
+                               ...data.getComments.comments
+                           ]
+
+                         }  
+                       } 
+                   })
+
+
+                  }
+           }
+           
+   })
+   Keyboard.dismiss();
+   flatlistRef.current.scrollToIndex({ index: 0, viewPosition: 0.16 });
+  };
+
+ 
+
+  if (loading) return <FullScreenLoading />
+  if(Comment_loading || sponsor_loading) return <Loading />
+  if (error) return <View><Text>`Error! ${error.message}`</Text></View>
+
+  const _renderItem = ({ item }) => <CommentItem 
+      {...data.getPost} 
+      navigation={props.navigation}
+      {...item} 
+      />
+
+  return (
+    <View style={styles.Root}>
+        <FlatList
+            ListHeaderComponent={
+              <DetailFeedCard
+                userHaveCoin={me_data.me.userHaveCoin}
+                _id={data.getPost.postInfo._id}
+                likeCount={data.getPost.postInfo.likeCount}
+                commentCount={data.getPost.postInfo.commentCount}
+                isLiked={data.getPost.userRelation.isLiked}
+                isCoined={data.getPost.userRelation.isCoined}
+                coinCount={data.getPost.postInfo.coinCount}
+                userCoinCount={data.getPost.userRelation.userCoinCount} 
+                text={data.getPost.postInfo.text}
+                author={data.getPost.postInfo.author}
+                createdAt={data.getPost.postInfo.createdAt}
+                navigation={props.navigation}
+                myId={me_data.me._id}
+                sponsor={sponsor_data? sponsor_data.getSponsor : null }
+                inputRef={inputRef}
+                showNewComment={showNewComment}
+                changeShow={changeShow}
+            />}
+             contentContainerStyle={{ alignSelf: 'stretch' }}
+             data={Comment_data.getComments.comments}
+             keyExtractor={item => item.commentInfo._id}
+             renderItem={_renderItem}
+             onEndReachedThreshold={0.5}
+             onEndReached={() => loadMore()}
+             scrollEventThrottle={16}
+             ref={flatlistRef}
+        />
+        <View style={styles.footer}>
+        <Avatar rounded source={me.avatar? {uri: me.avatar} : require('../../assets/pic/profile.jpg')}/>
+          <View style={styles.commentBox}>
+          
+          <TextInput 
+            style={styles.inputBox}
+            value={text}
+            placeholder='เขียนความคิดเห็น..'
+            onChangeText={(value)=>setText(value)}
+            onFocus={() => focusInput()}
+            onBlur={()=>setText('')}
+            ref={inputRef}
+          />
+          <TouchableOpacity>
+          <View style={styles.photoInput}>
+          <Icon name="photo-camera" size={30} color={colors.LIGHT_GRAY} />
+          </View>
+          </TouchableOpacity>
+          </View>
+          {text == ''? null : 
+          <TouchableOpacity onPress={() => submit()}>
+          <View style={styles.sendButton}>
+          <Icon name="send" size={30} color={colors.PRIMARY} />
+          </View>
+          </TouchableOpacity> }
+          
+    </View>
+    </View>
+    
+        
+  )
+}
+
+
+const styles = StyleSheet.create({
+    Root: {
+      flex: 1,
+      backgroundColor: 'white',
+      justifyContent: 'center'
+    },
+    inputBox: {
+      flex: 1
+    },
+    commentBox: { 
+      height: 40, 
+      borderColor: 'gray',
+      borderWidth: 1 ,
+      borderRadius: 20,
+      margin: 5,
+      marginRight: 10,
+      flex: 1,
+      paddingHorizontal: 10,
+      flexDirection: 'row', 
+    },
+    footer: {
+      height: 50,
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
+    photoInput: {
+      marginLeft: 10,
+      padding: 5,
+      borderRadius: 20,
+      marginVertical: 'auto',
+    },
+    sendButton: {
+      marginRight: 10
+    }
+  })
+
+export default DetailScreen;

@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-camera-roll-picker/index.js b/node_modules/react-native-camera-roll-picker/index.js
+index ba5a617..fc6180b 100644
+--- a/node_modules/react-native-camera-roll-picker/index.js
++++ b/node_modules/react-native-camera-roll-picker/index.js
+@@ -280,7 +280,7 @@ CameraRollPicker.propTypes = {
+   selectedMarker: PropTypes.element,
+   backgroundColor: PropTypes.string,
+   emptyText: PropTypes.string,
+-  emptyTextStyle: Text.propTypes.style,
++  emptyTextStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+   loader: PropTypes.node,
+ };
+ 

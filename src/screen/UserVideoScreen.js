@@ -10,7 +10,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { iOSColors } from 'react-native-typography';
 
 import FeedCard from '../component/FeedCard/FeedCard';
-import GET_USER_POSTS_QUERY from '../graphql/queries/getPosts';
+import GET_USER_POSTS_QUERY from '../graphql/queries/getUserPosts';
 import { store } from '../utils/store';
 import Loading from '../component/Loading';
 import { BOTTOM_TAB_HEIGHT } from '../utils/constants'
@@ -19,7 +19,6 @@ const { height, width } = Dimensions.get('window');
 
 const UserVideoScreen = (props) => {
   const param = props.route.params;
-  const { postId } = param;
   const { state: { me } } = useContext(store);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -27,25 +26,24 @@ const UserVideoScreen = (props) => {
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(
     GET_USER_POSTS_QUERY,
     {
-        variables: { userId: param.userId }
+      variables: { userId: param.userId }
     }
   );
 
   const flatlistRef = useRef();
 
   useEffect(() => {
-    if (data && postId) {
-      const index = data.getPosts.posts.findIndex(post => post.postInfo.id === postId);
-      if (index !== -1) {
-        flatlistRef.current.scrollToIndex({ index, animated: true });
+    if (data && param.index) {
+      if (param.index !== -1) {
+        flatlistRef.current.scrollToIndex({ index: param.index });
       }
     }
-  }, [data, postId]);
+  }, [data, param.index]);
 
   function loadMore() {
     fetchMore({
       variables: {
-        cursor: data.getPosts.pageInfo.endCursor,
+        cursor: data.getUserPosts.pageInfo.endCursor,
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
         // Update logic here
@@ -94,17 +92,15 @@ const UserVideoScreen = (props) => {
 
   if (loading) return <Loading />;
   if (error) return <View><Text>`Error! ${error.message}`</Text></View>;
-  console.log("----------UserVideoScreen----------")
-  console.log(data.getPosts)
 
   return (
     <View style={styles.Root}>
       <FlatList
         horizontal={true}
-        data={data.getPosts.posts}
+        data={data.getUserPosts.posts}
         renderItem={renderItem}
         keyExtractor={item => item.postInfo.id}
-        onEndReached={data.getPosts.pageInfo.hasNextPage ? loadMore : null}
+        onEndReached={data.getUserPosts.pageInfo.hasNextPage ? loadMore : null}
         removeClippedSubviews={true}
         refreshing={networkStatus === 4}
         onRefresh={refetch}

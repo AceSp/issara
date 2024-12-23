@@ -1,0 +1,68 @@
+import React, { memo } from 'react';
+import { StyleSheet } from 'react-native';
+
+import {
+    Card,
+    Divider,
+    Paragraph,
+    Text,
+    Avatar
+} from 'react-native-paper';
+import { materialTall } from 'react-native-typography';
+
+import FeedCardHeader from '../../../component/FeedCard/FeedCardHeader';
+import FeedCardBottom from '../../../component/FeedCard/FeedCardBottom';
+import Sponsor from '../../../component/FeedCard/Sponsor';
+import FullSponsor from '../../../component/FeedCard/FullSponsor';
+
+
+function DetailFeedCard(props) {
+
+    return (
+        <Card 
+            style={{ marginTop: 5 }}>
+            <Divider/>
+            <Card.Title title={props.title} />
+            <Divider/>
+            <Card.Content>
+                <Text style={materialTall.subheading}>
+                    {props.text}
+                </Text>
+            </Card.Content>
+            {props.sponsor && (
+                <FullSponsor navigation={props.navigation} {...props.sponsor} />
+            )}
+            <Divider />
+            <FeedCardHeader 
+                author={props.author} 
+                createdAt={props.createdAt} 
+                myId={props.myId}
+            />
+            <FeedCardBottom 
+                id={props.id}
+                relationId={props._id}
+                likeCount={props.likeCount}
+                isLiked={props.isLiked}
+                isCoined={props.isCoined}
+                isSaved={props.isSaved}
+                coinCount={props.coinCount}
+                commentCount={props.commentCount}
+                text={props.text}
+                author={props.author}
+                createdAt={props.createdAt}
+                userCoinCount={props.userCoinCount} 
+                userHaveCoin={props.userHaveCoin}
+                inputRef={props.inputRef}
+            />
+            <Divider />  
+        </Card>
+    )
+}
+
+const styles = StyleSheet.create({
+    name: {
+        backgroundColor: 'red'
+    }
+})
+
+export default memo(DetailFeedCard);

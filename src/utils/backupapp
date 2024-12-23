@@ -1,0 +1,159 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow
+ */
+if(__DEV__) {
+  import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
+}
+import 'react-native-gesture-handler';
+import React, { 
+  useState, 
+  useEffect, 
+  useMemo, 
+  useReducer 
+} from 'react';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import { Button } from 'react-native';
+import { ApolloProvider } from '@apollo/client';
+import { ThemeProvider } from 'styled-components';
+import { NavigationContainer } from '@react-navigation/native';
+
+
+import { colors } from './src/utils/constants';
+import { client, signIn, signOut, getToken, check } from './src/utils/store';
+import { MainStack, AuthStack } from './src/utils/navigation';
+import FullScreenLoading from './src/screen/FullScreenLoading';
+import { AuthContext } from './src/utils/context';
+import { APNBadgeProvider } from './src/utils/BadgeProvider';
+import { iOSColors } from 'react-native-typography';
+import RemotePushController from './src/utils/RemotePushController';
+import LocalNotification from './src/utils/PushController';
+
+const AUTH_TOKEN = 'AUTH_TOKEN';
+const ME_DATA = 'ME_DATA';
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: iOSColors.orange,
+    accent: iOSColors.black,
+  },
+};
+
+export default function App({ navigation }) {
+  const [state, dispatch] = useReducer(
+    (prevState, action) => {
+      switch (action.type) {
+        case 'RESTORE_TOKEN':
+          return {
+            ...prevState,
+            userToken: action.token,
+            isLoading: false,
+          };
+        case 'SIGN_IN':
+          return {
+            ...prevState,
+            isSignout: false,
+            userToken: action.token,
+          };
+        case 'SIGN_OUT':
+          return {
+            ...prevState,
+            isSignout: true,
+            userToken: null,
+          };
+      }
+    },
+    {
+      isLoading: true,
+      isSignout: false,
+      userToken: null,
+    }
+  );
+
+  
+
+  useEffect(() => {
+    // Fetch the token from storage then navigate to our appropriate place
+    const bootstrapAsync = async () => {
+      let userToken;
+
+      try {
+        userToken = await AsyncStorage.getItem(AUTH_TOKEN);
+      } catch (error) {
+        throw(error)
+      }
+
+      // After restoring token, we may need to validate it in production apps
+
+      // This will switch to the App screen or Auth screen and this loading
+      // screen will be unmounted and thrown away.
+      dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+    };
+
+    bootstrapAsync();
+  }, []);
+
+  const authContext = useMemo(
+    () => ({
+      signIn: async (newToken, newMeData) => {
+        let userToken
+        try {
+          await AsyncStorage.setItem(ME_DATA, JSON.stringify(newMeData));
+          userToken = await AsyncStorage.setItem(AUTH_TOKEN, newToken);
+        } catch (error) {
+          throw error;
+        }
+        dispatch({ type: 'SIGN_IN', token: newToken });
+      },
+      signOut: () => {
+        AsyncStorage.removeItem(ME_DATA);
+        AsyncStorage.removeItem(AUTH_TOKEN);
+        dispatch({ type: 'SIGN_OUT' })
+      },
+      signUp: async (newToken, newMeData) => {
+        let userToken
+        try {
+          await AsyncStorage.setItem(ME_DATA, JSON.stringify(newMeData));
+          userToken = await AsyncStorage.setItem(AUTH_TOKEN, newToken);
+        } catch (error) {
+          throw error;
+        }
+        dispatch({ type: 'SIGN_IN', token: newToken });
+      },
+      test: true
+    }),
+    []
+  );
+
+  if (state.isLoading) {
+    return <FullScreenLoading />
+  }
+
+  return (
+       <ApolloProvider client={client}>
+         <ThemeProvider theme={colors}>
+         <AuthContext.Provider value={authContext}>
+           <PaperProvider theme={theme}>
+
+
+              <NavigationContainer>
+
+                  { state.userToken? <MainStack /> : <AuthStack /> }
+                  <RemotePushController />
+              </NavigationContainer>
+
+
+              
+           </PaperProvider>
+           </AuthContext.Provider>
+         </ThemeProvider>
+       </ApolloProvider>
+     )
+};
+
+

@@ -1,0 +1,319 @@
+
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Button,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity
+} from 'react-native';
+import {
+  Icon,
+  Avatar,
+  Overlay
+} from 'react-native-elements';
+import {
+  List
+} from 'react-native-paper';
+import { useQuery, useMutation } from '@apollo/client';
+
+import { AuthContext } from '../../utils/context';
+import { colors } from '../../utils/constants';
+import MemberListItem from '../GroupScreen/Component/MemberListItem';
+import ME_QUERY from '../../graphql/queries/me';
+import ME_SUBSCRIPTION from '../../graphql/subscriptions/me';
+import CREATE_ALT_USER from '../../graphql/mutations/createAltUser';
+import Loading from '../../component/Loading';
+import MenuListItem from './Component/MenuListItem';
+import { TextInput } from 'react-native-gesture-handler';
+
+const CreateAltOverlay = (props) => {
+  return(
+    <View style={styles.overlay}>
+      <Text style={[styles.titleText, styles.textBold]}>ตั้งชื่อเพจ</Text>
+      <View style={styles.inputBox}>
+        <TextInput 
+          style={{flex: 1}} 
+          value={props.text}
+          placeholder='กรอกชื่อเพจ..'
+          onChangeText={(value)=>props.setText(value)}
+        />
+      </View>
+      <TouchableOpacity onPress={() => props.create()} style={styles.button}>
+        <Text style={[styles.buttonText, styles.textBold]}>สร้างเพจ</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+const MenuScreen = (props) => {
+
+  const { signOut } = React.useContext(AuthContext);
+
+  const [ overlayVisible , setVisible ] = useState(false);
+  const [ text , setText ] = useState('');
+
+  const { 
+    loading: me_loading, 
+    error: me_error,
+    data: me_data, 
+    subscribeToMore: me_subscribeToMore 
+  } = useQuery(ME_QUERY);
+
+  const [createAlt, {data, loading}] = useMutation(
+    CREATE_ALT_USER,
+    {
+      onCompleted(data) {
+        props.navigation.navigate('User', { userId: data.createAltUser.altUser._id });
+      },
+    }
+    );
+
+  const create = () => {
+    createAlt({
+      variables: {
+        username: text
+      }
+    });
+    setVisible(false);
+    setText('');
+  }
+
+  const backDropPress = () => {
+    setVisible(false);
+    setText('');
+  }
+
+  /*useEffect(() => {
+    if(me_data) {
+      me_subscribeToMore({
+        document: ME_SUBSCRIPTION,
+            updateQuery: (prev, { subscriptionData }) => {
+                if(!subscriptionData.data) {
+                  return prev;
+                }  
+                const newData = subscriptionData.data.me  
+                    return Object.assign({}, prev, {
+                      me: {
+                        ...newData
+                      }
+                    });
+            }           
+        })
+    }
+  }, [me_data]);*/
+
+  if (me_loading) return <View style={styles.Root}><Loading /></View>
+  if (me_error) return <TouchableOpacity onPress={() => signOut()} style={styles.Root}><Text>`Error! ${me_error.message}`</Text></TouchableOpacity>
+
+  const renderPage = () => {
+    const pageField = [];
+    let count = 0;
+    for (const a of me_data.me.altUser) {
+        if(count <= 2) {
+        pageField.push(
+          <TouchableOpacity 
+            key={a._id}
+            onPress={() => props.navigation.navigate('User', 
+            { 
+              userId: a._id
+            })}  
+            style={styles.menuRow}
+          >
+              <Avatar containerStyle={styles.avatar} rounded source={a.avatar? {uri: a.avatar} : require('../../assets/pic/profile.jpg')}/>
+              <View>
+                <Text style={styles.nameText}>{a.username}</Text>
+              </View>
+          </TouchableOpacity>
+              );
+            count++;
+      }
+    }
+    if(count == 3) {
+      pageField.push(
+        <TouchableOpacity onPress={() => props.navigation.navigate('FollowedList', { following: me_data.me.altUser })} key="read-more">
+            <View style={[styles.button, styles.viewMore]}>
+                <Text style={styles.textBold}>ดูเพิ่มเติม</Text>
+            </View>
+        </TouchableOpacity>
+        
+    );
+    }
+    
+    return pageField;
+  }
+
+  const renderShop = () => {
+    const pageField = [];
+    let count = 0;
+    for (const a of me_data.me.shop) {
+        if(count <= 2) {
+        pageField.push(
+          <TouchableOpacity 
+            key={a._id}
+            onPress={() => props.navigation.navigate('User', 
+            { 
+              userId: a._id
+            })}  
+            style={styles.menuRow}
+          >
+              <Avatar containerStyle={styles.avatar} rounded source={a.avatar? {uri: a.avatar} : require('../../assets/pic/profile.jpg')}/>
+              <View>
+                <Text style={styles.nameText}>{a.username}</Text>
+              </View>
+          </TouchableOpacity>
+              );
+            count++;
+      }
+    }
+    if(count == 3) {
+      pageField.push(
+        <TouchableOpacity onPress={() => props.navigation.navigate('FollowedList', { following: me_data.me.altUser })} key="read-more">
+            <View style={[styles.button, styles.viewMore]}>
+                <Text style={styles.textBold}>ดูเพิ่มเติม</Text>
+            </View>
+        </TouchableOpacity>
+        
+    );
+    }
+    
+    return pageField;
+  }
+
+  return (
+      <ScrollView>
+        <View style={styles.Root}>
+          <TouchableOpacity onPress={() => props.navigation.navigate('Profile') } style={styles.menuRow}>
+              <Avatar size="medium" containerStyle={styles.avatar} rounded source={me_data.me.avatar? {uri: me_data.me.avatar} : require('../../assets/pic/profile.jpg')}/>
+              <View>
+                <Text style={[styles.nameText, styles.textBold ]}>{me_data.me.username}</Text>
+                <Text>ดูโปรไฟล์ของคุณ</Text>
+              </View>
+          </TouchableOpacity>
+          {me_data.me.altUser.length === 0? null :
+            <List.Accordion 
+            title="เพจ"
+            >
+                {renderPage()}
+            </List.Accordion>
+          }
+          {me_data.me.shop.length === 0? null :
+            <List.Accordion 
+            title="ร้านค้า"
+            >
+                {renderShop()}
+            </List.Accordion>
+          }
+
+          <Overlay
+                isVisible={overlayVisible}
+                onBackdropPress={() => backDropPress()}
+                height='auto'
+            >
+                <CreateAltOverlay text={text} setText={setText} create={create} />
+            </Overlay>
+          <MenuListItem 
+            onPress={() => setVisible(true)} 
+            name="สร้างคอลัมน์" 
+            iconName="new-message"
+            iconType="entypo"  
+          />
+          <MenuListItem 
+            onPress={() => setVisible(true)} 
+            name="สร้างกลุ่ม" 
+            iconName="account-multiple-plus"
+            iconType="material-community"  
+          />
+          <MenuListItem 
+            onPress={() => props.navigation.navigate('YourProduct')} 
+            name="ประกาศสินค้าของคุณ" 
+            iconName="archive"
+            iconType="entypo"  
+          />
+          <MenuListItem 
+            onPress={() => props.navigation.navigate('ManageAd')} 
+            name="โฆษณาของคุณ" 
+            iconName="megaphone"
+            iconType="entypo"  
+          />
+          <MenuListItem 
+            onPress={() => props.navigation.navigate('BuyCoin')} 
+            name="ซื้อเหรียญ" 
+            iconName="alpha-v" 
+            iconType="material-community" 
+          />
+          <MenuListItem 
+            onPress={signOut} 
+            name="ออกจากระบบ" 
+            iconName="logout" 
+            iconType="material-community" 
+          />
+        </View>
+      </ScrollView>
+  )
+}
+
+const styles = StyleSheet.create({
+  Root: {
+    alignItems: 'stretch', 
+  },
+  menuRow: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    alignItems: 'center'
+  },
+  icon: {
+    backgroundColor: colors.LIGHT_GREY_2,
+    borderRadius: 20,
+    padding: 5,
+    marginRight: 15
+  },
+  avatar: {
+    marginRight: 20
+  },
+  nameText: {
+    fontSize: 20
+  },
+  textBold: {
+    fontWeight: 'bold'
+  },
+  pageList: {
+    paddingHorizontal: 20,
+    backgroundColor: 'white'
+  },
+  viewMore: {
+    backgroundColor: colors.LIGHT_RED
+  },
+  button: {
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingVertical: 10
+  },
+  overlay: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    paddingBottom: 0
+  },
+  inputBox: { 
+    height: 40, 
+    borderColor: 'gray',
+    borderWidth: 1 ,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    margin: 2,
+    marginTop: 10
+  },
+  buttonText: {
+    fontSize: 20,
+    color: colors.PRIMARY
+  },
+  titleText: {
+    fontSize: 20,
+  }
+})
+
+export default MenuScreen;

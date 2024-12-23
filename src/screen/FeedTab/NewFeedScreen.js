@@ -16,22 +16,22 @@ import { store, getShowQuestion } from '../../utils/store';
 import NewFeedHeader from './Component/NewFeedHeader';
 import Loading from '../../component/Loading';
 import { BOTTOM_TAB_HEIGHT } from '../../utils/constants'
+import { useFocusEffect } from '@react-navigation/native';
 
 const { height, width } = Dimensions.get('window');
 
 const NewFeedScreen = (props) => {
   const { state: { me } } = useContext(store);
+  const [posts, setPosts] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(-1);
+  const [uploadError, setUploadError] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [nextVideoIndex, setNextVideoIndex] = useState(null);
-  const videoRefs = useRef([]);
-  const [nextVideoIndex, setNextVideoIndex] = useState(null);
 
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(GET_POSTS_QUERY);
   const [createPost, { createpost_data }] = useMutation(CREATE_POST_MUTATION);
 
   const flatlistRef = useRef();
-  const videoRef = useRef([]);
 
   useEffect(() => {
     const checkFirstTime = async () => {
@@ -41,21 +41,14 @@ const NewFeedScreen = (props) => {
     checkFirstTime();
   }, []);
 
-  useEffect(() => {
-    if (currentlyPlaying !== null && data && data.getPosts.posts.length > 0) {
-      const nextIndex = (currentlyPlaying + 1) % data.getPosts.posts.length;
-      setNextVideoIndex(nextIndex);
-    }
-  }, [currentlyPlaying, data]);
-
-  useEffect(() => {
-    if (nextVideoIndex !== null && videoRefs.current[nextVideoIndex]) {
-      videoRefs.current[nextVideoIndex].preload();
-    }
-  }, [nextVideoIndex]);
+  useFocusEffect(useCallback(() => {
+    setIsPaused(false);
+    return () => {
+      setIsPaused(true);
+    };
+  }, []));
 
   function loadMore() {
-    console.log("----------newfeedScreen--------loadmore")
     fetchMore({
       variables: {
         cursor: data.getPosts.pageInfo.endCursor,
@@ -100,12 +93,12 @@ const NewFeedScreen = (props) => {
   };
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      setCurrentlyPlaying(viewableItems[0].index);
-      setIsPaused(false);
-    }
+    const currentIndex = viewableItems.length > 0 ? viewableItems[0].index : null;
+    setCurrentlyPlaying(currentIndex);
+    setIsPaused(false);
   }, []);
 
+  const keyExtractor = useCallback((item, index) => `${index}`);
 
   const renderItem = useCallback(({ item, index }) => (
     <FeedCard
@@ -115,8 +108,9 @@ const NewFeedScreen = (props) => {
       index={index}
       paused={index !== currentlyPlaying || isPaused}
       onPress={togglePause}
+      shouldUnload={Math.abs(index - currentlyPlaying) > 1}
+      // shouldUnload={index !== currentlyPlaying}
       navigation={props.navigation}
-      ref={ref => videoRefs.current[index] = ref}
     />
   ), [currentlyPlaying, isPaused, togglePause, props.navigation]);
 
@@ -129,7 +123,7 @@ const NewFeedScreen = (props) => {
         horizontal={true}
         data={data.getPosts.posts}
         renderItem={renderItem}
-        keyExtractor={item => item.postInfo.id}
+        keyExtractor={keyExtractor}
         onEndReached={data.getPosts.pageInfo.hasNextPage ? loadMore : null}
         onEndReachedThreshold={1}
         removeClippedSubviews={true}

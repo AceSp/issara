@@ -1,7 +1,6 @@
 import React, {
   useState,
-  forwardRef,
-  useImperativeHandle
+  useEffect
 } from 'react';
 import { 
   View, 
@@ -16,34 +15,26 @@ import { iOSUIKitTall } from 'react-native-typography'
 import { useMutation } from '@apollo/client';
 
 import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
-import VideoPlayer from '../Video/views/VideoPlayer.android';
+import { VideoPlayer } from '../Video/views';
 import { BOTTOM_TAB_HEIGHT } from '../../utils/constants'
 import FeedCardRight from './FeedCardRight';
 import Sponsor from './Sponsor';
 
 const { height, width } = Dimensions.get('window');
 
-const FeedCard = forwardRef(({
+function FeedCard({
   postInfo,
   relation,
   sponsor,
   index,
   paused,
   onPress,
+  shouldUnload,
   navigation
-}, ref) => {
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [videoRef, setVideoRef] = useState(null);
 
   const [viewPost, { data }] = useMutation(VIEW_POST_MUTATION);
-
-  useImperativeHandle(ref, () => ({
-    preload: () => {
-      if (videoRef) {
-        videoRef.preload();
-      }
-    }
-  }));
 
   const onEnd = () => {
     viewPost({
@@ -51,17 +42,18 @@ const FeedCard = forwardRef(({
     });
   }
 
+  if(shouldUnload) return <SafeAreaView style={styles.fullScreenCard} />
+
   return (
     <SafeAreaView style={styles.fullScreenCard}>
       <View style={styles.videoContainer}>
-        <VideoPlayer
-          source={{ uri: postInfo.video, type: 'm3u8' }}
-          paused={paused}
-          onPress={() => onPress(index)}
-          onEnd={onEnd}
-          style={styles.video}
-          ref={videoRef}
-        />
+          <VideoPlayer
+            source={{ uri: postInfo.video, type: 'm3u8' }}
+            paused={paused}
+            onPress={() => onPress(index)}
+            onEnd={onEnd}
+            style={styles.video}
+          />
       </View>
       {/* <FeedCardRight
         postInfo={postInfo}
@@ -103,7 +95,7 @@ const FeedCard = forwardRef(({
       }
     </SafeAreaView>
   );
-});
+}
 
 const styles = StyleSheet.create({
   fullScreenCard: {

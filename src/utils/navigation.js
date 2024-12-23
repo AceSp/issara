@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {
@@ -90,6 +90,9 @@ import PostJobPictureScreen from '../screen/JobScreen/PostJobPictureScreen';
 import FollowedListScreen from '../screen/GroupScreen/FollowedListScreen';
 import GokgokgokLogo from '../assets/Images/gokgokgokLogo'
 import { MediaScreen } from '../screen/PostVideoScreen/MediaScreen';
+import PostPreviewScreen from '../screen/PostVideoScreen/PostPreviewScreen';
+import UserVideoScreen from '../screen/UserVideoScreen';
+import { store } from './store';
 
 const BTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -104,10 +107,12 @@ const styles = StyleSheet.create({
 });
 
 function BottomTab(props) {
+  const { state: { me } } = useContext(store);
   return (
     <BTab.Navigator
       screenOptions={{
-        headerShow: false
+        headerShow: false,
+        tabBarActiveTintColor: "orange"
       }}
     >
       <BTab.Screen
@@ -130,7 +135,7 @@ function BottomTab(props) {
         component={ShopFeedScreen}
         options={{
           headerShown: false,
-          tabBarLabel: 'สินค้า',
+          tabBarLabel: 'ร้านค้า',
           tabBarIcon: ({ color: tintColor }) => (
             <Icon 
               type="font-awesome"
@@ -159,11 +164,12 @@ function BottomTab(props) {
         }}
       />
       <BTab.Screen
-        name="Job"
-        component={JobFeedScreen}
+        name="MyProfile"
+        component={UserProfileScreen}
+        initialParams={{userId: me?.id}}
         options={{
           headerShown: false,
-          tabBarLabel: 'งาน',
+          tabBarLabel: 'โปรไฟล์',
           tabBarIcon: ({ color: tintColor }) => (
             <Icon 
               name="account-tie"
@@ -372,6 +378,12 @@ export function MainStack(props) {
       <Stack.Screen
         name="UserProfile"
         component={UserProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UserVideo"
+        component={UserVideoScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen name="Map" component={MapScreen} />
       <Stack.Screen name="EditUser" component={EditUserScreen} />
@@ -438,6 +450,11 @@ export function MainStack(props) {
       <Stack.Screen 
         name="PostVideo" 
         component={PostVideoScreen} 
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="PostPreview" 
+        component={PostPreviewScreen} 
         options={{ headerShown: false }}
       />
       <Stack.Screen 

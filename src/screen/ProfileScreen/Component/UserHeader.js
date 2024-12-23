@@ -8,25 +8,22 @@ import {
     StyleSheet,
     Dimensions,
     Text,
-    TouchableOpacity
 } from 'react-native';
 
 import {
-    Icon
-} from 'react-native-elements';
-import {
-    Avatar,
     Divider,
+    IconButton,
     ToggleButton
 } from 'react-native-paper';
-import {
-    Button
-} from 'react-native-paper';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import getDirections from 'react-native-google-maps-directions';
-import ReadMore from 'react-native-read-more-text';
-import LinearGradient from 'react-native-linear-gradient';
 import { useMutation } from '@apollo/client';
+import {launchImageLibrary} from 'react-native-image-picker'
+import {
+  request,
+  check,
+  PERMISSIONS,
+  RESULTS
+} from 'react-native-permissions';
+import BackgroundService from 'react-native-background-actions';
 
 import formatNumber from '../../../utils/formatNumber';
 import { colors, DEFAULT_AVATAR } from '../../../utils/constants';
@@ -40,6 +37,10 @@ import {
 } from 'react-native-typography';
 import { store } from '../../../utils/store';
 import FOLLOW_MUTATION from '../../../graphql/mutations/follow';
+import UPDATE_ME_MUTATION from '../../../graphql/mutations/updateMe';
+import AvatarWrapper from '../../../component/AvatarWrapper';
+import { VIDEO_URL } from '../../../utils/apollo-client';
+import uploadFileInChunks from '../../../utils/uploadFileInChunks';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -51,6 +52,7 @@ export default function UserHeader(props) {
     const [followed, setFollowed] = useState(false);
 
     const [follow, { data: follow_data }] = useMutation(FOLLOW_MUTATION);
+    const [updateMe, { data: updateMe_data }] = useMutation(UPDATE_ME_MUTATION);
 
     useEffect(() => {
         if (isFollowed) 
@@ -64,6 +66,97 @@ export default function UserHeader(props) {
         });
         setFollowed(!followed);
     }
+
+    async function checkImagePermission() {
+        if (Platform.OS === 'android') {
+        const result = await check(PERMISSIONS.ANDROID.CAMERA)
+        switch (result) {
+            case RESULTS.UNAVAILABLE:
+            console.log("unavailable")
+            return false;
+            case RESULTS.DENIED:
+            console.log("denied")
+            return false;
+            case RESULTS.GRANTED:
+            console.log("granted")
+            return true;
+            case RESULTS.BLOCKED:
+            console.log("blocked")
+            return false;
+        }
+        } else {
+        const result = await check(PERMISSIONS.IOS.CAMERA)
+        switch (result) {
+            case RESULTS.UNAVAILABLE:
+            console.log("unavailable")
+            return false;
+            case RESULTS.DENIED:
+            console.log("denied")
+            return false;
+            case RESULTS.GRANTED:
+            console.log("granted")
+            return true;
+            case RESULTS.BLOCKED:
+            console.log("blocked")
+            return false;
+        }
+        }
+    };
+
+    const openVideoGallery = async () => {
+        await checkImagePermission()
+        const options = {
+            mediaType: 'image',
+            includeBase64: false,
+            assetRepresentationMode: 'current',
+            maxHeight: 2000,
+            maxWidth: 2000,
+        };
+
+        const result = await launchImageLibrary(options);
+            if (result.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (result.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else {
+                const source = result.uri || result.assets[0].uri;
+                const fileName = result.fileName || result.assets[0].fileName
+                console.log('Selected image:', source);
+                console.log(result)
+                handleUpload(fileName, source)
+            }
+    }
+
+    const handleUpload = async (fileName, filePath) => {
+        const options = {
+            taskName: 'FileUpload',
+            taskTitle: 'Uploading File',
+            taskDesc: 'Progress',
+            taskIcon: {
+                name: 'ic_launcher',
+                type: 'mipmap',
+            },
+            color: '#ff00ff',
+            //change this for opening the app from notification
+            linkingURI: 'uploadFile',
+        };
+        await BackgroundService.start(async () => {
+            const sanitize = (name) => name.replace(/[^a-zA-Z0-9-_]/g, '_'); 
+            const imageId = sanitize(fileName);
+            const userId = sanitize(me.id);
+            await uploadFileInChunks({ filePath, userId, imageId });
+            console.log('Upload complete');
+            await BackgroundService.updateNotification({
+                taskDesc: 'File Uploaded',
+            });
+            const avatar = `${VIDEO_URL}images/${userId}/${imageId}.jpg`
+            await updateMe({
+                variables: {
+                    avatar
+                },
+            })
+        }, options);
+    };
 
     // useEffect(() => {
     //     setFollow(props.userData.meFollowed);
@@ -103,18 +196,18 @@ export default function UserHeader(props) {
             <View style={styles.Profile}>
                 <View style={styles.header}>
                     <View style={styles.avatarContainer}>
-                        <Avatar.Image
-                            size={80}
-                            style={styles.avatar}
-                            source={props.userData.avatar ? { uri: props.userData.avatar } : DEFAULT_AVATAR}
-                        />
-                        <Icon
-                            name="pencil"
-                            type="font-awesome"
-                            color="white"
-                            size={16}
-                            containerStyle={styles.editIconButton}
-                            onPress={() => console.log("changing avatar")}
+                            <AvatarWrapper
+                                size={80}
+                                style={styles.avatar}
+                                uri={props.userData.avatar}
+                                label={props.userData.itemName[0]}
+                            />
+                        <IconButton
+                            icon="pencil"
+                            iconColor="white"
+                            size={20}
+                            style={styles.editIconButton}
+                            onPress={openVideoGallery}
                         />
                     </View>
                     <Text style={[iOSUIKitTall.bodyEmphasized, styles.usernameText]}>
@@ -186,6 +279,8 @@ const styles = StyleSheet.create({
         height: 30,
         justifyContent: 'center',
         alignItems: 'center',
+        borderColor: 'white',
+        borderWidth: 2
     },
     Root: {
         backgroundColor: '#f1f6f8',

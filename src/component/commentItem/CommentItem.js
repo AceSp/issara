@@ -17,9 +17,8 @@ import 'moment/locale/th';
 import { iOSColors } from "react-native-typography";
 
 import LIKE_COMMENT_MUTATION from '../../graphql/mutations/likeComment';
-
-
-
+import ReplyItem from "./ReplyItem";
+import AvatarWrapper from "../AvatarWrapper";
 
 function CommentItem(props) {
 
@@ -46,7 +45,10 @@ function CommentItem(props) {
   return (
     <View>
       <View style={styles.topContainer}>
-        <Avatar source={props.commentInfo.author.avatar} />
+        <AvatarWrapper 
+          uri={props.commentInfo.author.avatar}
+          label={props.commentInfo.author.itemName[0]}
+        />
         <View style={styles.commentBox}>
           <View style={styles.commentBoxMeta}>
             <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{props.commentInfo.author.username}</Text>
@@ -65,7 +67,7 @@ function CommentItem(props) {
               <Icon
                 name="thumbs-up"
                 type='font-awesome'
-                color={iOSColors.red}
+                color={iOSColors.orange}
                 size={18} />
               :
               <Text>ถูกใจ</Text>
@@ -88,15 +90,17 @@ function CommentItem(props) {
         onPress={() => setShowReplies(!showReplies)}
         underlayColor='#dddcf5'>
         <View style={styles.bottomContainer}>
-          {props.commentInfo.commentCount ? <Text style={{ fontWeight: 'bold' }}>ดูการตอบกลับอีก {props.replies.length} รายการ</Text> : <View></View>}
+          {props.replies?.length ? 
+            showReplies 
+              ? <Text style={{ fontWeight: 'bold' }}>ดูการตอบกลับอีก {props.replies.length} รายการ</Text> 
+              : <Text style={{ fontWeight: 'bold' }}>ซ่อนการตอบกลับ</Text> 
+            : <View></View>}
         </View>
       </TouchableOpacity>
       {showReplies && (
         <View style={styles.repliesContainer}>
           {props.replies.map(reply => (
-            <View key={reply.id} style={styles.replyItem}>
-              <Text>{reply.text}</Text>
-            </View>
+            <ReplyItem key={reply.commentInfo.id} {...reply}/>
           ))}
         </View>
       )}
@@ -138,7 +142,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   repliesContainer: {
-    marginLeft: 80,
     marginTop: 10,
     paddingLeft: 20,
     borderLeftWidth: 2,
@@ -148,41 +151,5 @@ const styles = StyleSheet.create({
     marginBottom: 10
   }
 });
-
-const styles = StyleSheet.create({
-  commentBox: {
-    backgroundColor: '#ffe8e8',
-    marginVertical: 0,
-    marginRight: 20,
-    marginHorizontal: 10,
-    borderRadius: 20,
-    padding: 10
-  },
-  commentBoxMeta: {
-    flexDirection: 'row',
-    alignItems: 'flex-end'
-  },
-  topContainer: {
-      flexDirection: 'row',
-      width: 380,
-      marginHorizontal: 20,
-      marginTop: 10,
-  },
-  middleContainer: {
-    flexDirection: 'row', 
-    marginLeft: 80,
-    marginBottom: 5,
-    marginTop: 10
-  },
-  bottomContainer: {
-    flexDirection: 'row', 
-    marginLeft: 80,
-    marginBottom: 5,
-  },
-  likeButton: {
-    flexDirection: 'row'
-  }
-
-})
 
 export default memo(CommentItem);

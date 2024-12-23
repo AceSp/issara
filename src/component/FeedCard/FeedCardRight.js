@@ -40,6 +40,7 @@ import ReportModal from './ReportModal';
 import { DEFAULT_AVATAR } from '../../utils/constants';
 import CommentModal from './CommentModal';
 import Avatar from './Avatar';
+import AvatarWrapper from '../AvatarWrapper';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -115,6 +116,7 @@ function FeedCardRight({
                     commentCount: postInfo.commentCount,
                     createdAt: postInfo.createdAt,
                     pinLocation: postInfo.pinLocation,
+                    thumbnail: postInfo.thumbnail,
                     author: {
                         __typename: 'Author',
                         itemName: postInfo.author.itemName,
@@ -179,8 +181,9 @@ function FeedCardRight({
                 style={styles.button} 
                 onPress={() => navigation.navigate('UserProfile', { userId: postInfo.author.id })}
                 >
-                <Avatar 
-                    source={postInfo.author.avatar}
+                <AvatarWrapper 
+                    uri={postInfo.author.avatar}
+                    label={postInfo.author.itemName[0]}
                     style={styles.avatar}
                 />
                 </TouchableOpacity>
@@ -200,7 +203,7 @@ function FeedCardRight({
                 <Icon
                     name={liked ? "heart" : "heart-outline"}
                     type="material-community"
-                    color={liked ? iOSColors.red : iOSColors.white}
+                    color={liked ? iOSColors.orange : iOSColors.white}
                     size={35}
                 />
                 <Text style={styles.buttonText}>
@@ -277,8 +280,9 @@ const styles = StyleSheet.create({
     root: {
         position: 'absolute',
         right: 10,
-        bottom: 100,
+        bottom: 130,
         alignItems: 'center',
+        zIndex: 1
     },
     avatarContainer: {
         marginBottom: 20,
@@ -303,7 +307,7 @@ const styles = StyleSheet.create({
     followButton: {
         position: 'absolute',
         bottom: -10,
-        backgroundColor: '#FF4040',
+        backgroundColor: iOSColors.orange,
         borderRadius: 12,
         width: 24,
         height: 24,

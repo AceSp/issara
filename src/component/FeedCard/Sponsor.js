@@ -59,13 +59,13 @@ function Sponsor({
       isVisible={modalVisible}
       onBackdropPress={dismissModal}
       onSwipeComplete={dismissModal}
-      swipeDirection="down"
-      propagateSwipe={true}
+      // swipeDirection="down"
+      // propagateSwipe={true}
       style={styles.modal} // Add style for modal
     >
       <View style={styles.modalContainer}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Comments</Text>
+          <Text style={styles.headerText}>ผู้สนับสนุน</Text>
           <IconButton icon='close' onPress={dismissModal} />
         </View>
         <ShopScreen shopId={shop.id} navigation={navigation} />
@@ -96,13 +96,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: iOSColors.lightGray,
   },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginLeft: 24
   },
   itemName: {
     ...iOSUIKitTall.title3White,

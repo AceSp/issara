@@ -29,7 +29,7 @@ export default function UserProfileScreen(props) {
   const { state: { me } } = useContext(store);
 
   const [uploadProgress, setUploadProgress] = useState(-1);
-  const [currentToggleValue, setCurrentToggleValue] = useState('left');
+  const [currentToggleValue, setCurrentToggleValue] = useState(0);
 
   const {
     loading: user_loading,
@@ -49,7 +49,9 @@ export default function UserProfileScreen(props) {
     fetchMore, 
     refetch, 
     networkStatus 
-  } = useQuery(GET_POST_QUERY);
+  } = useQuery(GET_POST_QUERY, {
+    variables: { limit: 27 }
+  });
   const { 
     loading: liked_loading, 
     error: liked_error, 
@@ -57,7 +59,9 @@ export default function UserProfileScreen(props) {
     fetchMore: liked_fetchMore, 
     refetch: liked_refetch, 
     networkStatus: liked_networkStatus 
-  } = useQuery(GET_LIKED_POST_QUERY);
+  } = useQuery(GET_LIKED_POST_QUERY, {
+    variables: { limit: 27 }
+  });
   const { 
     loading: saved_loading, 
     error: saved_error, 
@@ -65,7 +69,9 @@ export default function UserProfileScreen(props) {
     fetchMore: saved_fetchMore, 
     refetch: saved_refetch, 
     networkStatus: saved_networkStatus 
-  } = useQuery(GET_SAVED_POST_QUERY);
+  } = useQuery(GET_SAVED_POST_QUERY, {
+    variables: { limit: 27 }
+  });
 
   useEffect(() => {
     if(!param.userId)
@@ -80,16 +86,80 @@ export default function UserProfileScreen(props) {
 
   const getCurrentData = () => {
     switch (currentToggleValue) {
-      case 'left':
+      case 0:
         return data.getUserPosts.posts;
-      case 'center':
+      case 1:
         return saved_data.getSavedPosts.posts;
-      case 'right':
+      case 2:
         return liked_data.getLikedPosts.posts;
       default:
         return [];
     }
   };
+
+
+  function loadMoreUserPosts() {
+    fetchMore({
+      variables: {
+        cursor: data.getUserPosts.pageInfo.endCursor,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const newPosts = fetchMoreResult.getUserPosts.posts;
+        const pageInfo = fetchMoreResult.getUserPosts.pageInfo;
+        return newPosts.length
+            ? {
+                getUserPosts: {
+                    __typename: previousResult.getUserPosts.__typename,
+                    posts: [...previousResult.getUserPosts.posts, ...newPosts],
+                    pageInfo,
+                }
+            }
+            : previousResult;
+      }
+    });
+  }
+
+  function loadMoreSavedPosts() {
+    saved_fetchMore({
+      variables: {
+        cursor: saved_data.getSavedPosts.pageInfo.endCursor,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const newPosts = fetchMoreResult.getSavedPosts.posts;
+        const pageInfo = fetchMoreResult.getSavedPosts.pageInfo;
+        return newPosts.length
+            ? {
+                getSavedPosts: {
+                    __typename: previousResult.getSavedPosts.__typename,
+                    posts: [...previousResult.getSavedPosts.posts, ...newPosts],
+                    pageInfo,
+                }
+            }
+            : previousResult;
+      }
+    });
+  }
+
+  function loadMoreLikedPosts() {
+    liked_fetchMore({
+      variables: {
+        cursor: liked_data.getLikedPosts.pageInfo.endCursor,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const newPosts = fetchMoreResult.getLikedPosts.posts;
+        const pageInfo = fetchMoreResult.getLikedPosts.pageInfo;
+        return newPosts.length
+            ? {
+                getLikedPosts: {
+                    __typename: previousResult.getLikedPosts.__typename,
+                    posts: [...previousResult.getLikedPosts.posts, ...newPosts],
+                    pageInfo,
+                }
+            }
+            : previousResult;
+      }
+    });
+  }
 
   const _renderItem = ({ item, index }) => <VideoPreviewItem
     index={index}
@@ -137,39 +207,29 @@ export default function UserProfileScreen(props) {
             numColumns={3}
             onEndReachedThreshold={0.9}
             onEndReached={() => {
-              if (currentToggleValue === 'left' && data.getUserPosts.pageInfo.hasNextPage) {
-                fetchMore({
-                  variables: {
-                    cursor: data.getUserPosts.pageInfo.endCursor,
-                  },
-                  updateQuery: (previousResult, { fetchMoreResult }) => {
-                    // Update logic here
-                  }
-                });
-              } else if (currentToggleValue === 'center' && saved_data.getSavedPosts.pageInfo.hasNextPage) {
-                saved_fetchMore({
-                  variables: {
-                    cursor: saved_data.getSavedPosts.pageInfo.endCursor,
-                  },
-                  updateQuery: (previousResult, { fetchMoreResult }) => {
-                    // Update logic here
-                  }
-                });
-              } else if (currentToggleValue === 'right' && liked_data.getLikedPosts.pageInfo.hasNextPage) {
-                liked_fetchMore({
-                  variables: {
-                    cursor: liked_data.getLikedPosts.pageInfo.endCursor,
-                  },
-                  updateQuery: (previousResult, { fetchMoreResult }) => {
-                    // Update logic here
-                  }
-                });
-              }
+              if (currentToggleValue === 0 && data.getUserPosts.pageInfo.hasNextPage) 
+                loadMoreUserPosts()
+              else if (currentToggleValue === 1 && saved_data.getSavedPosts.pageInfo.hasNextPage) 
+                loadMoreSavedPosts()
+              else if (currentToggleValue === 2 && liked_data.getLikedPosts.pageInfo.hasNextPage) 
+                loadMoreLikedPosts()
             }}
             // onEndReached={null}     
             removeClippedSubviews={true}
             refreshing={networkStatus === 4}
-            onRefresh={() => refetch()}
+            onRefresh={() => {
+              switch(currentToggleValue) {
+                case 0:
+                  refetch()
+                  break;
+                case 1:
+                  saved_refetch()
+                  break;
+                case 2:
+                  liked_refetch()
+                  break;
+              }
+            }}
         />
     </View>
   )

@@ -1,0 +1,405 @@
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import {
+    StyleSheet,
+    View,
+    TouchableOpacity
+  } from 'react-native';
+import { Icon } from 'react-native-elements';
+import F5Icon from 'react-native-vector-icons/FontAwesome5';
+import { HeaderBackButton } from '@react-navigation/stack';
+
+import SearchScreen from '../screen/SearchScreen';
+import MenuScreen from '../screen/MenuScreen/MenuScreen';
+import NotificationScreen from '../screen/Notification/NotificationScreen';
+import PostScreen from '../screen/PostScreen/PostScreen';
+import NewFeedScreen from '../screen/FeedTab/NewFeedScreen';
+import NewsFeedScreen from '../screen/FeedTab/NewsFeedScreen';
+import MoreCommentScreen from '../screen/commentScreen/MoreCommentScreen';
+import RegisterScreen from '../screen/RegisterScreen';
+import LoginScreen from '../screen/LoginScreen';
+import { colors } from './constants';
+import ProfileScreen from '../screen/ProfileScreen/ProfileScreen';
+import BuyCoinScreen from '../screen/BuyCoinScreen';
+import DetailScreen from '../screen/commentScreen/DetailScreen';
+import MoreReplyScreen from '../screen/commentScreen/MoreReplyScreen';
+import MarketScreen from '../screen/MarketScreen/MarketScreen';
+import CategoryScreen from '../screen/categoryScreen/CategoryScreen';
+import NewsCategoryScreen from '../screen/categoryScreen/NewsCategoryScreen';
+import PostCategoryScreen from '../screen/categoryScreen/PostCategoryScreen';
+import PostNewsCateScreen from '../screen/categoryScreen/PostNewsCateScreen';
+import NewsPostScreen from '../screen/PostScreen/NewsPostScreen';
+import GroupScreen from '../screen/GroupScreen/GroupScreen';
+import GroupListScreen from '../screen/GroupScreen/GroupListScreen';
+import GroupRoomScreen from '../screen/GroupScreen/GroupRoomScreen';
+import GroupPostScreen from '../screen/PostScreen/GroupPostScreen';
+import CreateGroupScreen from '../screen/GroupScreen/CreateGroupScreen';
+import EditGroupScreen from '../screen/GroupScreen/EditGroupScreen';
+import GroupMemberScreen from '../screen/GroupScreen/GroupMemberScreen';
+import SearchHeader from '../component/SearchHeader';
+import FollowedListScreen from '../screen/GroupScreen/FollowedListScreen';
+import UserScreen from '../screen/ProfileScreen/UserScreen';
+import UserPostScreen from '../screen/PostScreen/UserPostScreen';
+import CreateAltScreen from '../screen/ProfileScreen/CreateAltScreen';
+import EditUserScreen from '../screen/ProfileScreen/EditUserScreen';
+import ProductFeedScreen from '../screen/MarketScreen/ProductFeedScreen';
+import ProductOptionScreen from '../screen/MarketScreen/ProductOptionScreen';
+import PostProductPictureScreen from '../screen/MarketScreen/PostProductPictureScreen';
+import PostProductDetailScreen from '../screen/MarketScreen/PostProductDetailScreen';
+import ProductScreen from '../screen/MarketScreen/ProductScreen';
+import OnlineProductScreen from '../screen/MarketScreen/OnlineProductScreen';
+import OfflineProductScreen from '../screen/MarketScreen/OfflineProductScreen';
+import MapScreen from '../screen/MapScreen';
+import ShopFeedScreen from '../screen/shopScreen/ShopFeedScreen';
+import ShopScreen from '../screen/shopScreen/ShopScreen';
+import ReviewScreen from '../screen/shopScreen/ReviewScreen';
+import ShopImageScreen from '../screen/shopScreen/ShopImageScreen';
+import PostShopPictureScreen from '../screen/shopScreen/PostShopPictureScreen';
+import PostShopDetailScreen from '../screen/shopScreen/PostShopDetailScreen';
+import EditShopScreen from '../screen/shopScreen/EditShopScreen';
+import AdScreen from '../screen/shopScreen/AdScreen';
+import SponsorScreen from '../screen/shopScreen/SponsorScreen';
+import ManageShopScreen from '../screen/shopScreen/ManageShopScreen';
+import UpdateSponsorScreen from '../screen/shopScreen/UpdateSponsorScreen';
+import PromoteScreen from '../screen/shopScreen/PromoteScreen';
+import UpdatePromoteScreen from '../screen/shopScreen/UpdatePromoteScreen';
+import ManageAdScreen from '../screen/MenuScreen/ManageAdScreen';
+import NotificationIconWithBadge from '../component/IconWithBadge/IconWithBadge';
+
+const TTab = createMaterialTopTabNavigator();
+const BTab = createMaterialBottomTabNavigator();
+const Stack = createStackNavigator();
+
+const styles = StyleSheet.create({
+    iconContainer: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      width: 120
+    },
+  });
+
+  function TopTab(props) {
+
+    return(
+      <TTab.Navigator 
+          tabBarOptions={{
+            showIcon: true,
+            showLabel: false,
+            activeTintColor: colors.PRIMARY,
+            inactiveTintColor: colors.LIGHT_GRAY,
+            indicatorStyle: { backgroundColor: colors.PRIMARY },
+            iconStyle: { width: 40 },
+            style: {
+              height: 50,
+              overflow: 'hidden',
+              marginTop: 0
+            },
+          }}
+      >
+        <TTab.Screen 
+          name="NewFeed" 
+          component={NewFeedScreen} 
+          options={{
+            tabBarLabel: 'ทั่วไป',
+            tabBarIcon: ({color:tintColor}) => (
+              <F5Icon name = "book-reader" 
+                    color = {tintColor}
+                    size={25}
+              />
+            )
+          }} 
+        />
+        <TTab.Screen 
+          name="News" 
+          component={NewsFeedScreen}  
+          options={{
+            tabBarLabel: 'ข่าว',
+            tabBarIcon: ({color:tintColor}) => (
+              <Icon name = "newspaper-o" 
+                    type= "font-awesome"
+                    color = {tintColor}
+                    size={25}
+                    iconStyle={{ marginTop: 3 }}
+              />
+            )
+          }} 
+        />
+        <TTab.Screen 
+          name="Subscription" 
+          component={GroupScreen} 
+          options={{
+            tabBarLabel: 'การติดตาม',
+            tabBarIcon: ({color:tintColor}) => (
+              <Icon name = "cast-connected" 
+                    color = {tintColor}
+                    size={30}
+              />
+            )
+          }} 
+        />
+        <TTab.Screen 
+          name="Market" 
+          component={MarketScreen} 
+          options={{
+            tabBarLabel: 'ค้าขาย',
+            tabBarIcon: ({color:tintColor}) => (
+              <F5Icon name = "money-bill-wave" 
+                    color = {tintColor}
+                    size={23}
+              />
+            )
+          }} 
+        />
+        <TTab.Screen 
+          name="Notification" 
+          component={NotificationScreen} 
+          options={{
+            tabBarLabel: 'แจ้งเตือน',
+            tabBarIcon: ({color:tintColor}) => (
+              <NotificationIconWithBadge 
+                name="notifications"
+                color={tintColor}
+                size={28}
+              />
+              )
+          }} 
+        />
+        <TTab.Screen 
+          name="Menu" 
+          component={MenuScreen} 
+          options={{
+            tabBarLabel: 'ตัวเลือก',
+            tabBarIcon: ({color:tintColor}) => (
+              <Icon name = "menu" 
+                    color = {tintColor}
+                    size={35}
+                    iconStyle={{ marginBottom: 20}}
+              />
+            )
+          }} 
+          changeLogin={props.changeLogin} />
+      </TTab.Navigator>
+    )
+  }
+
+  function YourProductTopTab(props) {
+
+    return(
+      <TTab.Navigator 
+          tabBarOptions={{
+            showLabel: true,
+            activeTintColor: colors.PRIMARY,
+            inactiveTintColor: colors.LIGHT_GRAY,
+            indicatorStyle: { backgroundColor: colors.PRIMARY },
+            style: {
+              height: 50,
+              overflow: 'hidden',
+              marginTop: 0
+            },
+          }}
+      >
+        <TTab.Screen 
+          name="OnlineProduct" 
+          component={OnlineProductScreen} 
+          options={{
+            tabBarLabel: 'ออนไลน์'
+          }} 
+        />
+        <TTab.Screen 
+          name="OfflineProduct" 
+          component={OfflineProductScreen}  
+          options={{
+            tabBarLabel: 'ออฟไลน์'
+          }} 
+        />
+      </TTab.Navigator>
+    )
+  }
+
+  export function MainStack(props) {
+
+    return(
+      <Stack.Navigator
+        initialRouteName= 'Main'
+      >
+        <Stack.Screen 
+            name="Main" 
+            component={TopTab}
+            options = {({navigation}) => ({
+               title: 'Padjai',
+              headerTitleStyle: {
+                color: colors.PRIMARY,
+                fontFamily: 'AbrilFatface-Regular',
+                fontSize: 30,
+              },
+              headerRight:() => (
+                <View style={styles.iconContainer}>
+                  <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+                    <Icon size={30} name= 'search' />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => navigation.navigate('Menu')}>
+                    <Icon size={30} name= 'menu' />
+                  </TouchableOpacity>
+                </View>
+              )
+              
+            })}
+        />
+        <Stack.Screen 
+          name="ManageAd" 
+          component={ManageAdScreen}
+          options={({navigation}) => ({
+            headerLeft: (props) => (
+              <HeaderBackButton
+                {...props}
+                onPress={() => navigation.navigate('Menu')}
+              />
+            ),
+          })}
+        />
+        <Stack.Screen name="Post" component={PostScreen}/>
+        <Stack.Screen name="NewsPost" component={NewsPostScreen}/>
+        <Stack.Screen name="GroupPost" component={GroupPostScreen}/>
+        <Stack.Screen name="UserPost" component={UserPostScreen}/>
+        <Stack.Screen 
+          name="Category" 
+          component={CategoryScreen}
+          options={{
+            headerShown: false,
+            ...TransitionPresets.ModalPresentationIOS
+          }} 
+         />
+         <Stack.Screen 
+          name="NewsCategory" 
+          component={NewsCategoryScreen}
+          options={{
+            headerShown: false,
+            ...TransitionPresets.ModalPresentationIOS
+          }} 
+         />
+         <Stack.Screen 
+          name="PostCategory" 
+          component={PostCategoryScreen}
+          options={{
+            headerShown: false,
+            ...TransitionPresets.ModalPresentationIOS
+          }} 
+         />
+         <Stack.Screen 
+          name="NewsPostCate" 
+          component={PostNewsCateScreen}
+          options={{
+            headerShown: false,
+            ...TransitionPresets.ModalPresentationIOS
+          }} 
+         />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen 
+          name="User" 
+          component={UserScreen}
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen name="Map" component={MapScreen}/>
+        <Stack.Screen name="EditUser" component={EditUserScreen}/>
+        <Stack.Screen name="CreateAlt" component={CreateAltScreen}/>
+        <Stack.Screen name="GroupList" component={GroupListScreen} />
+        <Stack.Screen name="FollowedList" component={FollowedListScreen} />
+        <Stack.Screen 
+          name="GroupMember" 
+          component={GroupMemberScreen} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="GroupRoom" component={GroupRoomScreen} />
+        <Stack.Screen name="CreateGroup" component={CreateGroupScreen}/>
+        <Stack.Screen name="EditGroup" component={EditGroupScreen}/>
+        <Stack.Screen name="Ad" component={AdScreen}/>
+        <Stack.Screen 
+          name="ManageShop" 
+          component={ManageShopScreen}
+          options={({navigation}) => ({
+            headerLeft: (props) => (
+              <HeaderBackButton
+                {...props}
+                onPress={() => navigation.navigate('Shop')}
+              />
+            ),
+          })}
+        />
+        <Stack.Screen name="Sponsor" component={SponsorScreen}/>
+        <Stack.Screen name="UpdateSponsor" component={UpdateSponsorScreen}/>
+        <Stack.Screen name="Promote" component={PromoteScreen}/>
+        <Stack.Screen name="UpdatePromote" component={UpdatePromoteScreen}/>
+        <Stack.Screen name="ShopFeed" component={ShopFeedScreen}/>
+        <Stack.Screen name="Shop" component={ShopScreen}/>
+        <Stack.Screen name="EditShop" component={EditShopScreen}/>
+        <Stack.Screen name="ShopImage" component={ShopImageScreen}/>
+        <Stack.Screen name="Review" component={ReviewScreen}/>
+        <Stack.Screen 
+          name="PostShopPicture" 
+          component={PostShopPictureScreen}
+          options = {({navigation}) => ({
+           headerRight:() => (
+             <View style={{marginRight: 20}}>
+               <TouchableOpacity onPress={() => navigation.navigate('PostShopDetail')}>
+                 <Icon type="antdesign" name= 'arrowright' />
+               </TouchableOpacity>
+             </View>
+           )
+           
+         })}
+        />
+        <Stack.Screen name="PostShopDetail" component={PostShopDetailScreen}/>
+        <Stack.Screen 
+          name="ProductFeed" 
+          component={ProductFeedScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="Product" 
+          component={ProductScreen}
+        />
+        <Stack.Screen name="YourProduct" component={YourProductTopTab}/>
+        <Stack.Screen name="ProductOption" component={ProductOptionScreen}/>
+        <Stack.Screen 
+          name="PostProductPicture" 
+          component={PostProductPictureScreen}
+          options = {({navigation}) => ({
+           headerRight:() => (
+             <View style={{marginRight: 20}}>
+               <TouchableOpacity onPress={() => navigation.navigate('PostProductDetail')}>
+                 <Icon type="antdesign" name= 'arrowright' />
+               </TouchableOpacity>
+             </View>
+           )
+           
+         })}
+        />
+        <Stack.Screen name="PostProductDetail" component={PostProductDetailScreen}/>
+        <Stack.Screen name="Search" component={SearchScreen} />
+        <Stack.Screen name="BuyCoin" component={BuyCoinScreen} />
+        <Stack.Screen name="Detail" component={DetailScreen} />
+        <Stack.Screen name="MoreComment" component={MoreCommentScreen} />
+        <Stack.Screen name="MoreReply" component={MoreReplyScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  export function AuthStack() {
+    return(
+      <Stack.Navigator>
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen} 
+          options={{ title: 'Register' }}
+        />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{ title: 'Login' }}
+        />
+      </Stack.Navigator>
+    );
+  }

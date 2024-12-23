@@ -11,17 +11,17 @@ import {
   TouchableOpacity,
   Platform,
   NativeModules,
-  NativeEventEmitter, 
-  Image
+  NativeEventEmitter,
 } from 'react-native'
 import {launchImageLibrary} from 'react-native-image-picker'
-import MediaLibrary from 'react-native-media-library'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import {
   useCameraDevice,
   useCameraFormat,
   useFrameProcessor,
   useLocationPermission,
+  useCameraPermission,
+  useMicrophonePermission
 } from 'react-native-vision-camera'
 import { Camera } from 'react-native-vision-camera'
 import {
@@ -55,6 +55,7 @@ import { CaptureButton } from '../../utils/views/CaptureButton'
 import IonIcon from 'react-native-vector-icons/Ionicons'
 import { useIsFocused } from '@react-navigation/core'
 import { usePreferredCameraDevice } from '../../utils/hooks/usePreferredCameraDevice'
+import PermissionScreen from '../PermissionScreen'
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera)
 Reanimated.addWhitelistedNativeProps({
@@ -67,7 +68,8 @@ function PostVideoScreen({ navigation }) {
 
   const camera = useRef(null)
   const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-  const microphone = Camera.getMicrophonePermissionStatus()
+  const { hasPermission, requestPermission } = useCameraPermission()
+  const microphone = useMicrophonePermission()
   const location = useLocationPermission()
   const zoom = useSharedValue(1)
 
@@ -158,7 +160,6 @@ function PostVideoScreen({ navigation }) {
   }, [zoom, device])
   //#endregion
 
-
   useEffect(() => {
     const f =
       format != null
@@ -170,13 +171,6 @@ function PostVideoScreen({ navigation }) {
   useEffect(() => {
     location.requestPermission()
   }, [location])
-
-  useEffect(async () => {
-    const lastItemUri = await getLastGalleryItem();
-    if (lastItemUri) {
-      setPreviewImage(lastItemUri);
-    }
-  }, [])
 
   async function checkImagePermission() {
     if (Platform.OS === 'android') {
@@ -216,7 +210,12 @@ function PostVideoScreen({ navigation }) {
 
   const openVideoGallery = async () => {
     const filePermission = await checkImagePermission()
-    if(!filePermission) return;
+    if(!filePermission) {
+      if (Platform.OS === 'android') 
+        await request(PERMISSIONS.ANDROID.CAMERA)
+      else
+        await request(PERMISSIONS.IOS.CAMERA)
+    };
     const options = {
       mediaType: 'video',
       includeBase64: false,
@@ -232,18 +231,20 @@ function PostVideoScreen({ navigation }) {
       console.log('ImagePicker Error: ', response.error);
     } else {
       const source = result.uri || result.assets[0].uri;
+      const fileName = result.fileName || result.assets[0].fileName
       console.log('Selected video:', source);
       console.log(result)
       isValidFile(result.assets[0].uri || '').then((res) =>
         console.log(res)
       );
       // Handle the selected video here, e.g., navigate to a new screen with the video
-      navigation.navigate('PostPreview', { uri: source })
+      navigation.navigate('PostPreview', { uri: source, fileName })
     }
 
     // showEditor(result.assets[0]?.uri || '', {
     // });
   }
+
 
   // const frameProcessor = useFrameProcessor((frame) => {
   //   'worklet'
@@ -256,6 +257,21 @@ function PostVideoScreen({ navigation }) {
   //   })
   // }, [])
 
+  if(!hasPermission) return (
+    <PermissionScreen 
+      permissionText="เราจำเป็นต้องเข้าถึงกล้องของคุณเพื่อโพสต์วิดีโอ"
+      requestPermission={requestPermission}
+      navigation={navigation}
+    />
+  )
+
+  if(!microphone.hasPermission) return (
+    <PermissionScreen 
+      permissionText="เราจำเป็นต้องเข้าถึงไมค์ของคุณเพื่อโพสต์วิดีโอ"
+      requestPermission={microphone.requestPermission}
+      navigation={navigation}
+    />
+  )
 
   return (
     <View style={styles.container}>
@@ -310,10 +326,7 @@ function PostVideoScreen({ navigation }) {
         onPress={openVideoGallery} 
         disabledOpacity={0.4}
       >
-        <Image 
-          source={{ uri: previewImage || 'https://example.com/preview-image.jpg' }} 
-          style={{ width: 24, height: 24 }} 
-        />
+        <IonIcon name="cloud-upload" color="white" size={24} />
       </TouchableOpacity>
       <CaptureButton
         style={styles.captureButton}
@@ -340,21 +353,22 @@ function PostVideoScreen({ navigation }) {
         <IonIcon name="camera-reverse" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
-      {/* <View style={styles.rightButtonRow}>
+      <View style={styles.rightButtonRow}>
         <TouchableOpacity 
-          onPress={async () => {
-            const files = await listFiles()
-            // await cleanFiles()
-            console.log("-----------POstVideoScreen----listFiles")
-            console.log(files);
-            BackgroundService.stop();
-            handleUpload(files[0])
-          }}
+          // onPress={async () => {
+          //   const files = await listFiles()
+          //   // await cleanFiles()
+          //   console.log("-----------POstVideoScreen----listFiles")
+          //   console.log(files);
+          //   BackgroundService.stop();
+          //   handleUpload(files[0])
+          // }}
+          onPress={openVideoGallery}
           disabledOpacity={0.4}
         >
           <IonIcon name="cloud-upload" color="white" size={24} />
         </TouchableOpacity>
-      </View> */}
+      </View>
     </View>
   )
 }

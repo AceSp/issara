@@ -1,0 +1,180 @@
+import React, { Component } from "react";
+import { 
+  Image, 
+  StyleSheet, 
+  Text, 
+  View,
+  TouchableNativeFeedback,
+  TouchableHighlight,
+  TouchableOpacity
+} from "react-native";
+import {Icon, Avatar} from 'react-native-elements';
+
+import Reaction from "./Reaction";
+import Star from "./Star";
+
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+
+
+
+const images = [
+  { id: 'like', img: require('../assets/pic/like.gif') },
+  { id: 'love', img: require('../assets/pic/love2.png') },
+  { id: 'haha', img: require('../assets/pic/haha2.png') },
+  { id: 'yay', img: require('../assets/pic/yay.png') },
+  { id: 'wow', img: require('../assets/pic/wow2.png') },
+  { id: 'sad', img: require('../assets/pic/sad2.png') },
+  { id: 'angry', img: require('../assets/pic/angry2.png') },
+];
+
+class Item extends Component {
+  constructor(props) {
+    super(props)
+ 
+      this.state = {
+        reactionOpen: false,
+        starOpen: false,
+        url: require('../assets/pic/ic_like.png'),
+      };
+    }
+
+    change = i => {
+      this.setState({ url: images[i].img, reactionOpen: !this.state.reactionOpen });
+    };
+
+    close = () => {
+      this.setState({reactionOpen: false, starOpen: false,});
+    };
+  
+    reactionOpen = () => {
+      if(this.state.url != require('../assets/pic/ic_like.png')) {
+        this.setState({url:require('../assets/pic/ic_like.png')});
+      } else this.setState({ reactionOpen: !this.state.reactionOpen });
+    };
+
+    starOpen = () => {
+      this.setState({starOpen: !this.state.starOpen });
+    }
+
+  render() {
+  return (
+    
+    <View style={styles.Item}>
+    <TouchableWithoutFeedback onPress={this.close}>
+      <ItemHead />
+      <Image
+        resizeMode= "contain"
+        style={styles.ItemImage}
+        source={require('../assets/pic/rose-blue-flower-rose-blooms-67636.jpeg')}
+        />
+        <Text style={[styles.padding, {paddingBottom: 0}]}>
+        เจี๊ยวดยุคออดิชั่นอุเทน โต๊ะจีนฮอต โบรกเกอร์มายองเนสหมิงกระดี๊กระด๊า วีซ่าฮาราคีรีมุมมอง ง่าวริคเตอร์สติกเกอร์ไฮกุพูล ฮวงจุ้ยอัลบั้มวอฟเฟิลโบ้ย บอยคอตต์วอล์คซูฮก เท็กซ์แอนด์ฟรุตทอล์ค ซูโม่ อิมพีเรียลโอยัวะ สันทนาการเมี่ยงคำสเตย์ ทำงานซาตานวานิลาจิ๊ก วิภัชภาครีโมทเมี่ยงคำสต็อก แบคโฮแกสโซฮอล์คาร์ หงวน ราชานุญาตเบิร์น</Text>
+        </TouchableWithoutFeedback>
+        <View style={[styles.row, styles.padding]}>
+    <Reaction 
+      state = {this.state}
+      change = {this.change}
+      reactionOpen = {this.reactionOpen}
+    />
+    <Star 
+      state = {this.state}
+      starOpen = {this.starOpen}
+    />
+    <TouchableOpacity>
+      <View>
+        <Icon name="chat-bubble-outline" />
+        <Text>ความคิดเห็น 100k</Text>
+      </View>
+    </TouchableOpacity>
+    <TouchableOpacity>
+      <View>
+        <Icon name="share" />
+        <Text>แชร์</Text>
+      </View>
+    </TouchableOpacity>
+  </View>
+    </View>
+  )
+  }
+}
+
+const ItemHead = () => {
+  return (
+    <View style={[styles.row, styles.padding]}>
+        <View style={styles.row}>
+            <Avatar rounded source={require('../assets/pic/profile.jpg')} />
+            <View>
+              <Text style={styles.headerText}>name</Text>
+              <Text style={styles.headerText}>2 ชั่วโมง</Text>  
+            </View>
+        </View>
+          <Icon name="notifications" />
+    </View>
+  )
+};
+
+const ItemFoot = () => {
+  return (
+  <View style={[styles.row, styles.padding]}>
+    <Reaction/>
+    <Star />
+    <TouchableNativeFeedback>
+      <View>
+        <Icon name="mode-comment" />
+        <Text>ความคิดเห็น 100k</Text>
+      </View>
+    </TouchableNativeFeedback>
+    <TouchableNativeFeedback>
+      <View>
+        <Icon name="share" />
+        <Text>แชร์</Text>
+      </View>
+    </TouchableNativeFeedback>
+  </View> 
+  )
+}
+
+const styles = StyleSheet.create({
+  headerText: { fontWeight: "600", marginLeft: 12, },
+    subtitle: {
+    opacity: 0.8
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  padding: {
+    padding: 12,
+  },
+  avatar: {
+    aspectRatio: 1,
+    backgroundColor: "#D8D8D8",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#979797",
+    borderRadius:  36 / 2,
+    width: 36,
+    height: 36,
+    resizeMode: "cover",
+    marginRight: 12
+  },
+  ItemImage: {
+    width: '100%',
+    height: null,
+    aspectRatio: 1.51,
+    backgroundColor: 'red',
+  },
+  fixToText: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  Item: {
+    backgroundColor: 'white',
+    marginTop: 5,
+  },
+  icon: {
+    margin: 5,
+  },
+})
+
+export default Item;

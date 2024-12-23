@@ -16,28 +16,34 @@ import {
 import { NativeModules, NativeEventEmitter } from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import IonIcon from 'react-native-vector-icons/Ionicons';
+import { useMutation } from '@apollo/client';
 
 import { VideoPlayer } from '../../component/Video/views';
 import PostTextModal from '../../component/PostTextModal';
 import uploadFileInChunks from '../../utils/uploadFileInChunks'
 import { store } from '../../utils/store';
+import CREATE_POST_MUTATION from '../../graphql/mutations/createPost';
+import { VIDEO_URL } from '../../utils/apollo-client';
 
 function PostPreviewScreen({
-  route
+  route,
+  navigation
 }) {
-  // const { 
-  //   uri
-  // } = route.params;
-  const uri = 'file:///data/user/0/com.gokgokgok/cache/rn_image_picker_lib_temp_75ad52c0-8c9b-47a0-80cc-e3170be56654.mp4'
+  const { 
+    uri,
+    fileName
+  } = route.params;
   const { state: { me } } = useContext(store);
 
   const [source, setSource] = useState(uri);
   const [paused, setPaused] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false)
+
+  const [createPost, { data }] = useMutation(CREATE_POST_MUTATION);
+
   const toggleVideo = () => {
     setPaused(!paused);
   }
-
   const handleUpload = async (filePath, text, tags) => {
     const options = {
       taskName: 'FileUpload',
@@ -51,7 +57,27 @@ function PostPreviewScreen({
       //change this for opening the app from notification
       linkingURI: 'uploadFile',
     };
-    await BackgroundService.start(() => uploadFileInChunks(filePath, me?.id, text, tags), options);
+    await BackgroundService.start(async () => {
+      const sanitize = (name) => name.replace(/[^a-zA-Z0-9-_]/g, '_'); 
+      const videoId = sanitize(fileName);
+      const userId = sanitize(me.id);
+      await uploadFileInChunks({ filePath, userId, videoId });
+      console.log('Upload complete');
+      await BackgroundService.updateNotification({
+        taskDesc: 'File Uploaded',
+      });
+      const video = `${VIDEO_URL}hls/${userId}/${videoId}/master.m3u8`
+      const thumbnail = `${VIDEO_URL}hls/${userId}/${videoId}/${videoId}.jpg`
+      await createPost({
+          variables: {
+              text,
+              video,
+              thumbnail,
+              tags,
+          },
+      })
+    }, options);
+    navigation.navigate('NewFeed')
   };
 
   useEffect(() => {
@@ -147,8 +173,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalButton: {
-    position: 'relative',
-    bottom: 20,
+    position: 'absolute',
+    bottom: 40,
     right: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 25,
@@ -158,9 +184,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    position: 'relative',
-    bottom: 20,
-    right: 90,
+    position: 'absolute',
+    bottom: 120,
+    right: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 25,
     width: 50,

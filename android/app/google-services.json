@@ -1,0 +1,106 @@
+{
+  "project_info": {
+    "project_number": "373674619437",
+    "firebase_url": "https://padjai-b1bbc.firebaseio.com",
+    "project_id": "padjai-b1bbc",
+    "storage_bucket": "padjai-b1bbc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373674619437:android:442969adaea897fd19fea4",
+        "android_client_info": {
+          "package_name": "com.gokgokgok"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_eoUG7AduA_0gwIZw9grnqX63UIKbeHA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373674619437:android:f87c9a51845dbfc119fea4",
+        "android_client_info": {
+          "package_name": "com.mixxer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373674619437-b5rv61knih50ned01qh24rcnaqqnpc33.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mixxer",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_eoUG7AduA_0gwIZw9grnqX63UIKbeHA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373674619437:android:d97b8771345b9a4c19fea4",
+        "android_client_info": {
+          "package_name": "com.padjai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_eoUG7AduA_0gwIZw9grnqX63UIKbeHA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

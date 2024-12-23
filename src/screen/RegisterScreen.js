@@ -46,7 +46,9 @@ import {
   materialTall
 } from 'react-native-typography';
 import { AuthContext } from '../utils/context';
-import GokgokgokLogo from '../assets/Images/gokgokgokLogo'
+import IssaraLogoLong from '../assets/Images/IssaraLogoLong'
+import { HTTP_URL } from '../utils/apollo-client';
+import PermissionScreen from './PermissionScreen';
 
 const Register = (props) => {
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,7 @@ const Register = (props) => {
     longitudeDelta: 0.035
   });
   const [ markerCoord, setMarkerCoord ] = useState({ latitude: 13.75630, longitude: 100.50180 });
+  const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
 
   const [signup, { data }] = useMutation(SIGN_UP_MUTATION);
   const [apiLogin, { data: api_login_data }] = useMutation(API_LOGIN_MUTATION);
@@ -127,6 +130,7 @@ const Register = (props) => {
               locateCurrentPosition();
               break;
             case RESULTS.BLOCKED:
+              setHasLocationPermission(false)
               break;
           }
         })
@@ -143,13 +147,14 @@ const Register = (props) => {
               locateCurrentPosition();
               break;
             case RESULTS.BLOCKED:
+              setHasLocationPermission(false)
               break;
           }
         })
     }
   },[])
 
-  function handleSubmit() {
+  async function handleSubmit() {
     setLoading(true);
     if (username.length === 0) {
       setErrorText('โปรดกรอกชื่อผู้ใช้')
@@ -191,11 +196,11 @@ const Register = (props) => {
     setConfirmPasswordError(false);
     setPasswordError(false);;
 
-    let referrerToken = '';
+    let referrerToken = null;
     PlayInstallReferrer.getInstallReferrerInfo((installReferrerInfo, error) => {
       if (!error) {
         const referrerMatch = installReferrerInfo.installReferrer.match(/referrer\?=(.*)/);
-        const referrerToken = referrerMatch ? referrerMatch[1] : '';
+        const referrerToken = referrerMatch ? referrerMatch[1] : null;
         console.log("Referrer token = " + referrerToken);
       } else {
         console.log("Failed to get install referrer info!");
@@ -204,44 +209,58 @@ const Register = (props) => {
       }
     });
 
-    signup({ 
-      variables: { 
-        username, 
-        email, 
-        password, 
-        pinLocation: {
-          lat: markerCoord.latitude,
-          lon: markerCoord.longitude,
+    try {
+      console.log("-----------RegisterScreen----Signup------")
+      console.log(markerCoord)
+      console.log(referrerToken)
+      const res = await fetch(HTTP_URL+"signup", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-      } 
-    })
-      .then(({ data }) => {
-        return signIn(data.signup.accessToken);
-      })
-      .catch(e => {
-        if (/username/i.test(e.message)) {
-          setErrorText('ชื่อนี้มีผู้ใช้แล้ว')
-          setLoading(false);
-          setEmailError(true);
-        }
-        else if (/email/i.test(e.message)) {
-          setErrorText('อีเมลล์ไม่ถูกต้อง')
-          setLoading(false);
-          setEmailError(true);
-        }
-        else if (/password/i.test(e.message)) {
-          setLoading(false);
-          setPasswordError(true);
-        }
-        else {
-          console.log(e.message);
-          setErrorText('มีบางอย่างผิดพลาด... เรากำลังตรวจสอบอยู่')
-          setLoading(false);
-          setUsernameError(true)
-        }
+        body: JSON.stringify({
+          username, 
+          email, 
+          password, 
+          pinLocation: {
+            lat: markerCoord.latitude,
+            lon: markerCoord.longitude,
+          },
+          referrerToken
+        })
       });
+      console.log(res)
+      const resJSON = await res.json();
+      signIn(resJSON.accessToken);
+      return;
+    } catch (error) {
+      if (/username/i.test(e.message)) {
+        setErrorText('ชื่อนี้มีผู้ใช้แล้ว')
+        setLoading(false);
+        setEmailError(true);
+      }
+      else if (/email/i.test(e.message)) {
+        setErrorText('อีเมลล์ไม่ถูกต้อง')
+        setLoading(false);
+        setEmailError(true);
+      }
+      else if (/password/i.test(e.message)) {
+        setLoading(false);
+        setPasswordError(true);
+      }
+      else {
+        console.log(e.message);
+        setErrorText('มีบางอย่างผิดพลาด... เรากำลังตรวจสอบอยู่')
+        setLoading(false);
+        setUsernameError(true)
+      }
+    }
   };
 
+  console.log("-----------RegisterScreen----------")
+  console.log(markerCoord)
   // function getInfoFromToken(token) {
   //   const PROFILE_REQUEST_PARAMS = {
   //     fields: {
@@ -357,12 +376,19 @@ const Register = (props) => {
         return false;
   }
 
-  // if (loading) return <Loading />
+  if(!hasLocationPermission) return (
+    <PermissionScreen 
+      permissionText="เราจำเป็นต้องเข้าถึงกล้องของคุณเพื่อโพสต์วิดีโอ"
+      requestPermission={requestLocationPermission}
+      navigation={props.navigation}
+      unbackable={true}
+    />
+  )
 
   return (
     <View style={styles.root}>
       <ScrollView >
-      <GokgokgokLogo
+      <IssaraLogoLong
         width='100%'
         height={100}
       />
@@ -383,7 +409,6 @@ const Register = (props) => {
           onChangeText={value => setEmail(value)}
           autoCapitalize="none"
           autoCorrect={false}
-          secureTextEntry
           onFocus={resetError}
           error={emailError}
           style={styles.input}
@@ -512,7 +537,7 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
   buttonText: {
-    color: iOSColors.red,
+    color: iOSColors.orange,
     fontWeight: 'bold'
   },
   loginButton: {
@@ -522,7 +547,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
       textAlign: 'center',
-      color: iOSColors.red,
+      color: iOSColors.orange,
   }
 })
 

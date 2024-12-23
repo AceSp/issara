@@ -1,7 +1,5 @@
-import React, { 
-  useRef, 
-  useEffect,
-  useState
+import React, {
+  useRef
 } from 'react';
 import {
   StyleSheet,
@@ -14,21 +12,8 @@ import Video from 'react-native-video';
 
 const { width, height } = Dimensions.get('window');
 
-export const VideoPlayer = React.forwardRef(({ source, paused, onPress, onEnd, index }, ref) => {
-  const videoRef = ref || useRef(null);
-
-  // useEffect(() => {
-  //   if (!paused) {
-  //     videoRef.current.seek(0);
-  //   }
-  // }, [paused]);
-
-  const onLoad = (data) => {
-    const { width, height } = data.naturalSize;
-    console.log("---------VideoPlayer-----------")
-    console.log(height)
-    console.log(width)
-};
+export const VideoPlayer = ({ source, paused, onPress, onEnd, index }) => {
+  const videoRef = useRef(null);
 
   const onError = (error) => {
     console.error('Video Error:', error);
@@ -42,13 +27,12 @@ export const VideoPlayer = React.forwardRef(({ source, paused, onPress, onEnd, i
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={() => onPress(index)}>
         <Video
-          ref={videoRef.current}
+          ref={videoRef}
           source={source}
           style={styles.video}
           resizeMode="cover"
           repeat={true}
           paused={paused}
-          onLoad={onLoad}
           onError={onError}
           onEnd={onEnd}
           onBuffer={onBuffer}
