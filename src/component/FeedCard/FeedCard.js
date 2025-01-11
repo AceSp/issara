@@ -16,9 +16,10 @@ import { useMutation } from '@apollo/client';
 
 import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
 import { VideoPlayer } from '../Video/views';
-import { BOTTOM_TAB_HEIGHT } from '../../utils/constants'
+import { BOTTOM_TAB_HEIGHT, colors } from '../../utils/constants'
 import FeedCardRight from './FeedCardRight';
 import Sponsor from './Sponsor';
+import { Button } from 'react-native-paper';
 
 const { height, width } = Dimensions.get('window');
 
@@ -46,6 +47,14 @@ function FeedCard({
 
   return (
     <SafeAreaView style={styles.fullScreenCard}>
+        <Button 
+          onPress={() => {}}
+          mode='contained'
+          buttonColor='rgba(0, 0, 0, 0.5)'
+          style={styles.viewShopButton}
+          >
+            ดูร้านค้า
+        </Button>
       <View style={styles.videoContainer}>
           <VideoPlayer
             source={{ uri: postInfo.video, type: 'm3u8' }}
@@ -55,11 +64,11 @@ function FeedCard({
             style={styles.video}
           />
       </View>
-      {/* <FeedCardRight
+      <FeedCardRight
         postInfo={postInfo}
         relation={relation}
         navigation={navigation}
-      /> */}
+      />
       <LinearGradient
         colors={isExpanded ? ['rgba(0, 0, 0, 0.4)', 'transparent'] : ['transparent', 'transparent']}
         start={{ x: 0, y: 0.5 }}
@@ -150,6 +159,9 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: 'column', 
     flex: 1
+  },
+  viewShopButton: {
+    positin: 'absolute',
   }
 });
 
