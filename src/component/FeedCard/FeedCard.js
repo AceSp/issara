@@ -47,6 +47,7 @@ function FeedCard({
 
   return (
     <SafeAreaView style={styles.fullScreenCard}>
+      <View style={styles.videoContainer}>
         <Button 
           onPress={() => {}}
           mode='contained'
@@ -55,7 +56,6 @@ function FeedCard({
           >
             ดูร้านค้า
         </Button>
-      <View style={styles.videoContainer}>
           <VideoPlayer
             source={{ uri: postInfo.video, type: 'm3u8' }}
             paused={paused}
@@ -161,7 +161,10 @@ const styles = StyleSheet.create({
     flex: 1
   },
   viewShopButton: {
-    positin: 'absolute',
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1
   }
 });
 
