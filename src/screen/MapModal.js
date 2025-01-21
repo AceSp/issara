@@ -185,9 +185,9 @@ function MapModal(props) {
                         source={require('../assets/pic/marker.png')} 
                         /> */}
         <Button
+          mode='contained'
           onPress={() => submit()} 
           style={styles.button}
-          labelStyle={styles.buttonText}
         >
           ยืนยัน
         </Button>
@@ -258,15 +258,10 @@ const styles = StyleSheet.create({
     },
     button: {
       position: 'absolute',
-      backgroundColor: colors.PRIMARY,
       bottom: 20,
       alignSelf: 'center',
       width: '90%',
-      paddingVertical: 10,
       borderRadius: 10,
-    },
-    buttonText: {
-      fontSize: 25
     },
     addressButton: {
       borderBottomWidth: 1,
