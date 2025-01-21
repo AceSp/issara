@@ -150,7 +150,7 @@ function MapModal(props) {
         style={styles.Root}
       >
         <Slider
-          style={{width: 200, height: 40, position: 'absolute'}}
+          style={{width: 200, height: 40, position: 'absolute', top: 20, alignSelf: 'center'}}
           minimumValue={1}
           maximumValue={200}
           minimumTrackTintColor="#FFFFFF"
