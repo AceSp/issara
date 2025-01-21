@@ -259,7 +259,11 @@ const styles = StyleSheet.create({
     button: {
       position: 'absolute',
       backgroundColor: colors.PRIMARY,
-
+      bottom: 20,
+      alignSelf: 'center',
+      width: '90%',
+      paddingVertical: 10,
+      borderRadius: 10,
     },
     buttonText: {
       fontSize: 25
