@@ -27,7 +27,7 @@ import {
 import { materialTall, materialColors, iOSColors } from 'react-native-typography';
 import SwitchSelector from 'react-native-switch-selector';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 
 import Loading from '../../component/Loading';
@@ -37,6 +37,7 @@ import CREATE_SHOP_MUTATION from '../../graphql/mutations/createShop';
 import AddressList from '../ProfileScreen/Component/AddressList';
 import { colors } from '../../utils/constants';
 import Category from './component/Category';
+import MapModal from '../MapModal';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -174,20 +175,20 @@ const OpenTimeInput = (props) => {
 
 const PostShopDetailScreen = (props) => {
 
-  const { 
-    imageObjArr
-   } = props.route.params
+  // const { 
+  //   imageObjArr
+  //  } = props.route.params
 
   const [ name, setName ] = useState('');
   const [ category, setCategory ] = useState('');
   const [ shopType, setShopType ] = useState('');
   const [ haveStoreFront, setHaveStoreFront ] = useState(true);
   const [ haveOnline, setHaveOnline ] = useState(true);
-  const [ address, setAddress ] = useState('');
-  const [ tambon, setTambon ] = useState('');
-  const [ amphoe, setAmphoe ] = useState('');
-  const [ changwat, setChangwat ] = useState('');
-  const [ region, setRegion ] = useState('');
+  // const [ address, setAddress ] = useState('');
+  // const [ tambon, setTambon ] = useState('');
+  // const [ amphoe, setAmphoe ] = useState('');
+  // const [ changwat, setChangwat ] = useState('');
+  // const [ region, setRegion ] = useState('');
   const [ phone, setPhone ] = useState('');
   const [ website, setWebsite ] = useState('');
   const [ email, setEmail ] = useState('');
@@ -201,6 +202,7 @@ const PostShopDetailScreen = (props) => {
     longitudeDelta: 0.035
   });
   const [ markerCoord, setMarkerCoord ] = useState({ latitude: 13.75630, longitude: 100.50180 });
+  const [ mapRadius, setMapRadius ] = useState(1000);
 
   const [ monday, setMonday ] = useState(false);
   const [ mondayOpenHour, setMondayOpenHour ] = useState('08');
@@ -239,16 +241,11 @@ const PostShopDetailScreen = (props) => {
   const [ sundayCloseMinute, setSundayCloseMinute ] = useState('00');
 
   const [ categoryVisible, setCateVis ] = useState(false);
-  const [ tambonVisible, setDisVis ] = useState(false);
-  const [ amphoeVisible, setAmVis ] = useState(false);
-  const [ changwatVisible, setProVis ] = useState(false);
+  const [ mapVisible, setMapVisible ] = useState(false);
 
   const [ nameError, setNameError ] = useState(false);
   const [ categoryError, setCategoryError ] = useState(false);
   const [ typeError, setTypeError ] = useState(false);
-  const [ tambonError, setDisError ] = useState(false);
-  const [ amphoeError, setAmError ] = useState(false);
-  const [ changwatError, setProError ] = useState(false);
   const [ phoneError, setPhoneError ] = useState(false);
   const [ websiteError, setWebsiteError ] = useState(false);
   const [ emailError, setEmailError ] = useState(false);
@@ -268,14 +265,14 @@ const PostShopDetailScreen = (props) => {
     }
     );
 
-  const [
-    getAddress, 
-    {
-      data: address_data, 
-      loading: address_loading, 
-      error: address_error
-    }
-  ] = useLazyQuery(GET_ADDRESS_QUERY);
+  // const [
+  //   getAddress, 
+  //   {
+  //     data: address_data, 
+  //     loading: address_loading, 
+  //     error: address_error
+  //   }
+  // ] = useLazyQuery(GET_ADDRESS_QUERY);
 
   // const [getSignedUrl, { data: data_url }] = useMutation(GET_SIGNED_URL_MUTATION);
 
@@ -325,17 +322,17 @@ const PostShopDetailScreen = (props) => {
     setHaveOnline(!haveOnline);
   }
 
-  const getTambon = (value) => {
-    getAddress({ variables: { tambon: value } });
-  }
+  // const getTambon = (value) => {
+  //   getAddress({ variables: { tambon: value } });
+  // }
 
-  const getAmphoe = (value) => {
-    getAddress({ variables: { amphoe: value } });
-  }
+  // const getAmphoe = (value) => {
+  //   getAddress({ variables: { amphoe: value } });
+  // }
 
-  const getChangwat = (value) => {
-    getAddress({ variables: { changwat: value } });
-  }
+  // const getChangwat = (value) => {
+  //   getAddress({ variables: { changwat: value } });
+  // }
 
   const validatePhone = value => {
     if(!value || value === '') {
@@ -427,18 +424,6 @@ const PostShopDetailScreen = (props) => {
       setTypeError(true);
       haveError = true;
     }  
-    if(tambon === '') {
-      setDisError(true);
-      haveError = true;
-    }
-    if(amphoe === '') {
-      setAmError(true);
-      haveError = true;
-    }
-    if(changwat === '') {
-      setProError(true);
-      haveError = true;
-    }
     if(haveError) return true
     else return false
   }
@@ -500,11 +485,7 @@ const PostShopDetailScreen = (props) => {
           haveOnline,
           images: imgUrlArr,
           mediaName: imgNameArr.length? imgNameArr : null,
-          address,
-          tambon,
-          amphoe,
-          changwat,
-          region,
+          // address,
           pinLocation: {
             lat: markerCoord.latitude,
             lon: markerCoord.longitude,
@@ -597,13 +578,12 @@ const PostShopDetailScreen = (props) => {
         type: shopType,
         haveStoreFront,
         haveOnline,
-        address,
-        tambon,
-        amphoe,
-        changwat,
-        region,
-        latitude: markerCoord.latitude,
-        longitude:markerCoord.longitude,
+        // address,
+        pinLocation: {
+          lat: markerCoord.latitude,
+          lon: markerCoord.longitude
+        },
+        maxRadius: parseInt(mapRadius/1000),
         openTime: {
           monday: monday? 
             [
@@ -680,412 +660,432 @@ const PostShopDetailScreen = (props) => {
   return (
     
     <View style={styles.Root}>
-        <ScrollView keyboardShouldPersistTaps="handled">
-          <KeyboardAvoidingView>
-            <View style={styles.sectionView}>
-              <TextInput 
-                label="ชื่อร้านค้า"
-                style={[materialTall.headline, styles.textInput]}
-                value={name}
-                maxLength={80}
-                onFocus={() => setNameError(false)}
-                onChangeText={(value) => setName(value)}
-                selectionColor="black"
-                error={nameError}
-               />
-                <View style={styles.underName}>
-                  <View>
-                    {nameError? <Text style={{ color: colors.ERROR }}>โปรดระบุชื่อร้านค้า</Text> : null }
-                  </View>
-                  <Text style={[materialTall.caption, styles.textInputCoun]}>{name.length}/80</Text>
-                </View>
-                <View> 
-                  <TouchableRipple 
-                    style={[styles.inputButton, { borderColor: categoryError? colors.ERROR : iOSColors.midGray }]} 
-                    onPress={() => {
-                      setCateVis(true);
-                      setCategoryError(false);
-                    }} 
-                  >
-                    <View>
-                      {category == ''? null : <Text style={styles.label}>หมวดหมู่</Text>}
-                      {category == ''? 
-                            <Text style={[
-                              styles.placeholderText, 
-                              materialTall.headline, 
-                              { 
-                                color: categoryError? colors.ERROR : materialColors.blackSecondary, 
-                                paddingBottom: 5 
-                              }]}
-                              >
-                              หมวดหมู่
-                            </Text> 
-                            : 
-                            <Text style={[
-                              materialTall.headline, 
-                              styles.placeholderText, 
-                              { color: 'black' }]}
-                              >
-                              {category}
-                            </Text>} 
-                    </View>
-                  </TouchableRipple>
-                  {categoryError? <Text style={styles.errorText}>โปรดระบุหมวดหมู่</Text> : null }
-                </View>
-                <Category
-                  visible={categoryVisible}
-                  setVisible={setCateVis}
-                  setCategory={setCategory}
-                  />
-                <View style={styles.typeView}>
-                  <Text style={materialTall.title}>ประเภท</Text>
-                  <SwitchSelector
-                    style={{flex: 0.75, marginLeft: 20}}
-                    buttonColor={colors.PRIMARY}
-                    selectedColor="white"
-                    textColor={materialColors.blackPrimary}
-                    textStyle={materialTall.subheading}
-                    selectedTextStyle={materialTall.body2White}
-                    backgroundColor={colors.LIGHT_GREY_2}
-                    hasPadding
-                    options={[
-                      { label: "ผลิต", value: 'ผลิต'},
-                      { label: "จำหน่าย", value: 'จำหน่าย'}, 
-                      { label: "บริการ", value: 'บริการ'}
-                    ]}
-                    onPress={(value) => {
-                      setTypeError(false);
-                      setShopType(value);
-                    }}
-                    />
-              </View>
-              {typeError? <Text style={styles.errorText}>โปรดเลือกประเภท</Text> : null }
-              <View style={styles.typeView}>
-                <Text style={materialTall.title}>มีหน้าร้าน</Text>
-                <View style={styles.switchView}>
-                  {
-                  haveStoreFront? 
-                    <Text style={materialTall.headline}>มี</Text> 
-                    : 
-                    <Text style={materialTall.headline}>ไม่มี</Text>  
-                  }
-                  <Switch 
-                    value={haveStoreFront} 
-                    onValueChange={haveStoreFrontSwitch} 
-                    color={iOSColors.orange} 
-                    style={{ marginRight: 30, marginLeft: 10 }}
-                    />
-                </View>  
-              </View>
-              <View style={styles.typeView}>
-                <Text style={materialTall.title}>ออนไลน์</Text>
-                <View style={styles.switchView}>
-                  {
-                  haveOnline? 
-                    <Text style={materialTall.headline}>มี</Text> 
-                    : 
-                    <Text style={materialTall.headline}>ไม่มี</Text>  
-                  }
-                  <Switch 
-                    value={haveOnline} 
-                    onValueChange={haveOnlineSwitch} 
-                    color={iOSColors.orange} 
-                    style={{ marginRight: 30, marginLeft: 10 }}
-                    />
-                </View>
-              </View>
-            </View>
-            <View style={haveStoreFront? styles.sectionView : { display: 'none' }}>
-              <Text style={[materialTall.title, { color: 'black' }]}>พื้นที่</Text>
-              <TextInput 
-                label="ที่อยู่"
-                style={[materialTall.headline, styles.textInput]}
-                value={address}
-                onChangeText={(value) => setAddress(value)}
-                selectionColor="black"
-               />
-              <View style={styles.rowView}>
-                <Text style={materialTall.title}>ตำบล</Text>
-                <View>
-                  <TouchableRipple 
-                    style={[
-                      styles.rightInputButton, 
-                      styles.addressButton,
-                      { borderColor: tambonError? colors.ERROR : iOSColors.midGray }
-                    ]} 
-                    onPress={() => { 
-                      setDisVis(true);
-                      setDisError(false);
-                      setAmError(false);
-                      setProError(false);
-                    }} 
-                    underlayColor={colors.LIGHT_GRAY}
-                  >
-                    <Text style={[materialTall.headline, { color: 'black' }]}>    {tambon} </Text>
-                  </TouchableRipple>
-                  {tambonError? <Text style={styles.errorText}>โปรดระบุตำบล</Text> : null }
-                </View>
-              </View>
-              <View style={styles.rowView}>
-                <Text style={materialTall.title}>อำเภอ</Text>
-                <View>
-                  <TouchableRipple 
-                    style={[
-                      styles.rightInputButton, 
-                      styles.addressButton, 
-                      { borderColor: amphoeError? colors.ERROR : iOSColors.midGray 
-                    }]} 
-                    onPress={() => { 
-                      setAmVis(true);
-                      setDisError(false);
-                      setAmError(false);
-                      setProError(false);
-                    }} 
-                    underlayColor={colors.LIGHT_GRAY}
-                  >
-                    <Text style={[materialTall.headline, { color: 'black' }]}>    {amphoe} </Text>
-                  </TouchableRipple>
-                  {amphoeError? <Text style={styles.errorText}>โปรดระบุอำเภอ</Text> : null }
-                </View>
-              </View>
-              <View style={styles.rowView}>
-                <Text style={materialTall.title}>จังหวัด</Text>
-                <View>
-                  <TouchableRipple 
-                    style={[
-                      styles.rightInputButton, 
-                      styles.addressButton,
-                      { borderColor: changwatError? colors.ERROR : iOSColors.midGray }
-                    ]} 
-                    onPress={() => { 
-                      setProVis(true);
-                      setDisError(false);
-                      setAmError(false);
-                      setProError(false);
-                    }} 
-                    underlayColor={colors.LIGHT_GRAY}
-                  >
-                    <Text style={[materialTall.headline, { color: 'black' }]}>    {changwat} </Text>
-                  </TouchableRipple>
-                  {changwatError? <Text style={styles.errorText}>โปรดระบุจังหวัด</Text> : null }
-                </View>
-              </View>
-              <AddressList
-                    visible={tambonVisible}
-                    setVisible={setDisVis}
-                    setTambon={setTambon}
-                    setAmphoe={setAmphoe}
-                    setChangwat={setChangwat}
-                    setRegion={setRegion}
-                    address={address_data? address_data.getAddress : null} 
-                    getAddress={getTambon}
+      <ScrollView keyboardShouldPersistTaps="handled">
+        <KeyboardAvoidingView>
+          <View style={styles.sectionView}>
+            <TextInput 
+              label="ชื่อร้านค้า"
+              style={[materialTall.headline, styles.textInput]}
+              value={name}
+              maxLength={80}
+              onFocus={() => setNameError(false)}
+              onChangeText={(value) => setName(value)}
+              selectionColor="black"
+              error={nameError}
               />
-              <AddressList
-                    visible={amphoeVisible}
-                    setVisible={setAmVis}
-                    setTambon={setTambon}
-                    setAmphoe={setAmphoe}
-                    setChangwat={setChangwat}
-                    setRegion={setRegion}
-                    address={address_data? address_data.getAddress : null} 
-                    getAddress={getAmphoe}
-              />
-              <AddressList
-                    visible={changwatVisible}
-                    setVisible={setProVis}
-                    setTambon={setTambon}
-                    setAmphoe={setAmphoe}
-                    setChangwat={setChangwat}
-                    setRegion={setRegion}
-                    address={address_data? address_data.getAddress : null} 
-                    getAddress={getChangwat}
-              />
-              <MapView
-                style={{height: 200}}
-                provider={PROVIDER_GOOGLE}
-                region={mapCoord}
-                scrollEnabled={false}
-                onPress={() => props.navigation.navigate('Map', 
-                { 
-                  mapParam: mapCoord,
-                  setMapParam: setMapCoord,
-                  setMarkerParam: setMarkerCoord 
-                })}
-              >
-                <Marker
-                  coordinate={markerCoord}
+              <View style={styles.underName}>
+                <View>
+                  {nameError? <Text style={{ color: colors.ERROR }}>โปรดระบุชื่อร้านค้า</Text> : null }
+                </View>
+                <Text style={[materialTall.caption, styles.textInputCoun]}>{name.length}/80</Text>
+              </View>
+              <View> 
+                <TouchableRipple 
+                  style={[styles.inputButton, { borderColor: categoryError? colors.ERROR : iOSColors.midGray }]} 
+                  onPress={() => {
+                    setCateVis(true);
+                    setCategoryError(false);
+                  }} 
                 >
-                </Marker>
-              </MapView>
+                  <View>
+                    {category == ''? null : <Text style={styles.label}>หมวดหมู่</Text>}
+                    {category == ''? 
+                          <Text style={[
+                            styles.placeholderText, 
+                            materialTall.headline, 
+                            { 
+                              color: categoryError? colors.ERROR : materialColors.blackSecondary, 
+                              paddingBottom: 5 
+                            }]}
+                            >
+                            หมวดหมู่
+                          </Text> 
+                          : 
+                          <Text style={[
+                            materialTall.headline, 
+                            styles.placeholderText, 
+                            { color: 'black' }]}
+                            >
+                            {category}
+                          </Text>} 
+                  </View>
+                </TouchableRipple>
+                {categoryError? <Text style={styles.errorText}>โปรดระบุหมวดหมู่</Text> : null }
+              </View>
+              <Category
+                visible={categoryVisible}
+                setVisible={setCateVis}
+                setCategory={setCategory}
+                />
+              <View style={styles.typeView}>
+                <Text style={materialTall.title}>ประเภท</Text>
+                <SwitchSelector
+                  style={{flex: 1, marginLeft: 20}}
+                  fontSize={16}
+                  buttonColor={colors.PRIMARY}
+                  selectedColor="white"
+                  textColor={materialColors.blackPrimary}
+                  backgroundColor={colors.LIGHT_GREY_2}
+                  hasPadding
+                  options={[
+                    { label: "ผลิต", value: 'ผลิต'},
+                    { label: "จำหน่าย", value: 'จำหน่าย'}, 
+                    { label: "บริการ", value: 'บริการ'}
+                  ]}
+                  onPress={(value) => {
+                    setTypeError(false);
+                    setShopType(value);
+                  }}
+                  />
             </View>
-            <View style={haveStoreFront? styles.sectionView : { display: 'none' }}>
-              <Text style={[materialTall.title, { color: 'black' }]}>เวลาเปิด</Text>
-              <OpenTimeInput 
-                day="วันจันทร์"
-                checkBoxStatus={monday}
-                setCheckBoxStatus={setMonday}
-                openHour={mondayOpenHour}
-                openMinute={mondayOpenMinute}
-                closeHour={mondayCloseHour}
-                closeMinute={mondayCloseMinute}
-                setOpenHour={setMondayOpenHour}
-                setOpenMinute={setMondayOpenMinute}
-                setCloseHour={setMondayCloseHour}
-                setCloseMinute={setMondayCloseMinute}
-                />
-              <OpenTimeInput 
-                day="วันอังคาร"
-                checkBoxStatus={tuesday}
-                setCheckBoxStatus={setTuesday}
-                openHour={tuesdayOpenHour}
-                openMinute={tuesdayOpenMinute}
-                closeHour={tuesdayCloseHour}
-                closeMinute={tuesdayCloseMinute}
-                setOpenHour={setTuesdayOpenHour}
-                setOpenMinute={setTuesdayOpenMinute}
-                setCloseHour={setTuesdayCloseHour}
-                setCloseMinute={setTuesdayCloseMinute}
-                />
-              <OpenTimeInput 
-                day="วันพุธ"
-                checkBoxStatus={wednesday}
-                setCheckBoxStatus={setWednesday}
-                openHour={wednesdayOpenHour}
-                openMinute={wednesdayOpenMinute}
-                closeHour={wednesdayCloseHour}
-                closeMinute={wednesdayCloseMinute}
-                setOpenHour={setWednesdayOpenHour}
-                setOpenMinute={setWednesdayOpenMinute}
-                setCloseHour={setWednesdayCloseHour}
-                setCloseMinute={setWednesdayCloseMinute}
-                />
-              <OpenTimeInput 
-                day="วันพฤหัส"
-                checkBoxStatus={thursday}
-                setCheckBoxStatus={setThursday}
-                openHour={thursdayOpenHour}
-                openMinute={thursdayOpenMinute}
-                closeHour={thursdayCloseHour}
-                closeMinute={thursdayCloseMinute}
-                setOpenHour={setThursdayOpenHour}
-                setOpenMinute={setThursdayOpenMinute}
-                setCloseHour={setThursdayCloseHour}
-                setCloseMinute={setThursdayCloseMinute}
-                />
-              <OpenTimeInput 
-                day="วันศุกร์"
-                checkBoxStatus={friday}
-                setCheckBoxStatus={setFriday}
-                openHour={fridayOpenHour}
-                openMinute={fridayOpenMinute}
-                closeHour={fridayCloseHour}
-                closeMinute={fridayCloseMinute}
-                setOpenHour={setFridayOpenHour}
-                setOpenMinute={setFridayOpenMinute}
-                setCloseHour={setFridayCloseHour}
-                setCloseMinute={setFridayCloseMinute}
-                />
-              <OpenTimeInput 
-                day="วันเสาร์"
-                checkBoxStatus={saturday}
-                setCheckBoxStatus={setSaturday}
-                openHour={saturdayOpenHour}
-                openMinute={saturdayOpenMinute}
-                closeHour={saturdayCloseHour}
-                closeMinute={saturdayCloseMinute}
-                setOpenHour={setSaturdayOpenHour}
-                setOpenMinute={setSaturdayOpenMinute}
-                setCloseHour={setSaturdayCloseHour}
-                setCloseMinute={setSaturdayCloseMinute}
-                />
-              <OpenTimeInput 
-                day="วันอาทิตย์"
-                checkBoxStatus={sunday}
-                setCheckBoxStatus={setSunday}
-                openHour={sundayOpenHour}
-                openMinute={sundayOpenMinute}
-                closeHour={sundayCloseHour}
-                closeMinute={sundayCloseMinute}
-                setOpenHour={setSundayOpenHour}
-                setOpenMinute={setSundayOpenMinute}
-                setCloseHour={setSundayCloseHour}
-                setCloseMinute={setSundayCloseMinute}
-                />
+            {typeError? <Text style={styles.errorText}>โปรดเลือกประเภท</Text> : null }
+            <View style={styles.typeView}>
+              <Text style={materialTall.title}>มีหน้าร้าน</Text>
+              <View style={styles.switchView}>
+                {
+                haveStoreFront? 
+                  <Text style={materialTall.headline}>มี</Text> 
+                  : 
+                  <Text style={materialTall.headline}>ไม่มี</Text>  
+                }
+                <Switch 
+                  value={haveStoreFront} 
+                  onValueChange={haveStoreFrontSwitch} 
+                  color={iOSColors.orange} 
+                  style={{ marginRight: 30, marginLeft: 10 }}
+                  />
+              </View>  
             </View>
-            <View style={styles.sectionView}>
-              <TextInput 
-                label="เบอร์โทร"
-                style={[materialTall.headline, styles.textInput]}
-                value={phone}
-                onFocus={() => setPhone('')}
-                onBlur={() => validatePhone(phone)}
-                keyboardType={'phone-pad'}
-                onChangeText={(value, previousValue)=>onPhoneNumChange(value, previousValue)}
-                error={phoneError}
-                />
-                {phoneError? <Text style={styles.errorText}>{phoneErrorText}</Text> : null }
-              <TextInput 
-                label="เว็บไซต์"
-                style={[materialTall.headline, styles.textInput]}
-                value={website}
-                onBlur={() => validateWebsite(website)}
-                onChangeText={(value)=>setWebsite(value)}
-                error={websiteError}
-                />
-                {websiteError? <Text style={styles.errorText}>เว็บไซต์ไม่ถูกต้อง</Text> : null }
-              <TextInput
-                label="อีเมลล์"
-                style={[materialTall.headline, styles.textInput]}
-                value={email}
-                onBlur={() => validateEmail(email)}
-                onChangeText={(value)=>setEmail(value)}
-                error={emailError}
-                />
-                {emailError? <Text style={styles.errorText}>อีเมลล์ไม่ถูกต้อง</Text> : null }
-              <TextInput 
-                label="คำเชิญชวน"
-                style={[materialTall.headline, styles.textInput]}
-                value={phrase}
-                maxLength={140}
-                onChangeText={(value) => setPhrase(value)}
-                selectionColor="black"
-               />
-               <Text style={[materialTall.caption, styles.textInputCount]}>{phrase.length}/140</Text>
-              <TextInput 
-                label="คำบรรยาย"
-                style={[materialTall.headline, styles.textInput]}
-                value={description}
-                onChangeText={(value) => setDescription(value)}
-                selectionColor="black"
-                multiline={true}
-               />
+            <View style={styles.typeView}>
+              <Text style={materialTall.title}>ออนไลน์</Text>
+              <View style={styles.switchView}>
+                {
+                haveOnline? 
+                  <Text style={materialTall.headline}>มี</Text> 
+                  : 
+                  <Text style={materialTall.headline}>ไม่มี</Text>  
+                }
+                <Switch 
+                  value={haveOnline} 
+                  onValueChange={haveOnlineSwitch} 
+                  color={iOSColors.orange} 
+                  style={{ marginRight: 30, marginLeft: 10 }}
+                  />
+              </View>
             </View>
-          </KeyboardAvoidingView>
-          {(nameError|| categoryError || tambonError || amphoeError || changwatError || emailError)
-               && ( 
-                 <View style={styles.errorView}>
-                   <Icon type="antdesign" name="exclamationcircle" color={colors.ERROR} />
-                   <Text style={[materialTall.subheading, styles.errorText]}>โปรดกรอกข้อมูลที่จำเป็นให้ครบถ้วน</Text> 
-                 </View>
-               
-               )
-              }
-          <Button  
-                mode="contained"
-                onPress={handleUploadFile}  
-                labelStyle={materialTall.headlineWhite} >
-                ลงร้านค้า
-          </Button>
-        </ScrollView>
+          </View>
+          <View style={haveStoreFront? styles.sectionView : { display: 'none' }}>
+            {/* <Text style={[materialTall.title, { color: 'black' }]}>พื้นที่</Text>
+            <TextInput 
+              label="ที่อยู่"
+              style={[materialTall.headline, styles.textInput]}
+              value={address}
+              onChangeText={(value) => setAddress(value)}
+              selectionColor="black"
+              />
+            <View style={styles.rowView}>
+              <Text style={materialTall.title}>ตำบล</Text>
+              <View>
+                <TouchableRipple 
+                  style={[
+                    styles.rightInputButton, 
+                    styles.addressButton,
+                    { borderColor: tambonError? colors.ERROR : iOSColors.midGray }
+                  ]} 
+                  onPress={() => { 
+                    setDisVis(true);
+                    setDisError(false);
+                    setAmError(false);
+                    setProError(false);
+                  }} 
+                  underlayColor={colors.LIGHT_GRAY}
+                >
+                  <Text style={[materialTall.headline, { color: 'black' }]}>    {tambon} </Text>
+                </TouchableRipple>
+                {tambonError? <Text style={styles.errorText}>โปรดระบุตำบล</Text> : null }
+              </View>
+            </View>
+            <View style={styles.rowView}>
+              <Text style={materialTall.title}>อำเภอ</Text>
+              <View>
+                <TouchableRipple 
+                  style={[
+                    styles.rightInputButton, 
+                    styles.addressButton, 
+                    { borderColor: amphoeError? colors.ERROR : iOSColors.midGray 
+                  }]} 
+                  onPress={() => { 
+                    setAmVis(true);
+                    setDisError(false);
+                    setAmError(false);
+                    setProError(false);
+                  }} 
+                  underlayColor={colors.LIGHT_GRAY}
+                >
+                  <Text style={[materialTall.headline, { color: 'black' }]}>    {amphoe} </Text>
+                </TouchableRipple>
+                {amphoeError? <Text style={styles.errorText}>โปรดระบุอำเภอ</Text> : null }
+              </View>
+            </View>
+            <View style={styles.rowView}>
+              <Text style={materialTall.title}>จังหวัด</Text>
+              <View>
+                <TouchableRipple 
+                  style={[
+                    styles.rightInputButton, 
+                    styles.addressButton,
+                    { borderColor: changwatError? colors.ERROR : iOSColors.midGray }
+                  ]} 
+                  onPress={() => { 
+                    setProVis(true);
+                    setDisError(false);
+                    setAmError(false);
+                    setProError(false);
+                  }} 
+                  underlayColor={colors.LIGHT_GRAY}
+                >
+                  <Text style={[materialTall.headline, { color: 'black' }]}>    {changwat} </Text>
+                </TouchableRipple>
+                {changwatError? <Text style={styles.errorText}>โปรดระบุจังหวัด</Text> : null }
+              </View>
+            </View>
+            <AddressList
+                  visible={tambonVisible}
+                  setVisible={setDisVis}
+                  setTambon={setTambon}
+                  setAmphoe={setAmphoe}
+                  setChangwat={setChangwat}
+                  setRegion={setRegion}
+                  address={address_data? address_data.getAddress : null} 
+                  getAddress={getTambon}
+            />
+            <AddressList
+                  visible={amphoeVisible}
+                  setVisible={setAmVis}
+                  setTambon={setTambon}
+                  setAmphoe={setAmphoe}
+                  setChangwat={setChangwat}
+                  setRegion={setRegion}
+                  address={address_data? address_data.getAddress : null} 
+                  getAddress={getAmphoe}
+            />
+            <AddressList
+                  visible={changwatVisible}
+                  setVisible={setProVis}
+                  setTambon={setTambon}
+                  setAmphoe={setAmphoe}
+                  setChangwat={setChangwat}
+                  setRegion={setRegion}
+                  address={address_data? address_data.getAddress : null} 
+                  getAddress={getChangwat}
+            /> */}
+            <MapView
+              style={{height: 200}}
+              provider={PROVIDER_GOOGLE}
+              region={mapCoord}
+              scrollEnabled={false}
+              onPress={() => setMapVisible(true)}
+            >
+              <Marker
+                coordinate={markerCoord}
+              />
+              <Circle 
+                center={markerCoord}
+                radius={mapRadius}
+                fillColor='rgba(0, 0, 0, 0.2)'
+              />
+            </MapView>
+            <Button 
+              mode='contained' 
+              onPress={() => setMapVisible(true)}
+              style={styles.button}
+            >  
+              แก้ไข
+            </Button>
+          </View>
+          <View style={haveStoreFront? styles.sectionView : { display: 'none' }}>
+            <Text style={[materialTall.title, { color: 'black' }]}>เวลาเปิด</Text>
+            <OpenTimeInput 
+              day="วันจันทร์"
+              checkBoxStatus={monday}
+              setCheckBoxStatus={setMonday}
+              openHour={mondayOpenHour}
+              openMinute={mondayOpenMinute}
+              closeHour={mondayCloseHour}
+              closeMinute={mondayCloseMinute}
+              setOpenHour={setMondayOpenHour}
+              setOpenMinute={setMondayOpenMinute}
+              setCloseHour={setMondayCloseHour}
+              setCloseMinute={setMondayCloseMinute}
+              />
+            <OpenTimeInput 
+              day="วันอังคาร"
+              checkBoxStatus={tuesday}
+              setCheckBoxStatus={setTuesday}
+              openHour={tuesdayOpenHour}
+              openMinute={tuesdayOpenMinute}
+              closeHour={tuesdayCloseHour}
+              closeMinute={tuesdayCloseMinute}
+              setOpenHour={setTuesdayOpenHour}
+              setOpenMinute={setTuesdayOpenMinute}
+              setCloseHour={setTuesdayCloseHour}
+              setCloseMinute={setTuesdayCloseMinute}
+              />
+            <OpenTimeInput 
+              day="วันพุธ"
+              checkBoxStatus={wednesday}
+              setCheckBoxStatus={setWednesday}
+              openHour={wednesdayOpenHour}
+              openMinute={wednesdayOpenMinute}
+              closeHour={wednesdayCloseHour}
+              closeMinute={wednesdayCloseMinute}
+              setOpenHour={setWednesdayOpenHour}
+              setOpenMinute={setWednesdayOpenMinute}
+              setCloseHour={setWednesdayCloseHour}
+              setCloseMinute={setWednesdayCloseMinute}
+              />
+            <OpenTimeInput 
+              day="วันพฤหัส"
+              checkBoxStatus={thursday}
+              setCheckBoxStatus={setThursday}
+              openHour={thursdayOpenHour}
+              openMinute={thursdayOpenMinute}
+              closeHour={thursdayCloseHour}
+              closeMinute={thursdayCloseMinute}
+              setOpenHour={setThursdayOpenHour}
+              setOpenMinute={setThursdayOpenMinute}
+              setCloseHour={setThursdayCloseHour}
+              setCloseMinute={setThursdayCloseMinute}
+              />
+            <OpenTimeInput 
+              day="วันศุกร์"
+              checkBoxStatus={friday}
+              setCheckBoxStatus={setFriday}
+              openHour={fridayOpenHour}
+              openMinute={fridayOpenMinute}
+              closeHour={fridayCloseHour}
+              closeMinute={fridayCloseMinute}
+              setOpenHour={setFridayOpenHour}
+              setOpenMinute={setFridayOpenMinute}
+              setCloseHour={setFridayCloseHour}
+              setCloseMinute={setFridayCloseMinute}
+              />
+            <OpenTimeInput 
+              day="วันเสาร์"
+              checkBoxStatus={saturday}
+              setCheckBoxStatus={setSaturday}
+              openHour={saturdayOpenHour}
+              openMinute={saturdayOpenMinute}
+              closeHour={saturdayCloseHour}
+              closeMinute={saturdayCloseMinute}
+              setOpenHour={setSaturdayOpenHour}
+              setOpenMinute={setSaturdayOpenMinute}
+              setCloseHour={setSaturdayCloseHour}
+              setCloseMinute={setSaturdayCloseMinute}
+              />
+            <OpenTimeInput 
+              day="วันอาทิตย์"
+              checkBoxStatus={sunday}
+              setCheckBoxStatus={setSunday}
+              openHour={sundayOpenHour}
+              openMinute={sundayOpenMinute}
+              closeHour={sundayCloseHour}
+              closeMinute={sundayCloseMinute}
+              setOpenHour={setSundayOpenHour}
+              setOpenMinute={setSundayOpenMinute}
+              setCloseHour={setSundayCloseHour}
+              setCloseMinute={setSundayCloseMinute}
+              />
+          </View>
+          <View style={styles.sectionView}>
+            <TextInput 
+              label="เบอร์โทร"
+              style={[materialTall.headline, styles.textInput]}
+              value={phone}
+              onFocus={() => setPhone('')}
+              onBlur={() => validatePhone(phone)}
+              keyboardType={'phone-pad'}
+              onChangeText={(value, previousValue)=>onPhoneNumChange(value, previousValue)}
+              error={phoneError}
+              />
+              {phoneError? <Text style={styles.errorText}>{phoneErrorText}</Text> : null }
+            <TextInput 
+              label="เว็บไซต์"
+              style={[materialTall.headline, styles.textInput]}
+              value={website}
+              onBlur={() => validateWebsite(website)}
+              onChangeText={(value)=>setWebsite(value)}
+              error={websiteError}
+              />
+              {websiteError? <Text style={styles.errorText}>เว็บไซต์ไม่ถูกต้อง</Text> : null }
+            <TextInput
+              label="อีเมลล์"
+              style={[materialTall.headline, styles.textInput]}
+              value={email}
+              onBlur={() => validateEmail(email)}
+              onChangeText={(value)=>setEmail(value)}
+              error={emailError}
+              />
+              {emailError? <Text style={styles.errorText}>อีเมลล์ไม่ถูกต้อง</Text> : null }
+            <TextInput 
+              label="คำเชิญชวน"
+              style={[materialTall.headline, styles.textInput]}
+              value={phrase}
+              maxLength={140}
+              onChangeText={(value) => setPhrase(value)}
+              selectionColor="black"
+              />
+              <Text style={[materialTall.caption, styles.textInputCount]}>{phrase.length}/140</Text>
+            <TextInput 
+              label="คำบรรยาย"
+              style={[materialTall.headline, styles.textInput]}
+              value={description}
+              onChangeText={(value) => setDescription(value)}
+              selectionColor="black"
+              multiline={true}
+              />
+          </View>
+        </KeyboardAvoidingView>
+        {(nameError|| categoryError || emailError)
+              && ( 
+                <View style={styles.errorView}>
+                  <Icon type="antdesign" name="exclamationcircle" color={colors.ERROR} />
+                  <Text style={[materialTall.subheading, styles.errorText]}>โปรดกรอกข้อมูลที่จำเป็นให้ครบถ้วน</Text> 
+                </View>
+              
+              )
+            }
+        <Button  
+          mode="contained"
+          onPress={handleUploadFile}  
+          style={styles.button}
+          labelStyle={materialTall.headlineWhite} 
+        >
+          ลงร้านค้า
+        </Button>
+      </ScrollView>
+      <MapModal
+        visible={mapVisible}
+        setVisible={setMapVisible}
+        mapParam={mapCoord}
+        setMapParam={setMapCoord}
+        markerCoord={markerCoord}
+        setMarkerParam={setMarkerCoord}
+        mapRadius={mapRadius}
+        setMapRadius={setMapRadius}
+      />
     </View>
 
   )
 }
 
 const styles = StyleSheet.create({
+  button: {
+    marginTop: 10
+  },
   Root: {     
-      flex: 1,
-      backgroundColor: iOSColors.lightGray
+    flex: 1,
+    backgroundColor: iOSColors.lightGray
   },
   sectionView: {
     backgroundColor: 'white',

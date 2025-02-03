@@ -25,12 +25,14 @@ import {
 // export const HOST = `192.168.1.33`;
 
 export const HOST = 'localhost';
-// const HTTP_URL = `http://${HOST}:3000/dev/`;
-const HTTP_URL = `https://www.gokgokgok.com/api/`;
-// const WS_URL = `ws://${HOST}:3001/`;
-const WS_URL = "wss://84qbh61nq1.execute-api.ap-southeast-1.amazonaws.com/dev/";
-export const VIDEO_URL = 'https://gokgokgok.sgp1.cdn.digitaloceanspaces.com/';
-// export const VIDEO_URL = 'http://localhost:3004/';
+// const HTTP_URL = `https://issara.app/api/`;
+const HTTP_URL = `http://${HOST}:3000/dev/`;
+// const WS_URL = "wss://wm4mpgo8q7.execute-api.ap-southeast-1.amazonaws.com/dev/";
+const WS_URL = `ws://${HOST}:3001/`;
+// export const VIDEO_URL = 'https://gokgokgok.sgp1.cdn.digitaloceanspaces.com/';
+export const VIDEO_URL = 'http://localhost:3004/';
+// export const UPLOAD_URL = "https://services.issara.app/media/";
+export const UPLOAD_URL = 'http://localhost:3004/';
 // const REST_URL = `http://${HOST}:3000/dev/rest/`
 // const REST_URL = `https://${API_GATEWAY}/rest/`;
 

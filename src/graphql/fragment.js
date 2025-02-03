@@ -7,6 +7,8 @@ const fragments = {
         text
         video
         thumbnail
+        promoteId
+        shopId
         likeCount
         commentCount
         createdAt
@@ -283,7 +285,6 @@ const fragments = {
         isAdmob
         text
         image
-        video
         impression
         budget
         startBudget

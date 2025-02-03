@@ -1,6 +1,6 @@
 import React, {
+  useContext,
   useState,
-  useEffect
 } from 'react';
 import { 
   View, 
@@ -15,11 +15,15 @@ import { iOSUIKitTall } from 'react-native-typography'
 import { useMutation } from '@apollo/client';
 
 import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
+import VIEW_AD_MUTATION from '../../graphql/mutations/viewAd';
+import CREATE_PROMOTE_MUTATION from '../../graphql/mutations/createPromote';
+import DELETE_PROMOTE_MUTATION from '../../graphql/mutations/deletePromote';
 import { VideoPlayer } from '../Video/views';
 import { BOTTOM_TAB_HEIGHT, colors } from '../../utils/constants'
 import FeedCardRight from './FeedCardRight';
 import Sponsor from './Sponsor';
 import { Button } from 'react-native-paper';
+import { store } from '../../utils/store';
 
 const { height, width } = Dimensions.get('window');
 
@@ -33,9 +37,15 @@ function FeedCard({
   shouldUnload,
   navigation
 }) {
+  const { state: { me }, dispatch } = useContext(store);
+
   const [isExpanded, setIsExpanded] = useState(false);
+  const [viewedAd, setViewedAd] = useState(false);
 
   const [viewPost, { data }] = useMutation(VIEW_POST_MUTATION);
+  const [viewAd, { data: viewAd_data }] = useMutation(VIEW_AD_MUTATION);
+  const [createPromote, { data: createPromote_data }] = useMutation(CREATE_PROMOTE_MUTATION);
+  const [deletePromote, { data: removePromote_data }] = useMutation(DELETE_PROMOTE_MUTATION);
 
   const onEnd = () => {
     viewPost({
@@ -43,23 +53,101 @@ function FeedCard({
     });
   }
 
+  const promotePress = () => {
+    const isoDate = new Date().toISOString();
+    if(!postInfo.promoteId) {
+      return createPromote({
+        variables: {postId: postInfo.id},
+        optimisticResponse: {
+          __typename: 'CreatePromote',
+          createPromote: {
+            __typename: 'PostInfo',
+            ...postInfo,
+            promoteId: `PROMOTE#${isoDate}@${me.id}`
+          },
+        }
+      });
+    }
+    else {
+      return deletePromote({
+        variables: {id: postInfo.promoteId, postId: postInfo.id},
+        optimisticResponse: {
+          __typename: 'DeletePromote',
+          deletePromote: {
+            __typename: 'PostInfo',
+            ...postInfo,
+            promoteId: null
+          },
+        }
+      });
+    }
+    // createPromote({variables: {postId: postInfo.id}});
+    // deletePromote({variables: {id: postInfo.promoteId, postId: postInfo.id}});
+  }
+
+  const onProgress = (event) => {
+    if(viewedAd) return;
+    if(event.currentTime < 2) return;
+    if(sponsor)
+      viewAd({
+        variables: {
+          pk: sponsor.pk,
+          id: sponsor.id,
+          isSponsor: true
+        }
+      })
+    if(postInfo.promoteId)
+      viewAd({
+        variables: {
+          pk: postInfo.author.id,
+          id: postInfo.promoteId,
+          isSponsor: false
+        }
+      })
+    setViewedAd(true);
+  }
+
   if(shouldUnload) return <SafeAreaView style={styles.fullScreenCard} />
 
   return (
-    <SafeAreaView style={styles.fullScreenCard}>
+    <SafeAreaView style={[
+        styles.fullScreenCard, 
+        {
+          height: sponsor ? height - BOTTOM_TAB_HEIGHT : height
+        }
+      ]}>
       <View style={styles.videoContainer}>
-        <Button 
-          onPress={() => {}}
-          mode='contained'
-          buttonColor='rgba(0, 0, 0, 0.5)'
-          style={styles.viewShopButton}
-          >
-            ดูร้านค้า
-        </Button>
+        {
+          postInfo.shopId 
+          ?
+          <Button 
+            onPress={() => navigation.navigate('Shop', { shopId: postInfo.shopId })}
+            mode='contained'
+            buttonColor={colors.FOB}
+            style={styles.viewShopButton}
+            >
+              ดูร้านค้า
+          </Button>
+          : null
+        }
+        {
+          postInfo.author.id === me.id
+          ?
+          <Button 
+            onPress={promotePress}
+            mode='contained'
+            buttonColor={colors.FOB}
+            style={styles.viewShopButton}
+            >
+              {postInfo.promoteId ? "ยกเลิกโปรโมท" : "โปรโมทโพสต์"}
+          </Button>
+          : null
+        }
           <VideoPlayer
             source={{ uri: postInfo.video, type: 'm3u8' }}
             paused={paused}
             onPress={() => onPress(index)}
+            onProgress={onProgress}
             onEnd={onEnd}
             style={styles.video}
           />
@@ -77,6 +165,7 @@ function FeedCard({
           styles.bottomContent, 
           { 
             flexDirection: isExpanded ? 'column' : 'row',
+            bottom: sponsor ? 120 : 0
           }
         ]}>
         <View style={styles.textContainer}>
@@ -109,7 +198,7 @@ function FeedCard({
 const styles = StyleSheet.create({
   fullScreenCard: {
     width: width,
-    height: height - BOTTOM_TAB_HEIGHT,
+    // height: height,
     backgroundColor: 'black',
   },
   video: {
@@ -124,7 +213,6 @@ const styles = StyleSheet.create({
   },
   bottomContent: {
     position: 'absolute',
-    bottom: 120,
     left: 0,
     width: width,
     padding: 10,

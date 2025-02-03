@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import {
+    Button,
     Divider,
     IconButton,
     ToggleButton
@@ -145,7 +146,6 @@ export default function UserHeader(props) {
             const imageId = sanitize(fileName);
             const userId = sanitize(me.id);
             await uploadFileInChunks({ filePath, userId, imageId });
-            console.log('Upload complete');
             await BackgroundService.updateNotification({
                 taskDesc: 'File Uploaded',
             });
@@ -171,26 +171,6 @@ export default function UserHeader(props) {
     //     })
     // }
 
-    function _renderReadmoreTruncated(handlePress) {
-        return (
-            <Text style={{ color: iOSColors.orange, marginTop: 5 }} onPress={handlePress}>
-                Read more
-            </Text>
-        );
-    }
-
-    function _renderReadmoreRevealed(handlePress) {
-        return (
-            <Text style={{ color: iOSColors.orange, marginTop: 5 }} onPress={handlePress}>
-                Show less
-            </Text>
-        );
-    }
-
-    console.log("------userHeader-------");
-    console.log("props.userData?.id:", props.userData?.id);
-    console.log("me.id:", me.id);
-    console.log("Comparison result:", props.userData?.id === me.id); 
     return (
         <View style={styles.Root}>
             <View style={styles.Profile}>
@@ -221,17 +201,21 @@ export default function UserHeader(props) {
                             ผู้ติดตาม  {formatNumber(props.userData.followerCount)}
                         </Text>
                     </View>
-                    {/* <ReadMore
-                        numberOfLines={3}
-                        renderTruncatedFooter={_renderReadmoreTruncated}
-                        renderRevealedFooter={_renderReadmoreRevealed}
-                    >
-                    <Text style={[iOSUIKitTall.subheadShort, styles.aboutText]}>
-                        แคมเปญ ขั้นตอนออร์แกนิค จ๊อกกี้คอปเตอร์เทเลกราฟโหลยโท่ย ฮิตเหมยโทรโข่งโบว์ ดิกชันนารีบู๊มอยส์เจอไรเซอร์เอาท์ ควิกโปรเจ็คท์เยนฟลุคกาญจน์ ซังเต คอลเล็กชั่นฟาสต์ฟู้ดบาร์บี้ ซากุระดีมานด์เมจิก เทควันโดมั้ยเซอร์โหงวเฮ้งแดนเซอร์ เมคอัพ﻿กรรมาชน อึ๋มโปรดิวเซอร์ห่วย ม็อบเตี๊ยมกาญจน์ แจ๊กเก็ตเบนโลบ๋อย มาร์จินเอ็นทรานซ์ ช็อปปิ้งเอ็นทรานซ์จูเนียร์ออร์แกนฟยอร์ด
-                    </Text>
-                    </ReadMore> */}
+                    {
+                        props.userData.info 
+                        ?
+                        <Text style={[iOSUIKitTall.subheadShort, styles.aboutText]}>
+                            {props.userData.info}
+                        </Text>
+                        : null
+                    }
+
                     {props.userData?.id == me.id 
-                        ? null
+                        ? <Button onPress={() => props.navigation.navigate('EditUser', {
+                            
+                        })}>
+                            แก้ไขโปรไฟล์
+                        </Button>
                         : <FollowButton
                             followText="ติดตาม"
                             unfollowText="เลิกติดตาม"

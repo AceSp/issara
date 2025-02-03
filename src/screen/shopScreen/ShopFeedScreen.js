@@ -46,9 +46,7 @@ const ShopFeedScreen = (props) => {
 
   const _listViewOffset = useRef(0);
 
-  const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(
-    GET_SHOPS_QUERY,
-    );
+  const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(GET_SHOPS_QUERY);
   const [
     searchShops, 
     { 

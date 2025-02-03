@@ -15,7 +15,7 @@ import {
     Image
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { Button } from 'react-native-paper';
+import { Button, Surface } from 'react-native-paper';
 
 import moment from 'moment';
 import 'moment/locale/th';
@@ -32,6 +32,7 @@ import Geolocation from 'react-native-geolocation-service';
 import { colors } from '../utils/constants';
 import Loading from '../component/Loading';
 import Slider from '@react-native-community/slider';
+import { iOSColors, iOSUIKit } from 'react-native-typography';
 
 moment.locale('th');
 
@@ -102,6 +103,7 @@ function MapModal(props) {
   const submit = () => {
     props.setMapParam(mapCoord);
     props.setMarkerParam({ latitude: mapCoord.latitude, longitude: mapCoord.longitude })
+    props.setMapRadius(mapRadius)
     props.setVisible(false);
   };
 
@@ -149,13 +151,22 @@ function MapModal(props) {
         coverScreen={true}
         style={styles.Root}
       >
-        <Slider
-          style={{width: 200, height: 40, position: 'absolute', top: 20, alignSelf: 'center'}}
-          minimumValue={1}
-          maximumValue={200}
-          minimumTrackTintColor="#FFFFFF"
-          maximumTrackTintColor="#000000"
-        />
+        <Surface style={styles.sliderContainer}>
+          <Text style={styles.sliderLabel}>ขอบเขตร้านค้า {parseInt(mapRadius/1000)} กม</Text>
+          <Slider
+            style={{
+              width: '100%'
+            }}
+            onValueChange={(value) => {
+              const km = value * 1000;
+              setMapRadius(km)
+            }}
+            minimumValue={1}
+            maximumValue={200}
+            minimumTrackTintColor="#FFFFFF"
+            maximumTrackTintColor="#000000"
+          />
+        </Surface>
         <MapView
           style={{height: '100%', width: '100%'}}
           provider={PROVIDER_GOOGLE}
@@ -173,6 +184,7 @@ function MapModal(props) {
           <Circle 
             center={markerCoord}
             radius={mapRadius}
+            fillColor='rgba(0, 0, 0, 0.2)'
           />
         </MapView>
         {/* <Image style={{
@@ -281,6 +293,22 @@ const styles = StyleSheet.create({
       flexDirection: 'row', 
       width: width*0.4, 
       marginLeft: 15,
+    },
+    sliderContainer: {
+      position: 'absolute', 
+      top: 10, 
+      alignItems: 'center',
+      marginLeft: 20,
+      zIndex: 1,
+      width: '80%',
+      padding: 6,
+      borderRadius: 14
+    },
+    sliderLabel: {
+      ...iOSUIKit.bodyEmphasized,
+      // backgroundColor: colors.FOB,
+      // color: 'white'
+
     }
   })
 

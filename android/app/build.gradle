@@ -79,7 +79,7 @@ android {
         applicationId "com.gokgokgok"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 18
+        versionCode 28
         versionName "1.1.0"
     }
     signingConfigs {

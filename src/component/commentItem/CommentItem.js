@@ -48,6 +48,7 @@ function CommentItem(props) {
         <AvatarWrapper 
           uri={props.commentInfo.author.avatar}
           label={props.commentInfo.author.itemName[0]}
+          size={36}
         />
         <View style={styles.commentBox}>
           <View style={styles.commentBoxMeta}>
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
   },
   topContainer: {
     flexDirection: 'row',
-    width: 380,
+    // width: 360,
     marginHorizontal: 20,
     marginTop: 10,
   },

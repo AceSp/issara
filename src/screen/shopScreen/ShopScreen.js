@@ -39,6 +39,7 @@ import ReviewCard from './component/ReviewCard';
 import { DEFAULT_IMAGE } from '../../utils/constants';
 import { store } from '../../utils/store';
 import FollowButton from '../../component/FollowButton';
+import getScheduleStatus from '../../utils/getScheduleStatus';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -57,7 +58,7 @@ const OpenTimeTitle = (props) => {
             ปิด
           </Text>
         }
-        {props.isOpen ? 'ถึง' : '\u25CFเปืด'} {'\t' + props.next} นาฬิกา
+        {props.isOpen ? 'ถึง ' + props.next.time : '\u25CFเปืด ' + props.next.day + ' ' + props.next.time} นาฬิกา
       </Text>
     </View>
 
@@ -77,6 +78,7 @@ const ShopScreen = (props) => {
   const [oneStarPercentage, setOneStarPercentage] = useState(0);
   const [myRating, setMyRating] = useState(0);
   const [myReview, setMyReview] = useState('');
+  const [scheduleStatus, setScheduleStatus] = useState(null);
 
   const [imageViewVisible, setImageView] = useState(false);
   const [imageIndex, setImageIndex] = useState(0);
@@ -105,8 +107,8 @@ const ShopScreen = (props) => {
   const handleGetDirections = () => {
     getDirections({
       destination: {
-        latitude: data.getShop.latitude,
-        longitude: data.getShop.longitude
+        latitude: data.getShop.pinLocation.lat,
+        longitude: data.getShop.pinLocation.lon
       }
     })
   };
@@ -121,6 +123,13 @@ const ShopScreen = (props) => {
   useEffect(() => {
     refetch();
   }, [])
+
+  useEffect(() => {
+    if(data?.getShop.openTime) {
+      const status = getScheduleStatus(data.getShop.openTime);
+      setScheduleStatus(status);
+    }
+  }, [data?.getShop.openTime])
 
   useEffect(() => {
     if (!loading) {
@@ -239,6 +248,8 @@ const ShopScreen = (props) => {
   if (loading) return <Loading />
   if (error) return <View><Text>`Error! ${error.message}`</Text></View>
 
+  console.log("--------SHopScreen-----------")
+  console.log(data.getShop.openTime)
   return (
     <View style={styles.Root}>
       <Modal
@@ -400,22 +411,23 @@ const ShopScreen = (props) => {
               : null
           }
           {
-            data.getShop.latitude ?
+            data.getShop.pinLocation?
               <View>
                 <View style={styles.map}>
                   <MapView
                     style={{ height: '100%', width: '100%' }}
                     provider={PROVIDER_GOOGLE}
                     region={{
-                      latitude: data.getShop.latitude,
-                      longitude: data.getShop.longitude,
+                      latitude: data.getShop.pinLocation.lat,
+                      longitude: data.getShop.pinLocation.lon,
                       latitudeDelta: 0.09,
                       longitudeDelta: 0.035
                     }}
-                    scrollEnabled={false}
+                    // onRegionChangeComplete={(e) => setMapCoord(e)}       
+                    scrollEnabled={true}
                   >
                     <Marker
-                      coordinate={{ latitude: data.getShop.latitude, longitude: data.getShop.longitude }}
+                      coordinate={{ latitude: data.getShop.pinLocation.lat, longitude: data.getShop.pinLocation.lon }}
                     >
 
                     </Marker>
@@ -428,7 +440,7 @@ const ShopScreen = (props) => {
             data.getShop.openTime ?
               <List.Accordion
                 title={''}
-                left={() => <OpenTimeTitle isOpen={data.getShop.isOpen} next={data.getShop.next} />}
+                left={() =>  scheduleStatus ? <OpenTimeTitle isOpen={scheduleStatus?.isOpen} next={scheduleStatus?.next} /> : null}
                 style={styles.opentime}
               >
                 <List.Item
@@ -438,7 +450,7 @@ const ShopScreen = (props) => {
                     if (data.getShop.openTime.monday[0])
                       return (
                         <Text style={materialTall.subheading}>
-                          {data.getShop.openTime.monday[0].opens} - {data.getShop.openTigetMe.monday[0].closes}
+                          {data.getShop.openTime.monday[0].opens} - {data.getShop.openTime.monday[0].closes}
                         </Text>
                       )
                     return <Text style={materialTall.subheading}>ปิด</Text>
@@ -450,7 +462,7 @@ const ShopScreen = (props) => {
                   right={() => {
                     if (data.getShop.openTime.tuesday[0])
                       return (<Text style={materialTall.subheading}>
-                        {data.getShop.openTime.tuesday[0].opens} - {data.getShop.openTigetMe.tuesday[0].closes}
+                        {data.getShop.openTime.tuesday[0].opens} - {data.getShop.openTime.tuesday[0].closes}
                       </Text>)
                     return <Text style={materialTall.subheading}>ปิด</Text>
                   }}
@@ -461,7 +473,7 @@ const ShopScreen = (props) => {
                   right={() => {
                     if (data.getShop.openTime.wednesday[0])
                       return (<Text style={materialTall.subheading}>
-                        {data.getShop.openTime.wednesday[0].opens} - {data.getShop.openTigetMe.wednesday[0].closes}
+                        {data.getShop.openTime.wednesday[0].opens} - {data.getShop.openTime.wednesday[0].closes}
                       </Text>)
                     return <Text style={materialTall.subheading}>ปิด</Text>
                   }}
@@ -472,7 +484,7 @@ const ShopScreen = (props) => {
                   right={() => {
                     if (data.getShop.openTime.thursday[0])
                       return (<Text style={materialTall.subheading}>
-                        {data.getShop.openTime.thursday[0].opens} - {data.getShop.openTigetMe.thursday[0].closes}
+                        {data.getShop.openTime.thursday[0].opens} - {data.getShop.openTime.thursday[0].closes}
                       </Text>)
                     return <Text style={materialTall.subheading}>ปิด</Text>
                   }}
@@ -483,7 +495,7 @@ const ShopScreen = (props) => {
                   right={() => {
                     if (data.getShop.openTime.friday[0])
                       return (<Text style={materialTall.subheading}>
-                        {data.getShop.openTime.friday[0].opens} - {data.getShop.openTigetMe.friday[0].closes}
+                        {data.getShop.openTime.friday[0].opens} - {data.getShop.openTime.friday[0].closes}
                       </Text>)
                     return <Text style={materialTall.subheading}>ปิด</Text>
                   }}
@@ -494,7 +506,7 @@ const ShopScreen = (props) => {
                   right={() => {
                     if (data.getShop.openTime.saturday[0])
                       return (<Text style={materialTall.subheading}>
-                        {data.getShop.openTime.saturday[0].opens} - {data.getShop.openTigetMe.saturday[0].closes}
+                        {data.getShop.openTime.saturday[0].opens} - {data.getShop.openTime.saturday[0].closes}
                       </Text>)
                     return <Text style={materialTall.subheading}>ปิด</Text>
                   }}
@@ -505,7 +517,7 @@ const ShopScreen = (props) => {
                   right={() => {
                     if (data.getShop.openTime.sunday[0])
                       return (<Text style={materialTall.subheading}>
-                        {data.getShop.openTime.sunday[0].opens} - {data.getShop.openTigetMe.sunday[0].closes}
+                        {data.getShop.openTime.sunday[0].opens} - {data.getShop.openTime.sunday[0].closes}
                       </Text>)
                     return <Text style={materialTall.subheading}>ปิด</Text>
                   }}

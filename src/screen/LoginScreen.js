@@ -334,7 +334,7 @@ const Login = (props) => {
         )}
       >
         เข้าสู่ระบบ google
-      </Button>
+      </Button> */}
       <View style={[styles.registerContainer, {
         marginTop: (usernameError || passwordError)?
         100 : 120
@@ -347,7 +347,7 @@ const Login = (props) => {
             สมัครสมาชิก
            </Text>
         </TouchableWithoutFeedback>
-      </View> */}
+      </View>
       </ScrollView>
     </View>
   );

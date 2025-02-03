@@ -3,10 +3,12 @@ import { gql } from '@apollo/client';
 import fragments from '../fragment';
 
 export default gql`
-mutation CreatePromote(
-        $postId: ID!
+mutation DeletePromote(
+    $id: ID!
+    $postId: ID!
     ){
-    createPromote(
+    deletePromote(
+        id: $id
         postId: $postId
     ) {
       ...post
@@ -14,3 +16,4 @@ mutation CreatePromote(
  }
  ${fragments.post}
 `;
+

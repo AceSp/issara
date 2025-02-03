@@ -16,13 +16,14 @@ import {
 import { NativeModules, NativeEventEmitter } from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import IonIcon from 'react-native-vector-icons/Ionicons';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 
 import { VideoPlayer } from '../../component/Video/views';
 import PostTextModal from '../../component/PostTextModal';
 import uploadFileInChunks from '../../utils/uploadFileInChunks'
 import { store } from '../../utils/store';
 import CREATE_POST_MUTATION from '../../graphql/mutations/createPost';
+import GET_MY_SHOP_QUERY from '../../graphql/queries/getMyShop';
 import { VIDEO_URL } from '../../utils/apollo-client';
 
 function PostPreviewScreen({
@@ -38,12 +39,19 @@ function PostPreviewScreen({
   const [source, setSource] = useState(uri);
   const [paused, setPaused] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false)
+  const [connectShop, setConnectShop] = useState(false)
 
-  const [createPost, { data }] = useMutation(CREATE_POST_MUTATION);
+  const {
+    loading,
+    error,
+    data,
+  } = useQuery(GET_MY_SHOP_QUERY);
+  const [createPost, { data: createPost_data }] = useMutation(CREATE_POST_MUTATION);
 
   const toggleVideo = () => {
     setPaused(!paused);
   }
+
   const handleUpload = async (filePath, text, tags) => {
     const options = {
       taskName: 'FileUpload',
@@ -62,10 +70,6 @@ function PostPreviewScreen({
       const videoId = sanitize(fileName);
       const userId = sanitize(me.id);
       await uploadFileInChunks({ filePath, userId, videoId });
-      console.log('Upload complete');
-      await BackgroundService.updateNotification({
-        taskDesc: 'File Uploaded',
-      });
       const video = `${VIDEO_URL}hls/${userId}/${videoId}/master.m3u8`
       const thumbnail = `${VIDEO_URL}hls/${userId}/${videoId}/${videoId}.jpg`
       await createPost({
@@ -74,6 +78,7 @@ function PostPreviewScreen({
               video,
               thumbnail,
               tags,
+              shopId: connectShop ? data.getShop[0].id : null
           },
       })
     }, options);
@@ -157,6 +162,9 @@ function PostPreviewScreen({
       <PostTextModal 
         visible={isModalVisible}
         onDismiss={() => setModalVisible(false)}
+        haveShop={data?.getMyShop.length > 0 ? true : false}
+        connectShop={connectShop}
+        setConnectShop={setConnectShop}
         onPost={handleUpload}
         source={source}
        />

@@ -42,7 +42,7 @@ const StateProvider = ( { children } ) => {
           return {
             ...prevState,
             accessToken: action.token,
-            me: action.me,
+            me: action.me || prevState.me,
             isLoading: false,
         };
         case 'SIGN_IN':
@@ -50,7 +50,7 @@ const StateProvider = ( { children } ) => {
             ...prevState,
             isSignout: false,
             accessToken: action.token,
-            me: action.me,
+            me: action.me || prevState.me,
         };
         case 'SIGN_OUT':
           return {

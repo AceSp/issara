@@ -184,6 +184,7 @@ function FeedCardRight({
                 <AvatarWrapper 
                     uri={postInfo.author.avatar}
                     label={postInfo.author.itemName[0]}
+                    size={48}
                     style={styles.avatar}
                 />
                 </TouchableOpacity>
@@ -252,12 +253,17 @@ function FeedCardRight({
                 <Text style={styles.buttonText}>รายงาน</Text>
             </TouchableOpacity>
             <Portal>
-                <CommentModal
-                    visible={isCommentModalVisible}
-                    onDismiss={() => setIsCommentModalVisible(false)}
-                    postId={postInfo.id}
-                    postData={postInfo}
-                />
+                {
+                    isCommentModalVisible
+                    ?
+                    <CommentModal
+                        visible={isCommentModalVisible}
+                        onDismiss={() => setIsCommentModalVisible(false)}
+                        postId={postInfo.id}
+                        postData={postInfo}
+                    />
+                    : null
+                }
                 <Modal
                     visible={showReportModal}
                     contentContainerStyle={styles.modal}

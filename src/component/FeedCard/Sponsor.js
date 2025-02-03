@@ -23,7 +23,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { DEFAULT_AVATAR } from '../../utils/constants';
 import ShopScreen from '../../screen/shopScreen/ShopScreen';
-// import AdmobSponsor from './AdmobSponsor';
 
 moment.locale('th');
 
@@ -50,8 +49,15 @@ function Sponsor({
       source={{ uri: 'https://avatars.githubusercontent.com/u/97165289' }} 
       style={styles.avatar} /> */}
     <View style={styles.textContainer}>
-      <Text style={styles.itemName}>{shop.itemName}</Text>
-      <Text style={styles.text}>{text}</Text>
+      <Text 
+        style={styles.itemName}>
+        {shop.itemName}
+      </Text>
+      <Text 
+        numberOfLines={1}
+        style={styles.text}>
+        {text}
+      </Text>
     </View>
     <Modal
       visible={modalVisible}
@@ -122,6 +128,7 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
     padding: 10,
+    height: '100%',
   },
   text: {
     ...iOSUIKitTall.bodyWhite,

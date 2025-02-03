@@ -1,6 +1,8 @@
 import BackgroundService from 'react-native-background-actions';
-import { VIDEO_URL } from './apollo-client';
+import { UPLOAD_URL } from './apollo-client';
 import axios from 'axios';
+import PushNotification from "react-native-push-notification";
+import { iOSColors } from 'react-native-typography';
 
 const uploadFileInChunks = async ({
   filePath,
@@ -9,7 +11,7 @@ const uploadFileInChunks = async ({
   imageId,
 }) => {
   try {
-    let uploadUrl = VIDEO_URL;
+    let uploadUrl = UPLOAD_URL;
     const formData = new FormData();
     if(videoId) {
       uploadUrl = uploadUrl + 'upload';
@@ -49,10 +51,18 @@ const uploadFileInChunks = async ({
           taskDesc: `Uploading file: ${percentCompleted}% completed`,
         });
         // offset += chunkSize;
+        if(percentCompleted >= 100) {
+          PushNotification.localNotification({
+            channelId: "RN_BACKGROUND_ACTIONS_CHANNEL",
+            title: "อัพโหลดวิดีโอสำเร็จ",
+            message: "อัพโหลดวิดีโอของคุณสำเร็จแล้ว",
+            color: iOSColors.orange
+          });
+        }
       }
     };
 
-    await axios.post(uploadUrl, formData, config)
+    await axios.post(uploadUrl, formData, config);
   } catch (error) {
     console.error('Error during chunk upload:', error);
     await BackgroundService.updateNotification({

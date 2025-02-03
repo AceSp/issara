@@ -72,6 +72,7 @@ const MenuScreen = (props) => {
             label={me?.itemName[0]}
             size={40}
             color={iOSColors.white}
+            uri={me?.avatar}
             style={{
               marginRight: 10
             }}
@@ -79,7 +80,6 @@ const MenuScreen = (props) => {
               fontSize: 30,
               marginBottom: 7
             }}
-            // source={me?.avatar ? { uri: me?.avatar } : require('../../assets/pic/profile.jpg')}
           />
           <View>
             <Text style={[styles.nameText, styles.textBold]}>{me?.itemName}</Text>

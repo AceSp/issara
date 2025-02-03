@@ -257,21 +257,32 @@ function PostVideoScreen({ navigation }) {
   //   })
   // }, [])
 
-  if(!hasPermission) return (
-    <PermissionScreen 
-      permissionText="เราจำเป็นต้องเข้าถึงกล้องของคุณเพื่อโพสต์วิดีโอ"
-      requestPermission={requestPermission}
-      navigation={navigation}
-    />
-  )
+  if(!hasPermission || !microphone.hasPermission) {
+    let permissionArr = [];
+    if(!hasPermission) permissionArr.push({
+      permissionText: "เราจำเป็นต้องเข้าถึงกล้องของคุณเพื่อโพสต์วิดีโอ",
+      requestPermission: requestPermission
+    })
+    if(!microphone.hasPermission) permissionArr.push({
+      permissionText: "เราจำเป็นต้องเข้าถึงไมค์ของคุณเพื่อโพสต์วิดีโอ",
+      requestPermission: microphone.requestPermission
+    })
+    return (
+      <PermissionScreen 
+        backable={true}
+        permissionArr={permissionArr}
+        navigation={navigation}
+      />
+    )
+  }
 
-  if(!microphone.hasPermission) return (
-    <PermissionScreen 
-      permissionText="เราจำเป็นต้องเข้าถึงไมค์ของคุณเพื่อโพสต์วิดีโอ"
-      requestPermission={microphone.requestPermission}
-      navigation={navigation}
-    />
-  )
+  // if(!microphone.hasPermission) return (
+  //   <PermissionScreen 
+  //     permissionText="เราจำเป็นต้องเข้าถึงไมค์ของคุณเพื่อโพสต์วิดีโอ"
+  //     requestPermission={microphone.requestPermission}
+  //     navigation={navigation}
+  //   />
+  // )
 
   return (
     <View style={styles.container}>

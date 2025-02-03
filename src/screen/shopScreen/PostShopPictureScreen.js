@@ -99,7 +99,10 @@ const PostShopPictureScreen = (props) => {
   const renderImages = () => {
     if (!imageObjArr.length) return null;
     let arr = [];
+    console.log("----------PostShopPictureScreen-----------")
+    console.log(imageObjArr)
     for (let [index, item] of imageObjArr.entries()) {
+      if(item.fileUri)
       arr.push(
         <View key={index} style={styles.imageView}>
           <Image source={{ uri: item.fileUri }} style={styles.imageView} />
@@ -184,7 +187,6 @@ const styles = StyleSheet.create({
     height: width * 0.33,
     borderWidth: 1.5,
     borderColor: iOSColors.midGray,
-    backgroundColor: 'red'
   },
   imageList: {
     flex: 1,

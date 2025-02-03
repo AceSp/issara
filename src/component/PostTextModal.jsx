@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal'; 
 import {
+  Button,
+  Chip,
   IconButton
 } from 'react-native-paper'
 
@@ -19,6 +21,9 @@ const { width, height } = Dimensions.get('window');
 const PostTextModal = ({ 
   visible, 
   onDismiss, 
+  haveShop,
+  connectShop,
+  setConnectShop,
   onPost,
   source
 }) => {
@@ -64,15 +69,43 @@ const PostTextModal = ({
           multiline
           maxLength={320}
         />
-        <TouchableOpacity onPress={handleHashtagPress} style={styles.hashtagButton}>
-          <Text style={styles.hashtagButtonText}># แฮชแท็ก</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
-          const tags = extractTags(text);
-          onPost(source, text, tags);
-        }} style={styles.postButton}>
-          <Text style={styles.postButtonText}>Post</Text>
-        </TouchableOpacity>
+        <View style={styles.bottomView}>
+          <Button 
+            onPress={handleHashtagPress}
+            mode='outlined' 
+            >
+            # แฮชแท็ก
+          </Button>
+          {
+            haveShop ?
+            <Chip 
+              selected={connectShop} 
+              style={{
+                backgroundColor: connectShop ? iOSColors.orange : iOSColors.lightGray,
+                paddingTop: 5
+              }} 
+              textStyle={{
+                color: connectShop ? 'white' : iOSColors.orange
+              }}
+              selectedColor={'white'}
+              showSelectedCheck={true}
+              icon={connectShop ? null : "link"} 
+              onPress={() => setConnectShop(!connectShop)}
+            >
+              โพสต์โดยร้านค้า
+            </Chip>
+            : null
+          }
+          <Button 
+            onPress={() => {
+              const tags = extractTags(text);
+              onPost(source, text, tags);
+            }}
+            mode='contained' 
+            >
+            โพสต์
+          </Button>
+        </View>
       </View>
     </Modal>
   );
@@ -82,6 +115,11 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: 'flex-end',
     margin: 0,
+  },
+  bottomView: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginHorizontal: 12
   },
   container: {
     backgroundColor: 'white',
@@ -122,25 +160,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   hashtagButton: {
-    alignSelf: 'flex-start',
-    marginLeft: 20,
     backgroundColor: iOSColors.lightGray,
-    padding: 10,
-    borderRadius: 5,
   },
   hashtagButtonText: {
-    fontSize: 16,
-  },
-  postButton: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: iOSColors.blue,
-    padding: 10,
-    borderRadius: 5,
-  },
-  postButtonText: {
-    color: 'white',
     fontSize: 16,
   },
 });

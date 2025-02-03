@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { 
     Text, 
     Keyboard,
@@ -19,6 +19,8 @@ import {
     Button,
     Overlay
 } from 'react-native-elements';
+import {launchImageLibrary} from 'react-native-image-picker'
+import BackgroundService from 'react-native-background-actions';
 
 import moment from 'moment';
 import 'moment/locale/th';
@@ -37,6 +39,11 @@ import UPDATE_ME_MUTATION from '../../graphql/mutations/updateMe';
 import GET_ADDRESS_QUERY from '../../graphql/queries/getAddress';
 import CategoryItem from '../categoryScreen/CategoryItem';
 import AddressList from './Component/AddressList';
+import { store } from '../../utils/store';
+import AvatarWrapper from '../../component/AvatarWrapper';
+import { IconButton } from 'react-native-paper';
+import uploadFileInChunks from '../../utils/uploadFileInChunks';
+import { VIDEO_URL } from '../../utils/apollo-client';
 
 moment.locale('th');
 
@@ -45,101 +52,122 @@ const height = Dimensions.get('window').height;
 
 function EditUserScreen(props) {
 
-  const { 
-    phoneNumberParam,
-    websiteParam,
-    emailParam,
-    addressParam,
-    districtParam,
-    amphoeParam,
-    provinceParam,
-    zipcodeParam,
-    infoParam
-    } = props.route.params;
+  const { state: { me } } = useContext(store);
 
+  const [ firstName, setFirstName ] = useState('');
+  const [ lastName, setLastName ] = useState('');
+  const [ username, setUsername ] = useState('');
   const [ phone, setPhone ] = useState('');
   const [ phoneError, setPhoneError ] = useState(' ');
   const [ website, setWebsite ] = useState('');
   const [ websiteError, setWebsiteError ] = useState(' ');
   const [ email, setEmail ] = useState('');
   const [ emailError, setEmailError ] = useState(' ');
-  const [ address, setAddress ] = useState('');
-  const [ district, setDistrict ] = useState('');
-  const [ amphoe, setAmphoe ] = useState('');
-  const [ province, setProvince ] = useState('');
-  const [ zipcode, setZipcode ] = useState(0);
   const [ info, setInfo ] = useState('');
-  const [ districtVisible, setDisVis ] = useState(false);
-  const [ amphoeVisible, setAmVis ] = useState(false);
-  const [ provinceVisible, setProVis ] = useState(false);
-  const [ zipcodeVisible, setZipVis ] = useState(false);
-  const [ locationPermission, setLocationPermission ] = useState(false);
-
-  const [ mapCoord, setMapCoord ] = useState({
-    latitude: 13.75630,
-    longitude: 100.50180,
-    latitudeDelta: 0.09,
-    longitudeDelta: 0.035
-  });
-  const [ markerCoord, setMarkerCoord ] = useState({ latitude: 13.75630, longitude: 100.50180 });
 
   const [updateMe, {data, loading}] = useMutation(UPDATE_ME_MUTATION);
   const [getAddress, {data: address_data, loading: address_loading, error: address_error}] = useLazyQuery(GET_ADDRESS_QUERY);
 
   useEffect(() => {
-      setPhone(phoneNumberParam);
-      setWebsite(websiteParam);
-      setEmail(emailParam);
-      setAddress(addressParam);
-      setDistrict(districtParam);
-      setAmphoe(amphoeParam);
-      setProvince(provinceParam);
-      setZipcode(zipcodeParam);
-      setInfo(infoParam);
+    if(me.phoneNumber)
+      setPhone(me.phoneNumber);
+    if(me.website)
+      setWebsite(me.website);
+    if(me.email)
+      setEmail(me.email);
+    if(me.info)
+      setInfo(me.info);
   }, []);
 
-  useEffect(() => {
-      
-    if(Platform.OS === 'android') {
-      check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
-        .then((result) => {
-          switch (result) {
-            case RESULTS.UNAVAILABLE:
-              setLocationPermission(false);
-              break;
-            case RESULTS.DENIED:
-              requestLocationPermission();
-              break;
-            case RESULTS.GRANTED:
-              setLocationPermission(true);
-              locateCurrentPosition();
-              break;
-            case RESULTS.BLOCKED:
-              setLocationPermission(false);
-              break;
-          }
-        })
-    } /*else {
-      check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
-        .then((result) => {
-          switch (result) {
-            case RESULTS.UNAVAILABLE:
-              setLocationPermission(false);
-              break;
-            case RESULTS.DENIED:
-              requestLocationPermission();
-              break;
-            case RESULTS.GRANTED:
-              setLocationPermission(true);
-              locateCurrentPosition();
-              break;
-            case RESULTS.BLOCKED:
-              setLocationPermission(false);
-              break;
-          }
-        })
-    }*/
-  },[])
+  async function checkImagePermission() {
+      if (Platform.OS === 'android') {
+      const result = await check(PERMISSIONS.ANDROID.CAMERA)
+      switch (result) {
+          case RESULTS.UNAVAILABLE:
+          console.log("unavailable")
+          return false;
+          case RESULTS.DENIED:
+          console.log("denied")
+          return false;
+          case RESULTS.GRANTED:
+          console.log("granted")
+          return true;
+          case RESULTS.BLOCKED:
+          console.log("blocked")
+          return false;
+      }
+      } else {
+      const result = await check(PERMISSIONS.IOS.CAMERA)
+      switch (result) {
+          case RESULTS.UNAVAILABLE:
+          console.log("unavailable")
+          return false;
+          case RESULTS.DENIED:
+          console.log("denied")
+          return false;
+          case RESULTS.GRANTED:
+          console.log("granted")
+          return true;
+          case RESULTS.BLOCKED:
+          console.log("blocked")
+          return false;
+      }
+      }
+  };
+
+  const openVideoGallery = async () => {
+    await checkImagePermission()
+    const options = {
+        mediaType: 'image',
+        includeBase64: false,
+        assetRepresentationMode: 'current',
+        maxHeight: 2000,
+        maxWidth: 2000,
+    };
+
+    const result = await launchImageLibrary(options);
+        if (result.didCancel) {
+            console.log('User cancelled image picker');
+        } else if (result.error) {
+            console.log('ImagePicker Error: ', response.error);
+        } else {
+            const source = result.uri || result.assets[0].uri;
+            const fileName = result.fileName || result.assets[0].fileName
+            console.log('Selected image:', source);
+            console.log(result)
+            handleUpload(fileName, source)
+        }
+  }
+
+  const handleUpload = async (fileName, filePath) => {
+      const options = {
+          taskName: 'FileUpload',
+          taskTitle: 'Uploading File',
+          taskDesc: 'Progress',
+          taskIcon: {
+              name: 'ic_launcher',
+              type: 'mipmap',
+          },
+          color: '#ff00ff',
+          //change this for opening the app from notification
+          linkingURI: 'uploadFile',
+      };
+      await BackgroundService.start(async () => {
+          const sanitize = (name) => name.replace(/[^a-zA-Z0-9-_]/g, '_'); 
+          const imageId = sanitize(fileName);
+          const userId = sanitize(me.id);
+          await uploadFileInChunks({ filePath, userId, imageId });
+          await BackgroundService.updateNotification({
+              taskDesc: 'File Uploaded',
+          });
+          const avatar = `${VIDEO_URL}images/${userId}/${imageId}.jpg`
+          await updateMe({
+              variables: {
+                  avatar
+              },
+          })
+      }, options);
+  };
 
   const onPhoneNumChange = (value, previousValue) => {
     if (!value) return setPhone(value);
@@ -179,99 +207,69 @@ function EditUserScreen(props) {
         setEmailError(' ');
   }
 
-  // $username: $username
-  // $firstName: $firstName,
-  // $lastName: $lastName,
-  // $avatar: $avatar,
-  // $headerPic: $headerPic,
-  // $info: $info,
-  // $email: $email,
-  // $phoneNumber: $phoneNumber,
-  // $website: $website,
-  // $latitude: $latitude,
-  // $longitude: $longitude,
-  // $address: $address,
-  // $district: $district,
-  // $amphoe: $amphoe,
-  // $province: $province,
-  // $zipcode: $zipcode,
-  // $category: $category,
-  // $badgeCount: $badgeCount,
-  // $notificationToken: $notificationToken,
   const submit = () => {
           updateMe({
               variables: {
-                  phoneNumber: phone,
+                  firstName,
+                  lastName,
+                  username,
                   website: website,
-                  email: email,
-                  latitude: markerCoord.latitude,
-                  longitude: markerCoord.longitude,
-                  address: address,
-                  district: district,
-                  amphoe: amphoe,
-                  province: province,
-                  zipcode: zipcode,
                   info: info
               }
           });
     props.navigation.goBack();
   };
 
-  const getDistrict = (value) => {
-    getAddress({ variables: { district: value } });
-  }
-
-  const getAmphoe = (value) => {
-    getAddress({ variables: { amphoe: value } });
-  }
-
-  const getProvince = (value) => {
-    getAddress({ variables: { province: value } });
-  }
-
-  const getZipcode = (value) => {
-    getAddress({ variables: { zipcode: value } });
-  }
-
-  const requestLocationPermission = async () => {
-    if(Platform.OS === 'android') {
-      const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-      if(response === 'granted') locateCurrentPosition();
-      else setLocationPermission(false);
-    }/* else {
-      const response = request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-      if(response === await 'granted') locateCurrentPosition();
-      else setLocationPermission(false);
-    }*/
-  }
-
-  const locateCurrentPosition = () => {
-
-      Geolocation.getCurrentPosition(
-        (position) => {
-            //console.log(position);
-            setMapCoord({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              latitudeDelta: 0.09,
-              longitudeDelta: 0.035
-          });
-
-          setMarkerCoord({ latitude: position.coords.latitude, longitude: position.coords.longitude });
-        },
-        (error) => {
-            // See error code charts below.
-            console.log(error.code, error.message);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
-  }
-
   return (
       <View style={styles.Root}>
           <ScrollView keyboardShouldPersistTaps="handled" >
               <KeyboardAvoidingView style={styles.viewInScroll}>
+              <View style={styles.avatarContainer}>
+                      <AvatarWrapper
+                          size={80}
+                          style={styles.avatar}
+                          uri={me.avatar}
+                          label={me.itemName[0]}
+                      />
+                  <IconButton
+                      icon="pencil"
+                      iconColor="white"
+                      size={20}
+                      style={styles.editIconButton}
+                      onPress={openVideoGallery}
+                  />
+              </View>
               <View>
+                <Input 
+                  label="ชื่อ"
+                  labelStyle={styles.sectionText}
+                  placeholder='ชื่อ..'
+                  value={firstName}
+                  onChangeText={(value)=>setFirstName(value)}
+                  inputStyle={{ marginLeft: 10 }}
+                />
+              </View>
+              <View>
+                <Input 
+                  label="นามสกุล"
+                  labelStyle={styles.sectionText}
+                  placeholder='นามสกุล..'
+                  value={lastName}
+                  onChangeText={(value)=>setLastName(value)}
+                  inputStyle={{ marginLeft: 10 }}
+                />
+              </View>
+              <View>
+                <Input 
+                  label="ชื่อผู้ใช้"
+                  labelStyle={styles.sectionText}
+                  placeholder='ชื่อผู้ใช้..'
+                  value={username}
+                  onChangeText={(value)=>setUsername(value)}
+                  inputStyle={{ marginLeft: 10 }}
+                />
+              </View>
+              {/* <View>
                       <Input 
                         label="เบอร์โทร"
                         labelStyle={styles.sectionText}
@@ -287,6 +285,19 @@ function EditUserScreen(props) {
                       />
               </View>
               <View>
+                      <Input
+                        label="อีเมลล์"
+                        labelStyle={styles.sectionText} 
+                        placeholder='อีเมลล์..'
+                        value={email}
+                        onBlur={() => validateEmail(email)}
+                        onChangeText={(value)=>setEmail(value)}
+                        inputStyle={{ marginLeft: 10 }}
+                        leftIcon={{ color: colors.SECONDARY, name: "email" }}
+                        errorMessage={emailError}
+                      />
+              </View> */}
+              <View>
                       <Input 
                         label="เว็บไซต์"
                         labelStyle={styles.sectionText}
@@ -299,123 +310,12 @@ function EditUserScreen(props) {
                         errorMessage={websiteError}
                       />
               </View>
-              <View>
-                      <Input
-                        label="อีเมลล์"
-                        labelStyle={styles.sectionText} 
-                        placeholder='อีเมลล์..'
-                        value={email}
-                        onBlur={() => validateEmail(email)}
-                        onChangeText={(value)=>setEmail(value)}
-                        inputStyle={{ marginLeft: 10 }}
-                        leftIcon={{ color: colors.SECONDARY, name: "email" }}
-                        errorMessage={emailError}
-                      />
-              </View>
-              <View>
-                      <Input 
-                        label="ที่อยู่"
-                        labelStyle={styles.sectionText}
-                        multiline={true}
-                        placeholder='ที่อยู่..'
-                        value={address}
-                        onChangeText={(value)=>setAddress(value)}
-                        inputStyle={{ marginLeft: 10 }}
-                        leftIcon={{ color: colors.SECONDARY, name: "directions" }}
-                      />
-                      <View style={styles.addressRow}>
-                        <View style={styles.addressView}>
-                          <Text style={styles.addressText}>ตำบล</Text>
-                          <TouchableHighlight style={styles.addressButton} onPress={() => setDisVis(true)} underlayColor={colors.LIGHT_GRAY}>
-                            <Text>    {district} </Text>
-                          </TouchableHighlight>
-                        </View>
-                        <View style={styles.addressView}>
-                          <Text style={styles.addressText}>อำเภอ</Text>
-                          <TouchableHighlight style={styles.addressButton} onPress={() => setAmVis(true)} underlayColor={colors.LIGHT_GRAY}>
-                            <Text>    {amphoe} </Text>
-                          </TouchableHighlight>
-                        </View>
-                      </View>
-                      <View style={styles.addressRow}>
-                        <View style={styles.addressView}>
-                          <Text style={styles.addressText}>จังหวัด</Text>
-                          <TouchableHighlight style={styles.addressButton} onPress={() => setProVis(true)} underlayColor={colors.LIGHT_GRAY}>
-                            <Text>    {province} </Text>
-                          </TouchableHighlight>
-                        </View>
-                        <View style={styles.addressView}>
-                          <Text style={styles.addressText}>รหัสไปรษณีย์</Text>
-                          <TouchableHighlight style={styles.addressButton} onPress={() => setZipVis(true)} underlayColor={colors.LIGHT_GRAY}>
-                            <Text>    {zipcode} </Text>
-                          </TouchableHighlight>
-                        </View>
-                      </View>
-                      <MapView
-                        style={{height: 200}}
-                        provider={PROVIDER_GOOGLE}
-                        region={mapCoord}
-                        scrollEnabled={false}
-                        onPress={() => props.navigation.navigate('Map', 
-                        { 
-                          mapParam: mapCoord,
-                          setMapParam: setMapCoord,
-                          setMarkerParam: setMarkerCoord 
-                        })}
-                      >
-                        <Marker
-                          coordinate={markerCoord}
-                        >
-
-                        </Marker>
-                      </MapView>
-                      <AddressList
-                            visible={districtVisible}
-                            setVisible={setDisVis}
-                            setDistrict={setDistrict}
-                            setAmphoe={setAmphoe}
-                            setProvince={setProvince}
-                            setZipcode={setZipcode}
-                            address={address_data? address_data.getAddress : null} 
-                            getAddress={getDistrict}
-                      />
-                      <AddressList
-                            visible={amphoeVisible}
-                            setVisible={setAmVis}
-                            setDistrict={setDistrict}
-                            setAmphoe={setAmphoe}
-                            setProvince={setProvince}
-                            setZipcode={setZipcode}
-                            address={address_data? address_data.getAddress : null} 
-                            getAddress={getAmphoe}
-                      />
-                      <AddressList
-                            visible={provinceVisible}
-                            setVisible={setProVis}
-                            setDistrict={setDistrict}
-                            setAmphoe={setAmphoe}
-                            setProvince={setProvince}
-                            setZipcode={setZipcode}
-                            address={address_data? address_data.getAddress : null} 
-                            getAddress={getProvince}
-                      />
-                      <AddressList
-                            visible={zipcodeVisible}
-                            setVisible={setZipVis}
-                            setDistrict={setDistrict}
-                            setAmphoe={setAmphoe}
-                            setProvince={setProvince}
-                            setZipcode={setZipcode}
-                            address={address_data? address_data.getAddress : null} 
-                            getAddress={getZipcode}
-                      />
-              </View>
               <View style={{marginTop: 20}}>
                       <Input
-                        label="เพิ่มเติม"
+                        label="คำบรรยาย"
                         labelStyle={styles.sectionText} 
                         multiline={true}
-                        placeholder='เพิ่มเติม..'
+                        placeholder='คำบรรยาย..'
                         value={info}
                         onChangeText={(value)=>setInfo(value)}
                         inputStyle={{ marginLeft: 10 }}
@@ -430,6 +330,29 @@ function EditUserScreen(props) {
 }
 
 const styles = StyleSheet.create({
+    avatar: {
+        alignSelf: 'center',
+    },
+    avatarContainer: {
+        position: 'relative',
+        width: 80,
+        marginBottom: 20,
+        alignItems: 'center',
+        alignSelf: 'center',
+    },
+    editIconButton: {
+        position: 'absolute',
+        bottom: -5,
+        right: -5,
+        backgroundColor: colors.PRIMARY,
+        borderRadius: 20,
+        width: 30,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: 'white',
+        borderWidth: 2
+    },
     Root: {     
         flex: 1,
         marginTop: 20

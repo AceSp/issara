@@ -64,24 +64,142 @@ const theme = {
 
 enableScreens();
 
-// ['log', 'warn'].forEach(function(method) {
-//   var old = console[method];
-//   console[method] = function() {
-//     var stack = (new Error()).stack.split(/\n/);
-//     // Chrome includes a single "Error" line, FF doesn't.
-//     if (stack[0].indexOf('Error') === 0) {
-//       stack = stack.slice(1);
-//     }
-//     var args = [].slice.apply(arguments).concat([stack[1].trim()]);
-//     return old.apply(console, args);
-//   };
-// });
-
 export default function App({ navigation }) {
   const { state, dispatch } = useContext(store);
 
   const [getMe, { loading, error, data, subscribeToMore }] = useLazyQuery(GET_ME_QUERY);
-  const [increaseCoin, { data: coin_data }] = useMutation(INCREASE_COIN_MUTATION);
+
+
+  async function changeMe() {
+    if (!data?.getMe) return;
+    subscribeToMore({
+      document: ME_SUBSCRIPTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev;
+        }
+
+        const newData = subscriptionData.data.me
+        dispatch({ type: 'CHANGE_ME', me: newData });
+        console.log("--------------App------------")
+        console.log(newData)
+
+        return Object.assign({}, prev, {
+          me: {
+            ...newData
+          }
+        });
+      },
+      onError: (err) => {
+        console.log("----------App----meSub---onError")
+        console.log(err)
+      }
+    });
+    // const branchUniversalObject = await branch.createBranchUniversalObject(
+    //   data.getMe.id, 
+    //   {
+    //     locallyIndex: true,
+    //     contentMetadata: { customMetadata: { prop1: 'test', prop2: 'abc' }},
+    //     title: 'Cool Content!',
+    //     contentDescription: 'Cool Content Description'
+    //   },
+    // )
+    dispatch({ 
+      type: 'CHANGE_ME', 
+      me: data.getMe,
+      // branchUniversalObject
+    });
+  }
+
+  useEffect(() => {
+    if (data && !state.me) {
+      changeMe();
+    }
+  }, [data, state.me]);
+
+  useEffect(() => {
+    // Fetch the token from storage then navigate to our appropriate place
+    let accessToken;
+    const bootstrapAsync = async () => {
+      try {
+        const [_, cookies] = await Promise.all([
+          CookieManager.clearAll(),
+          storage.getString(REFRESH_TOKEN)
+        ]);
+        const res = await fetch(`${HTTP_URL}refresh_token`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "cookie": `rt=${cookies}`
+          }
+        });
+        const resJSON = await res.json();
+        if (!resJSON.error) {
+          accessToken = resJSON.accessToken;
+          setAccessToken(accessToken);
+        };
+        if (!data) getMe();
+      } catch (error) {
+        console.log(error)
+      }
+      // After restoring token, we may need to validate it in production apps
+
+      // This will switch to the App screen or Auth screen and this loading
+      // screen will be unmounted and thrown away.
+      dispatch({ type: 'RESTORE_TOKEN', token: accessToken });
+    };
+
+    bootstrapAsync();
+  }, []);
+
+  const authContext = useMemo(
+    () => ({
+      signIn: async (newToken/*, newMeData*/) => {
+        try {
+          const { rt } = await CookieManager.get(HTTP_URL);
+          await Promise.all([
+            CookieManager.clearAll(),
+            //storage.set(ME_DATA, JSON.stringify(newMeData)),
+            storage.set(REFRESH_TOKEN, rt.value)
+          ]);
+          setAccessToken(newToken);
+          getMe();
+          // branch.setIdentity(data.getMe.id)
+        } catch (error) {
+          throw error;
+        }
+        dispatch({ type: 'SIGN_IN', token: newToken });
+      },
+      signOut: () => {
+        storage.delete(ME_DATA);
+        storage.delete(REFRESH_TOKEN);
+        CookieManager.clearAll();
+        // branch.logout();
+        dispatch({ type: 'SIGN_OUT' })
+      },
+      test: true
+    }),
+    []
+  );
+
+  if (state.isLoading) {
+    return <FullScreenLoading />
+  }
+
+  return (
+      <AuthContext.Provider value={authContext}>
+        <PaperProvider theme={theme}>
+          <NavigationContainer
+            linking={linking}
+            fallback={<Text>Loading...</Text>}
+          >
+            {state.accessToken ? <MainStack /> : <AuthStack />}
+            <RemotePushController />
+          </NavigationContainer>
+        </PaperProvider>
+      </AuthContext.Provider>
+  )
+};
 
   // const {
   //   connected,
@@ -147,116 +265,6 @@ export default function App({ navigation }) {
   //   checkOldPurchase();
   // }, [connected]);
 
-  useEffect(() => {
-    async function changeMe() {
-      subscribeToMore({
-        document: ME_SUBSCRIPTION,
-        updateQuery: (prev, { subscriptionData }) => {
-          if (!subscriptionData.data) {
-            return prev;
-          }
-
-          const newData = subscriptionData.data.me
-          dispatch({ type: 'CHANGE_ME', me: newData });
-          console.log("--------------App------------")
-          console.log(newData)
-
-          return Object.assign({}, prev, {
-            me: {
-              ...newData
-            }
-          });
-        },
-        onError: (err) => {
-          console.log("----------App----meSub---onError")
-          console.log(err)
-        }
-      });
-      // const branchUniversalObject = await branch.createBranchUniversalObject(
-      //   data.getMe.id, 
-      //   {
-      //     locallyIndex: true,
-      //     contentMetadata: { customMetadata: { prop1: 'test', prop2: 'abc' }},
-      //     title: 'Cool Content!',
-      //     contentDescription: 'Cool Content Description'
-      //   },
-      // )
-      dispatch({ 
-        type: 'CHANGE_ME', 
-        me: data?.getMe,
-        // branchUniversalObject
-      });
-    }
-
-    if (data) {
-      changeMe();
-      // branch.setIdentity(data.getMe.id);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    // Fetch the token from storage then navigate to our appropriate place
-    const bootstrapAsync = async () => {
-      let accessToken = null;
-
-      try {
-        const [_, cookies] = await Promise.all([
-          CookieManager.clearAll(),
-          storage.getString(REFRESH_TOKEN)
-        ]);
-        const res = await fetch(`${HTTP_URL}refresh_token`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "cookie": `rt=${cookies}`
-          }
-        });
-        const resJSON = await res.json();
-        if (!resJSON.error) {
-          accessToken = resJSON.accessToken;
-          setAccessToken(accessToken);
-          getMe();
-        };
-        if (!data) getMe();
-      } catch (error) {
-        console.log(error)
-      }
-      // After restoring token, we may need to validate it in production apps
-
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
-      dispatch({ type: 'RESTORE_TOKEN', token: accessToken });
-    };
-
-    bootstrapAsync();
-  }, []);
-
-  const authContext = useMemo(
-    () => ({
-      signIn: async (newToken/*, newMeData*/) => {
-        try {
-          console.log("---------App--------signIn")
-          const { rt } = await CookieManager.get(HTTP_URL);
-          await Promise.all([
-            CookieManager.clearAll(),
-            //storage.set(ME_DATA, JSON.stringify(newMeData)),
-            storage.set(REFRESH_TOKEN, rt.value)
-          ]);
-          setAccessToken(newToken);
-          getMe();
-          // branch.setIdentity(data.getMe.id)
-        } catch (error) {
-          throw error;
-        }
-        dispatch({ type: 'SIGN_IN', token: newToken });
-      },
-      signOut: () => {
-        storage.delete(ME_DATA);
-        storage.delete(REFRESH_TOKEN);
-        CookieManager.clearAll();
-        // branch.logout();
-        dispatch({ type: 'SIGN_OUT' })
-      },
       // signUp: async (newToken, newMeData) => {
       //   try {
       //     const { rt } = await CookieManager.get(`http://${HOST}:3000/dev/graphql`);
@@ -278,28 +286,3 @@ export default function App({ navigation }) {
       //   }
       //   dispatch({ type: 'SIGN_IN', token: newToken });
       // },
-      test: true
-    }),
-    []
-  );
-
-  if (state.isLoading) {
-    return <FullScreenLoading />
-  }
-
-  return (
-      <AuthContext.Provider value={authContext}>
-        <PaperProvider theme={theme}>
-          <NavigationContainer
-            linking={linking}
-            fallback={<Text>Loading...</Text>}
-          >
-            {state.accessToken ? <MainStack /> : <AuthStack />}
-            <RemotePushController />
-          </NavigationContainer>
-        </PaperProvider>
-      </AuthContext.Provider>
-  )
-};
-
-

@@ -1,8 +1,43 @@
+diff --git a/node_modules/react-native-camera-roll-picker/ImageItem.js b/node_modules/react-native-camera-roll-picker/ImageItem.js
+index cfc3e73..5eedfe3 100644
+--- a/node_modules/react-native-camera-roll-picker/ImageItem.js
++++ b/node_modules/react-native-camera-roll-picker/ImageItem.js
+@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
+ });
+ 
+ class ImageItem extends Component {
+-  componentWillMount() {
++  componentDidMount() {
+     let { width } = Dimensions.get('window');
+     const { imageMargin, imagesPerRow, containerWidth } = this.props;
+ 
 diff --git a/node_modules/react-native-camera-roll-picker/index.js b/node_modules/react-native-camera-roll-picker/index.js
-index ba5a617..fc6180b 100644
+index ba5a617..8a171f0 100644
 --- a/node_modules/react-native-camera-roll-picker/index.js
 +++ b/node_modules/react-native-camera-roll-picker/index.js
-@@ -280,7 +280,7 @@ CameraRollPicker.propTypes = {
+@@ -70,14 +70,16 @@ class CameraRollPicker extends Component {
+     this.renderImage = this.renderImage.bind(this);
+   }
+ 
+-  componentWillMount() {
++  componentDidMount() {
+     this.fetch();
+   }
+ 
+-  componentWillReceiveProps(nextProps) {
+-    this.setState({
+-      selected: nextProps.selected,
+-    });
++  componentDidUpdate(prevProps) {
++    if (prevProps.selected !== this.props.selected) {
++      this.setState({
++        selected: this.props.selected,
++      });
++    }
+   }
+ 
+   onEndReached() {
+@@ -280,7 +282,7 @@ CameraRollPicker.propTypes = {
    selectedMarker: PropTypes.element,
    backgroundColor: PropTypes.string,
    emptyText: PropTypes.string,

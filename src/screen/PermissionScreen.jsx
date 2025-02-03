@@ -6,20 +6,35 @@ import { iOSColors, iOSUIKitTall } from 'react-native-typography';
 export default function PermissionScreen({
     permissionText,
     requestPermission,
+    permissionArr,
     unbackable,
     navigation
 }) {
+    const renderPermissionRequest = () => {
+        let arr = [];
+        console.log("---------PermissionScreen----------")
+        console.log(permissionArr)
+        for(const item of permissionArr)
+        {
+            arr.push(
+                <View>
+                    <Text style={styles.text}>{item.permissionText}</Text>
+                    <Button labelStyle={styles.button} onPress={item.requestPermission}>อนุญาติ</Button>
+                    {
+                        unbackable 
+                        ?
+                        null
+                        :
+                        <Button labelStyle={styles.button} onPress={() => navigation.goBack()}>ย้อนกลับ</Button>
+                    }
+                </View>
+            )
+        }
+        return arr;
+    }
     return (
         <View style={styles.root}>
-            <Text style={styles.text}>{permissionText}</Text>
-            <Button labelStyle={styles.button} onPress={requestPermission}>อนุญาติ</Button>
-            {
-                unbackable 
-                ?
-                null
-                :
-                <Button labelStyle={styles.button} onPress={() => navigation.goBack()}>ย้อนกลับ</Button>
-            }
+            {renderPermissionRequest()}
         </View>
     )
 }

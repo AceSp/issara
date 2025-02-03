@@ -125,7 +125,7 @@ export const shopCategory = [
     picture: require("../../assets/pic/foundation.jpg"),
   },
   {
-    name: "เบ็ดเตล็ด",
+    name: "อื่นๆ",
     engName: "other",
     iconName: "shopping-basket",
     iconType: "font-awesome",

@@ -49,7 +49,7 @@ import PostProductDetailScreen from '../screen/MarketScreen/PostProductDetailScr
 import ProductScreen from '../screen/MarketScreen/ProductScreen';
 import OnlineProductScreen from '../screen/MarketScreen/OnlineProductScreen';
 import OfflineProductScreen from '../screen/MarketScreen/OfflineProductScreen';
-import MapScreen from '../screen/MapScreen';
+import MapScreen from '../screen/MapModal';
 import ShopFeedScreen from '../screen/shopScreen/ShopFeedScreen';
 import ShopScreen from '../screen/shopScreen/ShopScreen';
 import ReviewScreen from '../screen/shopScreen/ReviewScreen';
@@ -118,6 +118,7 @@ function BottomTab(props) {
       <BTab.Screen
         name="NewFeed"
         component={NewFeedScreen}
+        // component={PostShopDetailScreen}
         options={{
           headerShown: false,
           tabBarLabel: 'หน้าแรก',
@@ -150,7 +151,7 @@ function BottomTab(props) {
         component={PostVideoScreen}
         options={{
           headerShown: false,
-          tabBarLabel: 'Post Video',
+          tabBarLabel: 'โพสต์',
           tabBarIcon: ({ color: tintColor }) => (
             <Icon 
               name="video"
@@ -189,7 +190,6 @@ function BottomTab(props) {
             <Icon name="menu"
               color={tintColor}
               size={35}
-              iconStyle={{ marginBottom: 20 }}
             />
           )
         }}

@@ -208,9 +208,6 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
     />
   );
 
-  console.log("----------CommentModal-----------")
-  console.log(loading)
-  console.log(!me)
   if (loading || !me) return <Loading />;
   if (error) return <Text>Error: {error.message}</Text>;
 

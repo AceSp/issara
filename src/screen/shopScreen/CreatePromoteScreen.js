@@ -284,7 +284,7 @@ const CreatePromoteScreen = (props) => {
                 <Text style={materialTall.body1}>
                     การเลือกขอบเขตที่กว้างเกินไป อาจทำให้ท่านเสียค่าโฆษณาเกินความจำเป็น
                     กรุณาเลือกขอบเขตให้เหมาะสม
-                    </Text>
+                </Text>
                 <RadioButton.Group
                     onValueChange={value => setTarget(value)}
                     value={target}

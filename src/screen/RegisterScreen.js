@@ -235,7 +235,7 @@ const Register = (props) => {
       const resJSON = await res.json();
       signIn(resJSON.accessToken);
       return;
-    } catch (error) {
+    } catch (e) {
       if (/username/i.test(e.message)) {
         setErrorText('ชื่อนี้มีผู้ใช้แล้ว')
         setLoading(false);
@@ -259,8 +259,6 @@ const Register = (props) => {
     }
   };
 
-  console.log("-----------RegisterScreen----------")
-  console.log(markerCoord)
   // function getInfoFromToken(token) {
   //   const PROFILE_REQUEST_PARAMS = {
   //     fields: {
@@ -310,8 +308,9 @@ const Register = (props) => {
 
   async function loginWithGoogle() {
     try {
-      await GoogleSignin.hasPlayServices();
-      let userInfo;
+      console.log("--------RegisterScreen----------")
+      const hasPlayServices = await GoogleSignin.hasPlayServices();
+      console.log(hasPlayServices)
       // userInfo is
       // {
       //   idToken: string,
@@ -326,10 +325,9 @@ const Register = (props) => {
       //               name: string // full name
       //   }
       // }
-      if (await GoogleSignin.isSignedIn())
-        userInfo = await GoogleSignin.getCurrentUser()
-      else
-        userInfo = await GoogleSignin.signIn();
+      const userInfo = await GoogleSignin.signIn();
+
+      console.log(userInfo)
       await apiLogin({
         variables: {
           ...userInfo.user,

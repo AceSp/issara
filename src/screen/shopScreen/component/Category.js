@@ -13,9 +13,10 @@ import {
   Overlay
 } from 'react-native-elements';
 import { materialTall } from 'react-native-typography';
+import { TouchableRipple } from 'react-native-paper';
+import Modal from 'react-native-modal';
 
 import { shopCategory, colors } from '../../../utils/constants';
-import { TouchableRipple } from 'react-native-paper';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -45,12 +46,21 @@ const Category = (props) => {
   }
   
   return (
-    <Overlay 
-        onRequestClose={() => props.setVisible(false)} 
-        fullScreen 
-        isVisible={props.visible}
-        animationType='slide'
-        overlayStyle={{padding: 0}}
+    // <Overlay 
+    //     onRequestClose={() => props.setVisible(false)} 
+    //     fullScreen 
+    //     isVisible={props.visible}
+    //     animationType='slide'
+    //     overlayStyle={{padding: 0}}
+    // >
+    <Modal
+      visible={props.visible}
+      onDismiss={() => props.setVisible(false)}
+      isVisible={props.visible}
+      onBackdropPress={() => props.setVisible(false)}
+      onSwipeComplete={() => props.setVisible(false)}
+      propagateSwipe={true}
+      style={styles.modal} // Add style for modal
     >
       <View>
         <View style={styles.header}>
@@ -65,7 +75,8 @@ const Category = (props) => {
           </View>
         </ScrollView>
       </View> 
-    </Overlay>
+    </Modal>
+    // </Overlay>
   )
 }
 
@@ -109,6 +120,11 @@ const styles = StyleSheet.create({
   closeOverlay: {
     paddingBottom: 5,
     marginRight: 20
+  },
+  modal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+    backgroundColor: 'white'
   },
 })
 

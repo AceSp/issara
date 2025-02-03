@@ -12,7 +12,7 @@ import Video from 'react-native-video';
 
 const { width, height } = Dimensions.get('window');
 
-export const VideoPlayer = ({ source, paused, onPress, onEnd, index }) => {
+export const VideoPlayer = ({ source, paused, onPress, onEnd, onProgress, index }) => {
   const videoRef = useRef(null);
 
   const onError = (error) => {
@@ -35,6 +35,7 @@ export const VideoPlayer = ({ source, paused, onPress, onEnd, index }) => {
           paused={paused}
           onError={onError}
           onEnd={onEnd}
+          onProgress={onProgress}
           onBuffer={onBuffer}
           playInBackground={false}
           playWhenInactive={false}
