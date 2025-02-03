@@ -88,7 +88,6 @@ import JobDetailScreen from '../screen/commentScreen/JobDetailScreen';
 import PostJobDetailScreen from '../screen/JobScreen/PostJobDetailScreen';
 import PostJobPictureScreen from '../screen/JobScreen/PostJobPictureScreen';
 import FollowedListScreen from '../screen/GroupScreen/FollowedListScreen';
-import GokgokgokLogo from '../assets/Images/gokgokgokLogo'
 import { MediaScreen } from '../screen/PostVideoScreen/MediaScreen';
 import PostPreviewScreen from '../screen/PostVideoScreen/PostPreviewScreen';
 import UserVideoScreen from '../screen/UserVideoScreen';

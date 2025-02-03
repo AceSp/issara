@@ -1,4 +1,4 @@
-rootProject.name = 'gokgokgok'
+rootProject.name = 'issara'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 
 // include ':react-native-video'

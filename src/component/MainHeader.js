@@ -9,13 +9,13 @@ import {
   Icon,
 } from 'react-native-elements';
 import 'moment/locale/th';
-import GokgokgokLogo from '../assets/Images/gokgokgokLogo'
+import IssaraLogo from '../assets/Images/IssaraLogo'
 
 function MainHeader(props) {
 
   return (
     <View style={styles.Root}>
-      <GokgokgokLogo
+      <IssaraLogo
         width='100%'
         height={100}
       />

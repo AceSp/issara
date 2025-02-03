@@ -74,9 +74,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.gokgokgok"
+    namespace "com.issara"
     defaultConfig {
-        applicationId "com.gokgokgok"
+        applicationId "com.issara"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 28

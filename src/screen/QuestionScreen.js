@@ -25,7 +25,7 @@ import {
     store,
     setShowQuestion
 } from '../utils/store';
-import GokgokgokLogo from '../assets/Images/gokgokgokLogo'
+import IssaraLogo from '../assets/Images/IssaraLogo'
 
 const width = Dimensions.get('window').width;
 
@@ -51,7 +51,7 @@ function QuestionScreen(props) {
 
     return (
         <View style={styles.root}>
-            <GokgokgokLogo
+            <IssaraLogo
                 width='100%'
                 height={100}
             />
