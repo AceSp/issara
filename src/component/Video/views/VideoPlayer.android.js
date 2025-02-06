@@ -37,6 +37,7 @@ export const VideoPlayer = ({ source, paused, onPress, onEnd, onProgress, index 
           onEnd={onEnd}
           onProgress={onProgress}
           onBuffer={onBuffer}
+          controls={true}
           playInBackground={false}
           playWhenInactive={false}
         />
