@@ -15,7 +15,16 @@ import { BOTTOM_TAB_HEIGHT } from '../../../utils/constants';
 
 const { width, height } = Dimensions.get('window');
 
-export const VideoPlayer = ({ source, paused, onPress, onEnd, onProgress, index }) => {
+export const VideoPlayer = ({ 
+  source, 
+  paused, 
+  onPress, 
+  onEnd, 
+  onProgress, 
+  index,
+  onSliderTouchStart,
+  onSliderTouchEnd 
+}) => {
   const videoRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -64,8 +73,14 @@ export const VideoPlayer = ({ source, paused, onPress, onEnd, onProgress, index 
           minimumTrackTintColor="#FFFFFF"
           maximumTrackTintColor="#000000"
           thumbTintColor="#FFFFFF"
-          onSlidingStart={() => console.log("--------VIdeoPlayer sliding start--------")}
-          onSlidingComplete={() => console.log("--------VIdeoPlayer sliding complete--------")}
+          onSlidingStart={() => {
+            console.log("--------VideoPlayer sliding start--------");
+            onSliderTouchStart?.();
+          }}
+          onSlidingComplete={() => {
+            console.log("--------VideoPlayer sliding complete--------");
+            onSliderTouchEnd?.();
+          }}
           onValueChange={seek}
         />
     </View>

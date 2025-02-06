@@ -27,6 +27,7 @@ const NewFeedScreen = (props) => {
   const [uploadError, setUploadError] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(GET_POSTS_QUERY);
   const [createPost, { createpost_data }] = useMutation(CREATE_POST_MUTATION);
@@ -59,8 +60,6 @@ const NewFeedScreen = (props) => {
 
         return newPosts.length
             ? {
-                // Put the new.posts at the end of the list and update `pageInfo`
-                // so we have the new `endCursor` and `hasNextPage` values
                 getPosts: {
                     __typename: previousResult.getPosts.__typename,
                     posts: [...previousResult.getPosts.posts, ...newPosts],
@@ -109,29 +108,13 @@ const NewFeedScreen = (props) => {
       paused={index !== currentlyPlaying || isPaused}
       onPress={togglePause}
       shouldUnload={Math.abs(index - currentlyPlaying) > 1}
-      // shouldUnload={index !== currentlyPlaying}
       navigation={props.navigation}
+      onSliderInteraction={(isInteracting) => setScrollEnabled(!isInteracting)}
     />
   ), [currentlyPlaying, isPaused, togglePause, props.navigation]);
 
   if (loading) return <Loading />;
   if (error) return <View><Text>`Error! ${error.message}`</Text></View>;
-
-  // const post = data.getPosts.posts[0]
-  // return (
-  //   <FeedCard
-  //     postInfo={post.postInfo}
-  //     relation={post.relation}
-  //     sponsor={post.sponsor}
-  //     index={0}
-  //     paused={0 !== currentlyPlaying || isPaused}
-  //     onPress={togglePause}
-  //     shouldUnload={Math.abs(0 - currentlyPlaying) > 1}
-  //     // shouldUnload={index !== currentlyPlaying}
-  //     navigation={props.navigation}
-  //   />
-  // )
-
 
   return (
     <View style={styles.Root}>
@@ -158,6 +141,7 @@ const NewFeedScreen = (props) => {
         initialNumToRender={1}
         maxToRenderPerBatch={2}
         windowSize={3}
+        scrollEnabled={scrollEnabled}
       />
     </View>
   );
