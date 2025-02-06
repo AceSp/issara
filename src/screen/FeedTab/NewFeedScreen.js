@@ -83,8 +83,8 @@ const NewFeedScreen = (props) => {
   }, [currentlyPlaying]);
 
   const getItemLayout = useCallback((data, index) => ({
-    length: width,
-    offset: width * index,
+    length: height,
+    offset: height * index,
     index,
   }), []);
 
@@ -132,11 +132,10 @@ const NewFeedScreen = (props) => {
   //   />
   // )
 
-
   return (
     <View style={styles.Root}>
       <FlatList
-        horizontal={true}
+        horizontal={false}
         data={data.getPosts.posts}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
@@ -147,7 +146,7 @@ const NewFeedScreen = (props) => {
         onRefresh={refetch}
         ref={flatlistRef}
         pagingEnabled={true}
-        snapToInterval={width}
+        snapToInterval={height}
         getItemLayout={getItemLayout}
         onViewableItemsChanged={onViewableItemsChanged}
         contentContainerStyle={{ paddingBottom: BOTTOM_TAB_HEIGHT }}
