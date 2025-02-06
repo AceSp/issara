@@ -182,7 +182,7 @@ function FeedCard({
           </Text>
         </TouchableOpacity>
       </LinearGradient>
-      {
+      {/* {
         sponsor 
         ?
         <Sponsor 
@@ -190,7 +190,7 @@ function FeedCard({
           navigation={navigation}
         />
         : null
-      }
+      } */}
     </SafeAreaView>
   );
 }
