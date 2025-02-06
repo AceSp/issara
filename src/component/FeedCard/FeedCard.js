@@ -113,7 +113,7 @@ function FeedCard({
     <SafeAreaView style={[
         styles.fullScreenCard, 
         {
-          height: sponsor ? height - BOTTOM_TAB_HEIGHT : height
+          height: sponsor ? height : height - BOTTOM_TAB_HEIGHT
         }
       ]}>
       <View style={styles.videoContainer}>
@@ -198,7 +198,6 @@ function FeedCard({
 const styles = StyleSheet.create({
   fullScreenCard: {
     width: width,
-    // height: height,
     backgroundColor: 'black',
   },
   video: {
