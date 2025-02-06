@@ -35,8 +35,7 @@ function FeedCard({
   paused,
   onPress,
   shouldUnload,
-  navigation,
-  onSliderInteraction,
+  navigation
 }) {
   const { state: { me }, dispatch } = useContext(store);
 
@@ -82,6 +81,8 @@ function FeedCard({
         }
       });
     }
+    // createPromote({variables: {postId: postInfo.id}});
+    // deletePromote({variables: {id: postInfo.promoteId, postId: postInfo.id}});
   }
 
   const onProgress = (event) => {
@@ -105,9 +106,6 @@ function FeedCard({
       })
     setViewedAd(true);
   }
-
-  const handleSliderTouchStart = () => onSliderInteraction?.(true);
-  const handleSliderTouchEnd = () => onSliderInteraction?.(false);
 
   if(shouldUnload) return <SafeAreaView style={styles.fullScreenCard} />
 
@@ -152,8 +150,6 @@ function FeedCard({
             onProgress={onProgress}
             onEnd={onEnd}
             style={styles.video}
-            onSliderTouchStart={handleSliderTouchStart}
-            onSliderTouchEnd={handleSliderTouchEnd}
           />
       </View>
       <FeedCardRight
@@ -186,6 +182,15 @@ function FeedCard({
           </Text>
         </TouchableOpacity>
       </LinearGradient>
+      {/* {
+        sponsor 
+        ?
+        <Sponsor 
+          {...sponsor}
+          navigation={navigation}
+        />
+        : null
+      } */}
     </SafeAreaView>
   );
 }
@@ -193,6 +198,7 @@ function FeedCard({
 const styles = StyleSheet.create({
   fullScreenCard: {
     width: width,
+    // height: height,
     backgroundColor: 'black',
   },
   video: {
@@ -211,6 +217,7 @@ const styles = StyleSheet.create({
     width: width,
     padding: 10,
     paddingRight: 80
+    // maxHeight: 80,
   },
   videoContainer: {
     flex: 1,
