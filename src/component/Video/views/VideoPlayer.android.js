@@ -8,9 +8,10 @@ import {
   View,
   TouchableWithoutFeedback,
   Text,
-  Slider,
 } from 'react-native';
+import Slider from '@react-native-community/slider'
 import Video from 'react-native-video';
+import { BOTTOM_TAB_HEIGHT } from '../../../utils/constants';
 
 const { width, height } = Dimensions.get('window');
 
@@ -56,15 +57,17 @@ export const VideoPlayer = ({ source, paused, onPress, onEnd, onProgress, index 
           playWhenInactive={false}
         />
       </TouchableWithoutFeedback>
-      <Slider
-        style={styles.progressBar}
-        value={progress}
-        maximumValue={duration}
-        minimumTrackTintColor="#FFFFFF"
-        maximumTrackTintColor="#000000"
-        thumbTintColor="#FFFFFF"
-        onValueChange={seek}
-      />
+        <Slider
+          style={styles.progressBar}
+          value={progress}
+          maximumValue={duration}
+          minimumTrackTintColor="#FFFFFF"
+          maximumTrackTintColor="#000000"
+          thumbTintColor="#FFFFFF"
+          onSlidingStart={() => console.log("--------VIdeoPlayer sliding start--------")}
+          onSlidingComplete={() => console.log("--------VIdeoPlayer sliding complete--------")}
+          onValueChange={seek}
+        />
     </View>
   );
 };
@@ -81,7 +84,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     position: 'absolute',
-    bottom: 0,
+    bottom: BOTTOM_TAB_HEIGHT,
     width: '100%',
     height: 40,
   },

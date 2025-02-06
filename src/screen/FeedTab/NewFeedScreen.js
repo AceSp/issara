@@ -117,6 +117,22 @@ const NewFeedScreen = (props) => {
   if (loading) return <Loading />;
   if (error) return <View><Text>`Error! ${error.message}`</Text></View>;
 
+  // const post = data.getPosts.posts[0]
+  // return (
+  //   <FeedCard
+  //     postInfo={post.postInfo}
+  //     relation={post.relation}
+  //     sponsor={post.sponsor}
+  //     index={0}
+  //     paused={0 !== currentlyPlaying || isPaused}
+  //     onPress={togglePause}
+  //     shouldUnload={Math.abs(0 - currentlyPlaying) > 1}
+  //     // shouldUnload={index !== currentlyPlaying}
+  //     navigation={props.navigation}
+  //   />
+  // )
+
+
   return (
     <View style={styles.Root}>
       <FlatList
