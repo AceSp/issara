@@ -1,6 +1,7 @@
 import React, {
   useContext,
   useState,
+  useRef
 } from 'react';
 import { 
   View, 
@@ -11,7 +12,7 @@ import {
   SafeAreaView 
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { iOSUIKitTall } from 'react-native-typography'
+import { iOSColors, iOSUIKitTall } from 'react-native-typography'
 import { useMutation } from '@apollo/client';
 
 import VIEW_POST_MUTATION from '../../graphql/mutations/viewPost';
@@ -19,11 +20,12 @@ import VIEW_AD_MUTATION from '../../graphql/mutations/viewAd';
 import CREATE_PROMOTE_MUTATION from '../../graphql/mutations/createPromote';
 import DELETE_PROMOTE_MUTATION from '../../graphql/mutations/deletePromote';
 import { VideoPlayer } from '../Video/views';
-import { BOTTOM_TAB_HEIGHT, colors } from '../../utils/constants'
+import { BOTTOM_TAB_HEIGHT, colors, SPONSOR_HEIGHT } from '../../utils/constants'
 import FeedCardRight from './FeedCardRight';
 import Sponsor from './Sponsor';
 import { Button } from 'react-native-paper';
 import { store } from '../../utils/store';
+import Slider from '@react-native-community/slider';
 
 const { height, width } = Dimensions.get('window');
 
@@ -39,8 +41,13 @@ function FeedCard({
 }) {
   const { state: { me }, dispatch } = useContext(store);
 
+  const videoRef = useRef(null);
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [viewedAd, setViewedAd] = useState(false);
+
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const [viewPost, { data }] = useMutation(VIEW_POST_MUTATION);
   const [viewAd, { data: viewAd_data }] = useMutation(VIEW_AD_MUTATION);
@@ -86,8 +93,16 @@ function FeedCard({
   }
 
   const onProgress = (event) => {
+    setProgress(event.currentTime);
+    setDuration(event.playableDuration);
     if(viewedAd) return;
     if(event.currentTime < 2) return;
+    console.log("--------FeedCard--------")
+    console.log(postInfo.id)
+    console.log(postInfo.promoteId)
+    console.log(sponsor)
+    console.log(sponsor.pk)
+    console.log(sponsor.id)
     if(sponsor)
       viewAd({
         variables: {
@@ -107,15 +122,14 @@ function FeedCard({
     setViewedAd(true);
   }
 
+  const seek = (value) => {
+    videoRef.current.seek(value);
+  };
+
   if(shouldUnload) return <SafeAreaView style={styles.fullScreenCard} />
 
   return (
-    <SafeAreaView style={[
-        styles.fullScreenCard, 
-        {
-          height: sponsor ? height : height - BOTTOM_TAB_HEIGHT
-        }
-      ]}>
+    <SafeAreaView style={styles.fullScreenCard}>
       <View style={styles.videoContainer}>
         {
           postInfo.shopId 
@@ -149,9 +163,19 @@ function FeedCard({
             onPress={() => onPress(index)}
             onProgress={onProgress}
             onEnd={onEnd}
-            style={styles.video}
+            videoRef={videoRef}
           />
       </View>
+      <Slider
+        style={styles.progressBar}
+        value={progress}
+        maximumValue={duration}
+        minimumTrackTintColor={iOSColors.orange}
+        maximumTrackTintColor="white"
+        thumbTintColor={iOSColors.orange}
+        onValueChange={seek}
+        vertical={true}
+      />
       <FeedCardRight
         postInfo={postInfo}
         relation={relation}
@@ -182,7 +206,8 @@ function FeedCard({
           </Text>
         </TouchableOpacity>
       </LinearGradient>
-      {/* {
+
+      {
         sponsor 
         ?
         <Sponsor 
@@ -190,7 +215,7 @@ function FeedCard({
           navigation={navigation}
         />
         : null
-      } */}
+      }
     </SafeAreaView>
   );
 }
@@ -198,11 +223,9 @@ function FeedCard({
 const styles = StyleSheet.create({
   fullScreenCard: {
     width: width,
-    backgroundColor: 'black',
-  },
-  video: {
-    width: '100%',
-    height: '100%',
+    height: height - BOTTOM_TAB_HEIGHT,
+    backgroundColor: 'white',
+    marginBottom: BOTTOM_TAB_HEIGHT
   },
   rightButtons: {
     position: 'absolute',
@@ -252,7 +275,12 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1
-  }
+  },
+  progressBar: {
+    position: 'absolute',
+    // bottom: SPONSOR_HEIGHT - 8,
+    left: 10
+  },
 });
 
 export default FeedCard;
