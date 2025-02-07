@@ -280,8 +280,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 10,
     height: 200,
+    width: 40, // Added width constraint
     top: (height - BOTTOM_TAB_HEIGHT - 200) / 2,
-    transform:[{rotate: "-90deg"}]
   },
 });
 
