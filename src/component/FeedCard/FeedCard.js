@@ -278,8 +278,9 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     position: 'absolute',
-    // bottom: SPONSOR_HEIGHT - 8,
-    left: 10
+    left: 10,
+    height: 200,
+    top: (height - BOTTOM_TAB_HEIGHT - 200) / 2,
   },
 });
 
