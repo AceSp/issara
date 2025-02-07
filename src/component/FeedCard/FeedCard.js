@@ -281,6 +281,7 @@ const styles = StyleSheet.create({
     left: 10,
     height: 200,
     top: (height - BOTTOM_TAB_HEIGHT - 200) / 2,
+    transform:[{rotate: "-90deg"}]
   },
 });
 
