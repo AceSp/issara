@@ -86,7 +86,7 @@ const MenuScreen = (props) => {
           </View>
         </TouchableOpacity>
         <MenuListItem
-          onPress={() => props.navigation.navigate('Subscription')}
+          onPress={() => props.navigation.navigate('FollowingList')}
           name="การติดตาม"
           iconName="cast-connected"
         />
@@ -136,6 +136,7 @@ const MenuScreen = (props) => {
 const styles = StyleSheet.create({
   Root: {
     alignItems: 'stretch',
+    backgroundColor: 'white'
   },
   menuRow: {
     flexDirection: 'row',
