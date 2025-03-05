@@ -4,7 +4,7 @@ import React, {
     useEffect,
     useContext,
 } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, Clipboard } from 'react-native';
 import {
     View,
     StyleSheet,
@@ -76,27 +76,14 @@ const process = [
 function ShareAppScreen(props) {
 
     const { state: { me } } = useContext(store);
+    const [snackVisible, setSnackVisible] = useState(false);
 
-    // const [shareUrl, setShareUrl] = useState("");
     const shareLink = `https://play.google.com/store/apps/details?id=com.issara&referrer=${me.id}`
 
-    // useEffect(() => {
-    //     async function generateUrl() {
-    //         const linkProperties = {
-    //             feature: 'referrals',
-    //         }
-    //         const controlParams = {
-    //             $desktop_url: 'http://desktop-url.com/monster/12345'
-    //         }
-    //         // const { channel, completed, error } = 
-    //         // const { url } = await branchUniversalObject
-    //         //     .generateShortUrl(linkProperties, controlParams)
-    //         const url = "placeholderUrl"
-    //         setShareUrl(url);
-    //     }
-
-    //     generateUrl();
-    // })
+    const handleCopy = () => {
+        Clipboard.setString(shareLink);
+        setSnackVisible(true);
+    };
 
     async function externalShare() {
         try {
@@ -112,7 +99,23 @@ function ShareAppScreen(props) {
     return (
         <View style={styles.Root}>
                 <View style={styles.topContaienr}>
-                    <Text>{shareLink}</Text>
+                    <View style={styles.linkContainer}>
+                        <Text 
+                            style={styles.linkText}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                        >
+                            {shareLink}
+                        </Text>
+                        <Button
+                            mode="contained"
+                            onPress={handleCopy}
+                            style={styles.copyButton}
+                            labelStyle={iOSUIKitTall.footnoteEmphasized}
+                        >
+                            คัดลอก
+                        </Button>
+                    </View>
                     <QRCode value={shareLink} />
                     <Text style={iOSUIKitTall.title3Emphasized}>
                         ชวนเพื่อนของคุณเพื่อรับสิทธิ์ชิงโชค
@@ -129,6 +132,16 @@ function ShareAppScreen(props) {
                         แชร์เพื่อลุ้นโชค
                     </Button>
                 </View>
+                
+                <Snackbar
+                    visible={snackVisible}
+                    onDismiss={() => setSnackVisible(false)}
+                    duration={2000}
+                    style={styles.snack}
+                >
+                    คัดลอกลิงก์เรียบร้อยแล้ว
+                </Snackbar>
+
             {/* <View style={styles.bottomContainer}>
                 <Text style={[iOSUIKitTall.title3Emphasized, styles.topicText]}>
                     วิธีลุ้นโชค
@@ -166,6 +179,29 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderRadius: 20,
         marginTop: 20
+    },
+    linkContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: iOSColors.customGray,
+        borderRadius: 10,
+        padding: 10,
+        marginVertical: 15,
+        width: '90%'
+    },
+    linkText: {
+        flex: 1,
+        ...iOSUIKitTall.subheadEmphasized,
+        color: iOSColors.black,
+        marginRight: 10
+    },
+    copyButton: {
+        backgroundColor: iOSColors.orange,
+        borderRadius: 8,
+        paddingVertical: 3
+    },
+    snack: {
+        backgroundColor: iOSColors.green
     },
     topicText: {
         marginVertical: 10,
