@@ -27,6 +27,7 @@ import Skeleton from 'react-native-skeleton-placeholder';
 import Timeline from 'react-native-timeline-flatlist';
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
+import QRCode from 'react-native-qrcode-svg';
 
 import {
     store,
@@ -74,46 +75,45 @@ const process = [
 
 function ShareAppScreen(props) {
 
-    const { state: { me, branchUniversalObject } } = useContext(store);
+    const { state: { me } } = useContext(store);
 
-    const [shareUrl, setShareUrl] = useState("");
+    // const [shareUrl, setShareUrl] = useState("");
+    const shareLink = `https://play.google.com/store/apps/details?id=com.issara&referrer=${me.id}`
 
-    useEffect(() => {
-        async function generateUrl() {
-            const linkProperties = {
-                feature: 'referrals',
-            }
-            const controlParams = {
-                $desktop_url: 'http://desktop-url.com/monster/12345'
-            }
-            // const { channel, completed, error } = 
-            // const { url } = await branchUniversalObject
-            //     .generateShortUrl(linkProperties, controlParams)
-            const url = "placeholderUrl"
-            setShareUrl(url);
-        }
+    // useEffect(() => {
+    //     async function generateUrl() {
+    //         const linkProperties = {
+    //             feature: 'referrals',
+    //         }
+    //         const controlParams = {
+    //             $desktop_url: 'http://desktop-url.com/monster/12345'
+    //         }
+    //         // const { channel, completed, error } = 
+    //         // const { url } = await branchUniversalObject
+    //         //     .generateShortUrl(linkProperties, controlParams)
+    //         const url = "placeholderUrl"
+    //         setShareUrl(url);
+    //     }
 
-        generateUrl();
-    })
+    //     generateUrl();
+    // })
 
     async function externalShare() {
         try {
             await Share.open({
-                message: shareUrl,
+                message: shareLink,
             });
         } catch (error) {
             console.log(error.message);
         }
     };
 
+
     return (
         <View style={styles.Root}>
                 <View style={styles.topContaienr}>
-                    <View style={styles.rowView}>
-                        <Text style={iOSUIKitTall.body}>ได้รับแล้ว      </Text>
-                        <Text style={iOSUIKitTall.title3Emphasized}>{me?.userHaveCoin}</Text>
-                        <Text style={iOSUIKitTall.body}>        เหรียญ</Text>
-                    </View>
+                    <Text>{shareLink}</Text>
+                    <QRCode value={shareLink} />
                     <Text style={iOSUIKitTall.title3Emphasized}>
                         ชวนเพื่อนของคุณเพื่อรับสิทธิ์ชิงโชค
                     </Text>
@@ -129,7 +129,7 @@ function ShareAppScreen(props) {
                         แชร์เพื่อลุ้นโชค
                     </Button>
                 </View>
-            <View style={styles.bottomContainer}>
+            {/* <View style={styles.bottomContainer}>
                 <Text style={[iOSUIKitTall.title3Emphasized, styles.topicText]}>
                     วิธีลุ้นโชค
                 </Text>
@@ -143,7 +143,7 @@ function ShareAppScreen(props) {
                     style={styles.orderList}
                     titleStyle={iOSUIKitTall.title3}
                     innerCircle='element'
-                />
+                /> */}
         </View>
     )
 }
