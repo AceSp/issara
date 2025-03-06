@@ -48,7 +48,7 @@ function CommentItem(props) {
         <AvatarWrapper 
           uri={props.commentInfo.author.avatar}
           label={props.commentInfo.author.itemName[0]}
-          size={36}
+          size={40}
         />
         <View style={styles.commentBox}>
           <View style={styles.commentBoxMeta}>

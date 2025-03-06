@@ -1,100 +1,57 @@
 {
   "project_info": {
-    "project_number": "373674619437",
-    "firebase_url": "https://padjai-b1bbc.firebaseio.com",
-    "project_id": "padjai-b1bbc",
-    "storage_bucket": "padjai-b1bbc.appspot.com"
+    "project_number": "854327218670",
+    "project_id": "issara-545ef",
+    "storage_bucket": "issara-545ef.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:373674619437:android:442969adaea897fd19fea4",
+        "mobilesdk_app_id": "1:854327218670:android:59aef59488ab3da81dbeff",
         "android_client_info": {
           "package_name": "com.issara"
         }
       },
       "oauth_client": [
         {
-          "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA_eoUG7AduA_0gwIZw9grnqX63UIKbeHA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:373674619437:android:f87c9a51845dbfc119fea4",
-        "android_client_info": {
-          "package_name": "com.mixxer"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "373674619437-b5rv61knih50ned01qh24rcnaqqnpc33.apps.googleusercontent.com",
+          "client_id": "854327218670-h2va8t0lmnf0j8ijsr8h8t6t8fqkh0tr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.mixxer",
+            "package_name": "com.issara",
+            "certificate_hash": "039f1956bf1922caf709323216fd0969b8f5e87f"
+          }
+        },
+        {
+          "client_id": "854327218670-m0b71g6d5mg3tfngf9mcnffk0hbr77nk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.issara",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {
-          "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+          "client_id": "854327218670-tohielvqdvqsp3g86d8lla145l2hoic4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.issara",
+            "certificate_hash": "0dc5e07f19e8d271b5eb3f09a4d1f0371d87ee6f"
+          }
+        },
+        {
+          "client_id": "854327218670-277opfvnbtfv0602rk88kv1pjtdmtdev.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA_eoUG7AduA_0gwIZw9grnqX63UIKbeHA"
+          "current_key": "AIzaSyDuM9jywuazwn0ootF2caMqtxkOxdVTJ9s"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:373674619437:android:d97b8771345b9a4c19fea4",
-        "android_client_info": {
-          "package_name": "com.padjai"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA_eoUG7AduA_0gwIZw9grnqX63UIKbeHA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com",
+              "client_id": "854327218670-277opfvnbtfv0602rk88kv1pjtdmtdev.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

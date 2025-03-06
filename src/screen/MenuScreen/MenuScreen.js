@@ -9,7 +9,8 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
 import {
   Icon,
@@ -50,6 +51,23 @@ const MenuScreen = (props) => {
     setText('');
   }
 
+  const confirmSignOut = () => {
+    Alert.alert(
+      'ยืนยันการออกจากระบบ',
+      'คุณแน่ใจต้องการออกจากระบบหรือไม่?',
+      [
+        {
+          text: 'ยกเลิก',
+          style: 'cancel'
+        },
+        { 
+          text: 'ออกจากระบบ', 
+          onPress: () => signOut() 
+        }
+      ]
+    );
+  };
+
   async function externalShare() {
       try {
         const shareUrl = `https://playStorelink/referrer?=${accessToken}`
@@ -86,6 +104,11 @@ const MenuScreen = (props) => {
           </View>
         </TouchableOpacity>
         <MenuListItem
+          name={me.streak > 25 ? "ยินดีด้วย คุณผ่านเงื่อนไขการชิงโชคแล้ว" : `ถูกใจต่อเนื่อง ${me.streak} วัน`}
+          iconType="material-community"
+          iconName="heart"
+        />
+        <MenuListItem
           onPress={() => props.navigation.navigate('FollowingList')}
           name="การติดตาม"
           iconName="cast-connected"
@@ -117,13 +140,14 @@ const MenuScreen = (props) => {
           iconType="material-community"
         />
         <MenuListItem
-          onPress={externalShare}
+          // onPress={externalShare}
+          onPress={() => props.navigation.navigate('ShareApp')}
           name="แชร์แอพ"
           iconName="share-variant"
           iconType="material-community"
         />
         <MenuListItem
-          onPress={signOut}
+          onPress={confirmSignOut}
           name="ออกจากระบบ"
           iconName="logout"
           iconType="material-community"

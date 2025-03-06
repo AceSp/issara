@@ -97,12 +97,12 @@ function FeedCard({
     setDuration(event.playableDuration);
     if(viewedAd) return;
     if(event.currentTime < 2) return;
-    console.log("--------FeedCard--------")
-    console.log(postInfo.id)
-    console.log(postInfo.promoteId)
-    console.log(sponsor)
-    console.log(sponsor.pk)
-    console.log(sponsor.id)
+    // console.log("--------FeedCard--------")
+    // console.log(postInfo.id)
+    // console.log(postInfo.promoteId)
+    // console.log(sponsor)
+    // console.log(sponsor.pk)
+    // console.log(sponsor.id)
     if(sponsor)
       viewAd({
         variables: {
@@ -166,16 +166,6 @@ function FeedCard({
             videoRef={videoRef}
           />
       </View>
-      <Slider
-        style={styles.progressBar}
-        value={progress}
-        maximumValue={duration}
-        minimumTrackTintColor={iOSColors.orange}
-        maximumTrackTintColor="white"
-        thumbTintColor={iOSColors.orange}
-        onValueChange={seek}
-        vertical={true}
-      />
       <FeedCardRight
         postInfo={postInfo}
         relation={relation}
@@ -206,9 +196,18 @@ function FeedCard({
           </Text>
         </TouchableOpacity>
       </LinearGradient>
-
+      <Slider
+        style={styles.progressBar}
+        value={progress}
+        maximumValue={duration}
+        minimumTrackTintColor={iOSColors.orange}
+        maximumTrackTintColor="white"
+        thumbTintColor={iOSColors.orange}
+        onValueChange={seek}
+        vertical={true}
+      />
       {
-        sponsor 
+        sponsor && !sponsor.isPromote
         ?
         <Sponsor 
           {...sponsor}
@@ -278,10 +277,10 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     position: 'absolute',
-    left: 10,
-    height: 200,
-    width: 40, // Added width constraint
-    top: (height - BOTTOM_TAB_HEIGHT - 200) / 2,
+    left: -120,
+    top: 240,
+    width: 300,
+    transform:[{rotate: "90deg"}]
   },
 });
 

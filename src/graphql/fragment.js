@@ -112,6 +112,7 @@ const fragments = {
         userHavePost
         followerCount
         info
+        streak
         pinLocation {
           lat
           lon
@@ -121,6 +122,7 @@ const fragments = {
           amount
         }
         followingUser 
+        followingShop 
       }
     `,
   product: gql`

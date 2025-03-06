@@ -3,6 +3,8 @@ import StaticSafeAreaInsets from 'react-native-static-safe-area-insets'
 
 export const BOTTOM_TAB_HEIGHT = 50;
 
+export const SPONSOR_HEIGHT = 120;
+
 export const CONTENT_SPACING = 15
 
 const SAFE_BOTTOM =

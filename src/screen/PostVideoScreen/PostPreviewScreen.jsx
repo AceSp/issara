@@ -145,7 +145,6 @@ function PostPreviewScreen({
         source={{ uri: source }} 
         paused={paused}
         onPress={toggleVideo}
-        style={styles.video} 
       />
       <TouchableOpacity 
         style={styles.modalButton} 

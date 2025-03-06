@@ -63,7 +63,6 @@ const StateProvider = ( { children } ) => {
           return {
             ...prevState,
             me: action.me,
-            branchUniversalObject: action.branchUniversalObject
         };
         default:
           throw new Error("action not recognized");

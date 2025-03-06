@@ -19,12 +19,12 @@ import {
   Icon
 } from 'react-native-elements';
 import { useMutation } from '@apollo/client';
-// import {
-//   AccessToken,
-//   GraphRequest,
-//   GraphRequestManager,
-//   LoginManager,
-// } from 'react-native-fbsdk-next';
+import {
+  AccessToken,
+  GraphRequest,
+  GraphRequestManager,
+  LoginManager,
+} from 'react-native-fbsdk-next';
 import {
   GoogleSignin,
   statusCodes
@@ -74,7 +74,7 @@ const Register = (props) => {
   const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
 
   const [signup, { data }] = useMutation(SIGN_UP_MUTATION);
-  const [apiLogin, { data: api_login_data }] = useMutation(API_LOGIN_MUTATION);
+  // const [apiLogin, { data: api_login_data }] = useMutation(API_LOGIN_MUTATION);
 
   const { signIn } = React.useContext(AuthContext);
 
@@ -109,11 +109,7 @@ const Register = (props) => {
   }
 
   useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: '373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com',
-      offlineAccess: false,
-      androidClientId: '373674619437-b5rv61knih50ned01qh24rcnaqqnpc33.apps.googleusercontent.com'
-    });
+    GoogleSignin.configure();
   }, [])
 
   useEffect(() => {
@@ -272,14 +268,14 @@ const Register = (props) => {
   //       if (error) {
   //         console.log('login info has error: ' + error);
   //       } else {
-  //         apiLogin({
-  //           variables: {
-  //             ...result
-  //           }
-  //         })
-  //           .then(({ data }) => {
-  //             return signIn(data.apiLogin.accessToken);
-  //           });
+  //         // apiLogin({
+  //         //   variables: {
+  //         //     ...result
+  //         //   }
+  //         // })
+  //         //   .then(({ data }) => {
+  //         //     return signIn(data.apiLogin.accessToken);
+  //         //   });
   //         console.log('result:', result);
   //       }
   //     },
@@ -325,21 +321,47 @@ const Register = (props) => {
       //               name: string // full name
       //   }
       // }
-      const userInfo = await GoogleSignin.signIn();
-
-      console.log(userInfo)
-      await apiLogin({
-        variables: {
-          ...userInfo.user,
-          first_name: userInfo.user.givenName,
-          last_name: userInfo.user.familyName,
-          avatar: userInfo.user.photo,
+      let referrerToken = null;
+      PlayInstallReferrer.getInstallReferrerInfo((installReferrerInfo, error) => {
+        if (!error) {
+          const referrerMatch = installReferrerInfo.installReferrer.match(/referrer\?=(.*)/);
+          const referrerToken = referrerMatch ? referrerMatch[1] : null;
+          console.log(installReferrerInfo)
+          console.log("Referrer token = " + referrerToken);
+        } else {
+          console.log("Failed to get install referrer info!");
+          console.log("Response code: " + error.responseCode);
+          console.log("Message: " + error.message);
         }
-      })
-        .then(({ data }) => {
-          console.log('login')
-          return signIn(data.apiLogin.accessToken);
-        });
+      });
+      const signInResult = await GoogleSignin.signIn();
+      const userInfo = signInResult.data
+      console.log(userInfo)
+      const resObj = await fetch(HTTP_URL+"api_login", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: userInfo.user.id,
+          itemName: userInfo.user.name, 
+          avatar: userInfo.user.photo,
+          email: userInfo.user.email, 
+          pinLocation: {
+            lat: markerCoord.latitude,
+            lon: markerCoord.longitude,
+          },
+          referrerToken
+        })
+      });
+      const res = await resObj.json()
+      // const res = resObj
+      if(!resObj.ok) {
+        alert(res.message);
+      }
+      return signIn(res.accessToken);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -376,7 +398,7 @@ const Register = (props) => {
 
   if(!hasLocationPermission) return (
     <PermissionScreen 
-      permissionText="เราจำเป็นต้องเข้าถึงกล้องของคุณเพื่อโพสต์วิดีโอ"
+      permissionText="เราจำเป็นต้องเข้าถึงตำแหน่งของคุณ"
       requestPermission={requestLocationPermission}
       navigation={props.navigation}
       unbackable={true}

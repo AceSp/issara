@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,15 @@ import {
 
 import { colors } from '../../utils/constants';
 import AvatarWrapper from '../../component/AvatarWrapper';
+import { store } from '../../utils/store';
+import GET_MY_FOLLOWING from '../../graphql/queries/getMyFollowing';
+import Loading from '../../component/Loading';
+import { useQuery } from '@apollo/client';
 
 
 const ListItem = (props) => {
+  console.log("--------FollowedListScreen ListItem---------")
+  console.log(props)
   return(
     <TouchableHighlight onPress={() => props.navigation.navigate('UserProfile', 
         { 
@@ -27,6 +33,7 @@ const ListItem = (props) => {
           uri={props.avatar}
           label={props.itemName[0]}
           style={styles.avatar}
+          size={40}
         />
         <Text style={styles.groupName} >{props.itemName}</Text>
       </View>
@@ -37,22 +44,27 @@ const ListItem = (props) => {
 
 const FollowedListScreen = (props) => {
   
-  const { following } = props.route.params;
+  const { state: { me } } = useContext(store);
+
+  const { loading, error, data } = useQuery(GET_MY_FOLLOWING);
 
   const _renderItem = ({ item }) => {
-  return <ListItem {...item} navigation={props.navigation} />
+    return <ListItem {...item} navigation={props.navigation} />
   }
+  if (loading) return <Loading />;
+  if (error) return <View><Text>`Error! ${error.message}`</Text></View>;
+  console.log("--------FollowedListScreen--------")
+  console.log(data)
+
   return (
     <View style={styles.Root}>
-        <FlatList
-          contentContainerStyle={{ alignSelf: 'stretch' }}
-          data={following}
-          keyExtractor={item => item._id}
-          renderItem={_renderItem}
-        />
+      <FlatList
+        contentContainerStyle={{ alignSelf: 'stretch' }}
+        data={data.getMyFollowing}
+        keyExtractor={item => item._id}
+        renderItem={_renderItem}
+      />
     </View>
-    
-        
   )
 }
 

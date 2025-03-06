@@ -16,7 +16,8 @@ const uploadFileInChunks = async ({
     if(videoId) {
       uploadUrl = uploadUrl + 'upload';
       formData.append("file", {
-        uri: 'file://' + filePath,  
+        // uri: 'file://' + filePath,  
+        uri: filePath,  
         name: 'file.mp4',          
         type: 'video/mp4',           
       });
@@ -25,7 +26,7 @@ const uploadFileInChunks = async ({
     else if(imageId) {
       uploadUrl = uploadUrl + 'upload-image'
       formData.append("file", {
-        uri: 'file://' + filePath,
+        uri: filePath,
         name: 'file.jpg',          
         type: 'image/jpg',           
       });
@@ -62,6 +63,9 @@ const uploadFileInChunks = async ({
       }
     };
 
+    console.log("-------uploadFileINChunks---------")
+    console.log(formData)
+    console.log(uploadUrl)
     await axios.post(uploadUrl, formData, config);
   } catch (error) {
     console.error('Error during chunk upload:', error);

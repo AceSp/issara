@@ -3,8 +3,8 @@ import { gql } from '@apollo/client';
 import fragments from '../fragment';
 
 export default gql`
-mutation Review($id: ID! $text: String!){
-  review(id: $id text: $text){
+mutation ReviewShop($shopId: ID! $text: String!){
+  reviewShop(shopId: $shopId text: $text){
     shop {
       ...shop
     }

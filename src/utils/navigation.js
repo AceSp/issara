@@ -82,13 +82,11 @@ import QRCodeScreen from '../screen/PaymentScreen/QRCodeScreen';
 import ShopVideoScreen from '../screen/shopScreen/ShopVideoScreen';
 import UserIncomeScreen from '../screen/ProfileScreen/UserIncomeScreen';
 import ShareAppScreen from '../screen/MenuScreen/ShareAppScreen';
-import GroupScreen from '../screen/GroupScreen/GroupScreen';
 import JobFeedScreen from '../screen/FeedTab/JobFeedScreen';
 import JobDetailScreen from '../screen/commentScreen/JobDetailScreen';
 import PostJobDetailScreen from '../screen/JobScreen/PostJobDetailScreen';
 import PostJobPictureScreen from '../screen/JobScreen/PostJobPictureScreen';
 import FollowedListScreen from '../screen/GroupScreen/FollowedListScreen';
-import { MediaScreen } from '../screen/PostVideoScreen/MediaScreen';
 import PostPreviewScreen from '../screen/PostVideoScreen/PostPreviewScreen';
 import UserVideoScreen from '../screen/UserVideoScreen';
 import { store } from './store';
@@ -272,6 +270,7 @@ export function MainStack(props) {
       <Stack.Screen
         name="Main"
         component={BottomTab}
+        // component={NewFeedScreen}
         options={{headerShown: false}}
         // component={ShareAppScreen}
 
@@ -323,10 +322,6 @@ export function MainStack(props) {
       <Stack.Screen
         name="QRCode"
         component={QRCodeScreen}
-      />
-      <Stack.Screen
-        name="Subscription"
-        component={GroupScreen}
       />
       <Stack.Screen
         name="Post"
@@ -454,11 +449,6 @@ export function MainStack(props) {
       <Stack.Screen 
         name="PostPreview" 
         component={PostPreviewScreen} 
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen 
-        name="MediaScreen" 
-        component={MediaScreen} 
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Notification" component={NotificationScreen} />

@@ -10,6 +10,8 @@ import {
   View,
   TouchableOpacity,
   Platform,
+  Alert,
+  Linking,
   NativeModules,
   NativeEventEmitter,
 } from 'react-native'
@@ -66,11 +68,14 @@ const SCALE_FULL_ZOOM = 3
 
 function PostVideoScreen({ navigation }) {
 
-  const camera = useRef(null)
-  const [isCameraInitialized, setIsCameraInitialized] = useState(false)
-  const { hasPermission, requestPermission } = useCameraPermission()
-  const microphone = useMicrophonePermission()
-  const location = useLocationPermission()
+  const camera = useRef(null);
+  const [isCameraInitialized, setIsCameraInitialized] = useState(false);
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const microphone = useMicrophonePermission();
+  const location = useLocationPermission();
+  const [galleryPermission, setGalleryPermission] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState(false);
+  const [microphonePermission, setMicrophonePermission] = useState(false);
   const zoom = useSharedValue(1)
 
   // check if camera page is active
@@ -125,10 +130,14 @@ function PostVideoScreen({ navigation }) {
   const onMediaCaptured = useCallback(
     (media, type) => {
       console.log(`Media captured! ${JSON.stringify(media)}`)
-      navigation.navigate('MediaScreen', {
-        path: media.path,
-        type: type,
-      })
+      const mediaArr = media.path.split('/')
+      const fileName = mediaArr[mediaArr.length-1]
+      const uri = 'file://' + media.path;
+      navigation.navigate('PostPreview', { uri, fileName })
+      // navigation.navigate('MediaScreen', {
+      //   path: media.path,
+      //   type: type,
+      // })
     },
     [navigation],
   )
@@ -161,6 +170,11 @@ function PostVideoScreen({ navigation }) {
   //#endregion
 
   useEffect(() => {
+    checkPermissions();
+    location.requestPermission();
+  }, []);
+
+  useEffect(() => {
     const f =
       format != null
         ? `(${format.photoWidth}x${format.photoHeight} photo / ${format.videoWidth}x${format.videoHeight}@${format.maxFps} video @ ${fps}fps)`
@@ -168,54 +182,37 @@ function PostVideoScreen({ navigation }) {
     console.log(`Camera: ${device?.name} | Format: ${f}`)
   }, [device?.name, format, fps])
 
-  useEffect(() => {
-    location.requestPermission()
-  }, [location])
+  async function checkPermission() {
+    let permission;
 
-  async function checkImagePermission() {
     if (Platform.OS === 'android') {
-      const result = await check(PERMISSIONS.ANDROID.CAMERA)
-      switch (result) {
-        case RESULTS.UNAVAILABLE:
-          console.log("unavailable")
-          return false;
-        case RESULTS.DENIED:
-          console.log("denied")
-          return false;
-        case RESULTS.GRANTED:
-          console.log("granted")
-          return true;
-        case RESULTS.BLOCKED:
-          console.log("blocked")
-          return false;
-      }
+      permission =
+        Platform.Version >= 33
+          ? PERMISSIONS.ANDROID.READ_MEDIA_VIDEO // Android 13+ uses specific media permissions
+          : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE; // Android 12 and below
+
     } else {
-      const result = await check(PERMISSIONS.IOS.CAMERA)
-      switch (result) {
-        case RESULTS.UNAVAILABLE:
-          console.log("unavailable")
-          return false;
-        case RESULTS.DENIED:
-          console.log("denied")
-          return false;
-        case RESULTS.GRANTED:
-          console.log("granted")
-          return true;
-        case RESULTS.BLOCKED:
-          console.log("blocked")
-          return false;
-      }
+      permission = PERMISSIONS.IOS.PHOTO_LIBRARY; // iOS uses PHOTO_LIBRARY
     }
-  };
+
+    const result = await check(permission);
+    console.log("Permission Status:", result);
+
+    switch (result) {
+      case RESULTS.GRANTED:
+        setGalleryPermission(true);
+        break;
+      case RESULTS.DENIED:
+        requestGalleryPermission();
+        break;
+      case RESULTS.BLOCKED:
+      case RESULTS.UNAVAILABLE:
+        setGalleryPermission(false);
+        break;
+    }
+  }
 
   const openVideoGallery = async () => {
-    const filePermission = await checkImagePermission()
-    if(!filePermission) {
-      if (Platform.OS === 'android') 
-        await request(PERMISSIONS.ANDROID.CAMERA)
-      else
-        await request(PERMISSIONS.IOS.CAMERA)
-    };
     const options = {
       mediaType: 'video',
       includeBase64: false,
@@ -257,23 +254,182 @@ function PostVideoScreen({ navigation }) {
   //   })
   // }, [])
 
-  if(!hasPermission || !microphone.hasPermission) {
+  async function checkPermissions() {
+    await checkCameraPermission();
+    await checkMicrophonePermission();
+    await checkGalleryPermission();
+  }
+
+  async function checkCameraPermission() {
+    const permission =
+      Platform.OS === 'android'
+        ? PERMISSIONS.ANDROID.CAMERA
+        : PERMISSIONS.IOS.CAMERA;
+
+    const result = await check(permission);
+    console.log("Camera Permission Status:", result);
+
+    switch (result) {
+      case RESULTS.GRANTED:
+        setCameraPermission(true);
+        break;
+      case RESULTS.DENIED:
+        requestCameraPermission();
+        break;
+      case RESULTS.BLOCKED:
+      case RESULTS.UNAVAILABLE:
+        setCameraPermission(false);
+        showBlockedPermissionAlert("กล้อง", requestCameraPermission);
+        break;
+    }
+  }
+
+  async function requestCameraPermission() {
+    const permission =
+      Platform.OS === 'android'
+        ? PERMISSIONS.ANDROID.CAMERA
+        : PERMISSIONS.IOS.CAMERA;
+
+    const response = await request(permission);
+    console.log("Camera Permission Response:", response);
+
+    if (response === RESULTS.GRANTED) {
+      setCameraPermission(true);
+    } else if (response === RESULTS.BLOCKED) {
+      showBlockedPermissionAlert("กล้อง", requestCameraPermission);
+    } else {
+      setCameraPermission(false);
+    }
+  }
+
+  async function checkMicrophonePermission() {
+    const permission =
+      Platform.OS === 'android'
+        ? PERMISSIONS.ANDROID.RECORD_AUDIO
+        : PERMISSIONS.IOS.MICROPHONE;
+
+    const result = await check(permission);
+    console.log("Microphone Permission Status:", result);
+
+    switch (result) {
+      case RESULTS.GRANTED:
+        setMicrophonePermission(true);
+        break;
+      case RESULTS.DENIED:
+        requestMicrophonePermission();
+        break;
+      case RESULTS.BLOCKED:
+      case RESULTS.UNAVAILABLE:
+        setMicrophonePermission(false);
+        showBlockedPermissionAlert("ไมโครโฟน", requestMicrophonePermission);
+        break;
+    }
+  }
+
+  async function requestMicrophonePermission() {
+    const permission =
+      Platform.OS === 'android'
+        ? PERMISSIONS.ANDROID.RECORD_AUDIO
+        : PERMISSIONS.IOS.MICROPHONE;
+
+    const response = await request(permission);
+    console.log("Microphone Permission Response:", response);
+
+    if (response === RESULTS.GRANTED) {
+      setMicrophonePermission(true);
+    } else if (response === RESULTS.BLOCKED) {
+      showBlockedPermissionAlert("ไมโครโฟน", requestMicrophonePermission);
+    } else {
+      setMicrophonePermission(false);
+    }
+  }
+
+  async function checkGalleryPermission() {
+    let permission =
+      Platform.Version >= 33
+        ? PERMISSIONS.ANDROID.READ_MEDIA_VIDEO
+        : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
+
+    if (Platform.OS === 'ios') {
+      permission = PERMISSIONS.IOS.PHOTO_LIBRARY;
+    }
+
+    const result = await check(permission);
+    console.log("Gallery Permission Status:", result);
+
+    switch (result) {
+      case RESULTS.GRANTED:
+        setGalleryPermission(true);
+        break;
+      case RESULTS.DENIED:
+        requestGalleryPermission();
+        break;
+      case RESULTS.BLOCKED:
+      case RESULTS.UNAVAILABLE:
+        setGalleryPermission(false);
+        showBlockedPermissionAlert("คลังวิดีโอ", requestGalleryPermission);
+        break;
+    }
+  }
+
+  async function requestGalleryPermission() {
+    let permission =
+      Platform.Version >= 33
+        ? PERMISSIONS.ANDROID.READ_MEDIA_VIDEO
+        : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
+
+    console.log("Requesting Permission:", permission);
+    const response = await request(permission);
+    console.log("Gallery Permission Response:", response);
+
+    if (response === RESULTS.GRANTED) {
+      setGalleryPermission(true);
+    } else if (response === RESULTS.BLOCKED) {
+      showBlockedPermissionAlert("คลังวิดีโอ", requestGalleryPermission);
+    } else {
+      setGalleryPermission(false);
+    }
+  }
+
+  function showBlockedPermissionAlert(permissionName, retryFunction) {
+    Alert.alert(
+      `ต้องการสิทธิ์เข้าถึง ${permissionName}`,
+      `คุณได้บล็อกการเข้าถึง ${permissionName} กรุณาเปิดสิทธิ์ในการตั้งค่า`,
+      [
+        { text: "ยกเลิก", style: "cancel" },
+        { text: "แก้ไขการอนุญาต", onPress: () => Linking.openSettings() },
+      ]
+    );
+  }
+
+  if (!cameraPermission || !microphonePermission || !galleryPermission) {
     let permissionArr = [];
-    if(!hasPermission) permissionArr.push({
-      permissionText: "เราจำเป็นต้องเข้าถึงกล้องของคุณเพื่อโพสต์วิดีโอ",
-      requestPermission: requestPermission
-    })
-    if(!microphone.hasPermission) permissionArr.push({
-      permissionText: "เราจำเป็นต้องเข้าถึงไมค์ของคุณเพื่อโพสต์วิดีโอ",
-      requestPermission: microphone.requestPermission
-    })
+    if (!cameraPermission) {
+      permissionArr.push({
+        permissionText: "เราจำเป็นต้องเข้าถึงกล้องของคุณเพื่อโพสต์วิดีโอ",
+        requestPermission: requestCameraPermission,
+      });
+    }
+    if (!microphonePermission) {
+      permissionArr.push({
+        permissionText: "เราจำเป็นต้องเข้าถึงไมโครโฟนของคุณเพื่อบันทึกวิดีโอ",
+        requestPermission: requestMicrophonePermission,
+      });
+    }
+    if (!galleryPermission) {
+      permissionArr.push({
+        permissionText: "เราจำเป็นต้องเข้าถึงคลังวิดีโอของคุณเพื่อโพสต์วิดีโอ",
+        requestPermission: requestGalleryPermission,
+      });
+    }
+
     return (
-      <PermissionScreen 
+      <PermissionScreen
         backable={true}
         permissionArr={permissionArr}
         navigation={navigation}
       />
-    )
+    );
   }
 
   // if(!microphone.hasPermission) return (
@@ -364,7 +520,7 @@ function PostVideoScreen({ navigation }) {
         <IonIcon name="camera-reverse" color="white" size={24} />
       </TouchableOpacity>
       <StatusBarBlurBackground />
-      <View style={styles.rightButtonRow}>
+      {/* <View style={styles.rightButtonRow}>
         <TouchableOpacity 
           // onPress={async () => {
           //   const files = await listFiles()
@@ -379,7 +535,7 @@ function PostVideoScreen({ navigation }) {
         >
           <IonIcon name="cloud-upload" color="white" size={24} />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   )
 }

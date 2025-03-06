@@ -242,7 +242,7 @@ const CommentModal = ({ visible, onDismiss, postId, postData }) => {
         </ScrollView>
         <View style={styles.footer}>
           <AvatarWrapper 
-            uri={me.avatar}
+            uri={me?.avatar ? me.avatar : null}
             label={me.itemName[0]}
           />
           <View style={styles.commentBox}>

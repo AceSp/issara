@@ -5,7 +5,8 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   Alert,
-  ScrollView
+  ScrollView,
+  Image
 } from 'react-native';
 import {
   Button,
@@ -26,6 +27,13 @@ import {
   GoogleSignin,
   statusCodes
 } from '@react-native-google-signin/google-signin';
+import { PlayInstallReferrer } from 'react-native-play-install-referrer';
+import { 
+  request,
+  check, 
+  PERMISSIONS,
+  RESULTS 
+} from 'react-native-permissions';
 
 import Loading from '../component/Loading';
 import LOGIN_MUTATION from '../graphql/mutations/login';
@@ -47,6 +55,9 @@ const Login = (props) => {
   const [password, setPassword] = useState('');
   const [errorText, setErrorText] = useState('');
 
+  const [ markerCoord, setMarkerCoord ] = useState({ latitude: 13.75630, longitude: 100.50180 });
+  const [ hasLocationPermission, setHasLocationPermission ] = useState(true);
+
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
 
@@ -56,12 +67,76 @@ const Login = (props) => {
   const [apiLogin, { data: api_login_data }] = useMutation(API_LOGIN_MUTATION);
 
   useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: '373674619437-9ua4qdvlj293vel92q9fijof7adg5hq3.apps.googleusercontent.com',
-      offlineAccess: false,
-      androidClientId: '373674619437-b5rv61knih50ned01qh24rcnaqqnpc33.apps.googleusercontent.com'
-    });
+    GoogleSignin.configure();
   }, [])
+
+  const locateCurrentPosition = () => {
+      Geolocation.getCurrentPosition(
+        (position) => {
+            setMapCoord({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              latitudeDelta: 0.09,
+              longitudeDelta: 0.035
+          });
+
+          setMarkerCoord({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+        },
+        (error) => {
+            // See error code charts below.
+            //console.log(error.code, error.message);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      );
+  }
+
+  const requestLocationPermission = async () => {
+    if(Platform.OS === 'android') {
+      const response = await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+      if(response === 'granted') locateCurrentPosition();
+    } else {
+      const response = request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+      if(response === await 'granted') locateCurrentPosition();
+    }
+  }
+
+  useEffect(() => {
+    if(Platform.OS === 'android') {
+      check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION)
+        .then((result) => {
+          switch (result) {
+            case RESULTS.UNAVAILABLE:
+              break;
+            case RESULTS.DENIED:
+              requestLocationPermission();
+              break;
+            case RESULTS.GRANTED:
+              locateCurrentPosition();
+              break;
+            case RESULTS.BLOCKED:
+              setHasLocationPermission(false)
+              break;
+          }
+        })
+    } else {
+      check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
+        .then((result) => {
+          switch (result) {
+            case RESULTS.UNAVAILABLE:
+              break;
+            case RESULTS.DENIED:
+              requestLocationPermission();
+              break;
+            case RESULTS.GRANTED:
+              locateCurrentPosition();
+              break;
+            case RESULTS.BLOCKED:
+              setHasLocationPermission(false)
+              break;
+          }
+        })
+    }
+  },[])
 
   async function handleSubmit() {
     setLoading(true);
@@ -199,56 +274,81 @@ const Login = (props) => {
   //   );
   // };
 
-  // async function loginWithGoogle() {
-  //   try {
-  //     await GoogleSignin.hasPlayServices();
-  //     let userInfo;
-  //     // userInfo is
-  //     // {
-  //     //   idToken: string,
-  //     //     serverAuthCode: string,
-  //     //       scopes: Array < string >, // on iOS this is empty array if no additional scopes are defined
-  //     //         user: {
-  //     //     email: string,
-  //     //       id: string,
-  //     //         givenName: string,
-  //     //           familyName: string,
-  //     //             photo: string, // url
-  //     //               name: string // full name
-  //     //   }
-  //     // }
-  //     if(await GoogleSignin.isSignedIn()) 
-  //       userInfo = await GoogleSignin.getCurrentUser()
-  //     else
-  //       userInfo = await GoogleSignin.signIn();
-  //     await apiLogin({
-  //       variables: {
-  //         ...userInfo.user,
-  //         first_name: userInfo.user.givenName,
-  //         last_name: userInfo.user.familyName,
-  //         avatar: userInfo.user.photo,
-  //       }
-  //     })
-  //       .then(({ data }) => {
-  //         console.log('login')
-  //         return signIn(data.apiLogin.accessToken);
-  //       });
-  //   } catch (error) {
-  //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-  //       // user cancelled the login flow
-  //       alert('Cancel');
-  //     } else if (error.code === statusCodes.IN_PROGRESS) {
-  //       alert('Signin in progress');
-  //       // operation (f.e. sign in) is in progress already
-  //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-  //       alert('PLAY_SERVICES_NOT_AVAILABLE');
-  //       // play services not available or outdated
-  //     } else {
-  //       console.log(error)
-  //       // some other error happened
-  //     }
-  //   }
-  // }
+  async function loginWithGoogle() {
+    try {
+      console.log("--------LoginScreen----------")
+      const hasPlayServices = await GoogleSignin.hasPlayServices();
+      console.log(hasPlayServices)
+      // userInfo is
+      // {
+      //   idToken: string,
+      //     serverAuthCode: string,
+      //       scopes: Array < string >, // on iOS this is empty array if no additional scopes are defined
+      //         user: {
+      //     email: string,
+      //       id: string,
+      //         givenName: string,
+      //           familyName: string,
+      //             photo: string, // url
+      //               name: string // full name
+      //   }
+      // }
+      let referrerToken = null;
+      PlayInstallReferrer.getInstallReferrerInfo((installReferrerInfo, error) => {
+        if (!error) {
+          const referrerMatch = installReferrerInfo.installReferrer.match(/referrer\?=(.*)/);
+          const referrerToken = referrerMatch ? referrerMatch[1] : null;
+          console.log("Referrer token = " + referrerToken);
+        } else {
+          console.log("Failed to get install referrer info!");
+          console.log("Response code: " + error.responseCode);
+          console.log("Message: " + error.message);
+        }
+      });
+      const signInResult = await GoogleSignin.signIn();
+      const userInfo = signInResult.data
+      console.log(userInfo)
+      const resObj = await fetch(HTTP_URL+"api_login", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: userInfo.user.id,
+          itemName: userInfo.user.name, 
+          avatar: userInfo.user.photo,
+          email: userInfo.user.email, 
+          pinLocation: {
+            lat: markerCoord.latitude,
+            lon: markerCoord.longitude,
+          },
+          referrerToken
+        })
+      });
+      const res = await resObj.json()
+      // const res = resObj
+      if(!resObj.ok) {
+        alert(res.message);
+      }
+      return signIn(res.accessToken);
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        alert('Cancel');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        alert('Signin in progress');
+        // operation (f.e. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        alert('PLAY_SERVICES_NOT_AVAILABLE');
+        // play services not available or outdated
+      } else {
+        console.log(error)
+        // some other error happened
+      }
+    }
+  }
 
   function resetError() {
     setErrorText('');
@@ -257,6 +357,14 @@ const Login = (props) => {
   }
 
   // if (loading) return <Loading />
+  if(!hasLocationPermission) return (
+    <PermissionScreen 
+      permissionText="เราจำเป็นต้องเข้าถึงตำแหน่งของคุณ"
+      requestPermission={requestLocationPermission}
+      navigation={props.navigation}
+      unbackable={true}
+    />
+  )
 
   return (
     <View style={styles.root}>
@@ -320,7 +428,7 @@ const Login = (props) => {
       >
         เข้าสู่ระบบ facebook
       </Button> */}
-      {/* <Button
+      <Button
         mode="contained"
         full
         onPress={loginWithGoogle}
@@ -334,7 +442,7 @@ const Login = (props) => {
         )}
       >
         เข้าสู่ระบบ google
-      </Button> */}
+      </Button>
       <View style={[styles.registerContainer, {
         marginTop: (usernameError || passwordError)?
         100 : 120

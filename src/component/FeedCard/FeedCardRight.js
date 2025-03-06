@@ -109,21 +109,24 @@ function FeedCardRight({
                 __typename: 'Post',
                 postInfo: {
                     __typename: 'PostInfo',
-                    id: postInfo.id,
-                    text: postInfo.text,
-                    video: postInfo.video,
+                    ...postInfo,
+                    // id: postInfo.id,
+                    // text: postInfo.text,
+                    // video: postInfo.video,
+                    // promoteId: postInfo.promoteId,
+                    // shopId: postInfo.shopId,
                     likeCount: liked ? postInfo.likeCount - 1 : postInfo.likeCount + 1,
-                    commentCount: postInfo.commentCount,
-                    createdAt: postInfo.createdAt,
-                    pinLocation: postInfo.pinLocation,
-                    thumbnail: postInfo.thumbnail,
-                    author: {
-                        __typename: 'Author',
-                        itemName: postInfo.author.itemName,
-                        avatar: postInfo.author.avatar,
-                        id: postInfo.author.id,
-                        meFollowed: postInfo.author.meFollowed,
-                    },
+                    // commentCount: postInfo.commentCount,
+                    // createdAt: postInfo.createdAt,
+                    // pinLocation: postInfo.pinLocation,
+                    // thumbnail: postInfo.thumbnail,
+                    // author: {
+                    //     __typename: 'Author',
+                    //     itemName: postInfo.author.itemName,
+                    //     avatar: postInfo.author.avatar,
+                    //     id: postInfo.author.id,
+                    //     meFollowed: postInfo.author.meFollowed,
+                    // },
                 },
                 relation: {
                     __typename: 'Relation',
@@ -185,6 +188,7 @@ function FeedCardRight({
                     uri={postInfo.author.avatar}
                     label={postInfo.author.itemName[0]}
                     size={48}
+                    labelStyle={{ fontSize: 40 }}
                     style={styles.avatar}
                 />
                 </TouchableOpacity>

@@ -21,7 +21,7 @@ import {
 import Modal from 'react-native-modal'; 
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import { DEFAULT_AVATAR } from '../../utils/constants';
+import { DEFAULT_AVATAR, SPONSOR_HEIGHT } from '../../utils/constants';
 import ShopScreen from '../../screen/shopScreen/ShopScreen';
 
 moment.locale('th');
@@ -43,7 +43,7 @@ function Sponsor({
     onPress={() => setIsModalVisible(true)}
     style={styles.container}>
     <Image 
-      source={{ uri: shop.avatar ? shop.avatar : DEFAULT_AVATAR }} 
+      source={{ uri: shop?.avatar ? shop.avatar : DEFAULT_AVATAR }} 
       style={styles.avatar} />
     {/* <Image 
       source={{ uri: 'https://avatars.githubusercontent.com/u/97165289' }} 
@@ -96,7 +96,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
     alignItems: 'center',
     paddingHorizontal: 10,
-    height: 120
+    height: SPONSOR_HEIGHT,
+    position: 'absolute',
+    bottom: 0
   },
   header: {
     flexDirection: 'row',

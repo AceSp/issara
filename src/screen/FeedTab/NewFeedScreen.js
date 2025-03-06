@@ -5,7 +5,7 @@ import React, {
   useContext, 
   useCallback 
 } from 'react';
-import { View, Text, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions, RefreshControl } from 'react-native';
 import { useQuery, useMutation } from '@apollo/client';
 import { iOSColors } from 'react-native-typography';
 
@@ -17,6 +17,8 @@ import NewFeedHeader from './Component/NewFeedHeader';
 import Loading from '../../component/Loading';
 import { BOTTOM_TAB_HEIGHT } from '../../utils/constants'
 import { useFocusEffect } from '@react-navigation/native';
+import HorizontalPullToRefresh from '../../component/HorizontalFlatlist';
+import { ActivityIndicator, Surface } from 'react-native-paper';
 
 const { height, width } = Dimensions.get('window');
 
@@ -27,6 +29,7 @@ const NewFeedScreen = (props) => {
   const [uploadError, setUploadError] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(GET_POSTS_QUERY);
   const [createPost, { createpost_data }] = useMutation(CREATE_POST_MUTATION);
@@ -83,8 +86,8 @@ const NewFeedScreen = (props) => {
   }, [currentlyPlaying]);
 
   const getItemLayout = useCallback((data, index) => ({
-    length: height,
-    offset: height * index,
+    length: width,
+    offset: width * index,
     index,
   }), []);
 
@@ -114,39 +117,40 @@ const NewFeedScreen = (props) => {
     />
   ), [currentlyPlaying, isPaused, togglePause, props.navigation]);
 
+
   if (loading) return <Loading />;
   if (error) return <View><Text>`Error! ${error.message}`</Text></View>;
 
-  // const post = data.getPosts.posts[0]
-  // return (
-  //   <FeedCard
-  //     postInfo={post.postInfo}
-  //     relation={post.relation}
-  //     sponsor={post.sponsor}
-  //     index={0}
-  //     paused={0 !== currentlyPlaying || isPaused}
-  //     onPress={togglePause}
-  //     shouldUnload={Math.abs(0 - currentlyPlaying) > 1}
-  //     // shouldUnload={index !== currentlyPlaying}
-  //     navigation={props.navigation}
-  //   />
-  // )
-
   return (
     <View style={styles.Root}>
+      {
+        refreshing || loading
+        ?
+        <Surface style={styles.refreshIndicator}>
+          <ActivityIndicator animating={true} color={iOSColors.orange} />
+        </Surface>
+        : null
+      }
       <FlatList
-        horizontal={false}
+        horizontal={true}
         data={data.getPosts.posts}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         onEndReached={data.getPosts.pageInfo.hasNextPage ? loadMore : null}
         onEndReachedThreshold={1}
         removeClippedSubviews={true}
-        refreshing={networkStatus === 4}
-        onRefresh={refetch}
+        onScroll={async (e) => {
+          const xOffset = e.nativeEvent.contentOffset.x;
+          if(xOffset < 0) {
+            setRefreshing(true);
+            refetch();
+            setTimeout(() => setRefreshing(false), 1000);
+          }
+        }}
+        scrollEventThrottle={100}
         ref={flatlistRef}
         pagingEnabled={true}
-        snapToInterval={height}
+        snapToInterval={width}
         getItemLayout={getItemLayout}
         onViewableItemsChanged={onViewableItemsChanged}
         contentContainerStyle={{ paddingBottom: BOTTOM_TAB_HEIGHT }}
@@ -157,6 +161,18 @@ const NewFeedScreen = (props) => {
         initialNumToRender={1}
         maxToRenderPerBatch={2}
         windowSize={3}
+        // refreshControl={
+        //   <View style={{ transform: [{ rotate: '90deg' }] }}>    
+        //     <RefreshControl
+        //       refreshing={networkStatus === 4}
+        //       onRefresh={refetch}
+        //       progressViewOffset={-width}
+        //       style={{ transform: [{ rotate: '-90deg' }] }}      
+        //       tintColor={iOSColors.white}
+        //       colors={[iOSColors.white]}
+        //     />
+        //   </View>
+        // }
       />
     </View>
   );
@@ -171,6 +187,14 @@ const styles = StyleSheet.create({
     height: height,
     width: width,
   },
+  refreshIndicator: {
+    position: 'absolute',
+    top: 25,
+    zIndex: 1,
+    alignSelf: 'center',
+    borderRadius: 20,
+    padding: 8
+  }
 });
 
 export default NewFeedScreen;

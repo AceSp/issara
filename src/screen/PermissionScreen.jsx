@@ -12,12 +12,11 @@ export default function PermissionScreen({
 }) {
     const renderPermissionRequest = () => {
         let arr = [];
-        console.log("---------PermissionScreen----------")
-        console.log(permissionArr)
+        let index = 0;
         for(const item of permissionArr)
         {
             arr.push(
-                <View>
+                <View key={index}>
                     <Text style={styles.text}>{item.permissionText}</Text>
                     <Button labelStyle={styles.button} onPress={item.requestPermission}>อนุญาติ</Button>
                     {
@@ -29,6 +28,7 @@ export default function PermissionScreen({
                     }
                 </View>
             )
+            index++;
         }
         return arr;
     }

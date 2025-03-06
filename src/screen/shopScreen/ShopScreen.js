@@ -69,7 +69,7 @@ const ShopScreen = (props) => {
 
   const shopId = props.shopId ? props.shopId : props.route.params.shopId;
 
-  const { state: { me } } = useContext(store);
+  const { state: { me }, dispatch } = useContext(store);
 
   const [fiveStarPercentage, setFiveStarPercentage] = useState(0);
   const [fourStarPercentage, setFourStarPercentage] = useState(0);
@@ -84,7 +84,7 @@ const ShopScreen = (props) => {
   const [imageIndex, setImageIndex] = useState(0);
   const [imageList, setImageList] = useState([]);
 
-  const [follow, setFollow] = useState(true);
+  const [follow, setFollow] = useState(false);
   const [isMod, setIsMod] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -150,6 +150,11 @@ const ShopScreen = (props) => {
   ])
 
   useEffect(() => {
+    if(!me.followingShop) return;
+    if(me.followingShop.includes(data?.getShop.id)) setFollow(true);
+  }, [me, data])
+
+  useEffect(() => {
     if (data?.getShop.myReview?.star) {
       if (myRating != data?.getShop.myReview?.star) setMyRating(data?.getShop.myReview?.star);
     };
@@ -198,6 +203,15 @@ const ShopScreen = (props) => {
       }
     });
     setFollow(!follow);
+    const newMe = {...me};
+    const followed = me.followingShop.includes(data.getShop.id)
+    newMe.followingShop = followed 
+      ? newMe.followingShop.filter((current) => current !== data.getShop.id)
+      : [...me.followingShop, data.getShop.id]
+    dispatch({ 
+      type: 'CHANGE_ME', 
+      me: newMe,
+    });
   }
 
   const reviewBlur = () => {
@@ -248,8 +262,6 @@ const ShopScreen = (props) => {
   if (loading) return <Loading />
   if (error) return <View><Text>`Error! ${error.message}`</Text></View>
 
-  console.log("--------SHopScreen-----------")
-  console.log(data.getShop.openTime)
   return (
     <View style={styles.Root}>
       <Modal
